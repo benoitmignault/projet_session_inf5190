@@ -14,13 +14,14 @@ PATTERN_AUTEUR = "^[a-z-'A-Z ]{3,15}$"
 PATTERN_IDENTIFIANT = "^[a-z0-9A-Z]{3,15}$"
 # Ce pattern est pour valider le paragraphe
 PATTERN_PARAGRAPHE = "^[a-z0-9-'A-Z @_!#$%^&*()<>?/\\|}{~:]{10,100}$"
+# Lien qui sera utilisé pour récupérer les informations
+URL = 'http://donnees.ville.montreal.qc.ca/dataset/a5c1f0b9-261f-4247-99d8-f28da5000688/resource/92719d9b-8bf2-4dfd-b8e0-1021ffcaee2f/download/inspection-aliments-contrevenants.xml'
 
 
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
         g._database = Database()
-
     return g._database
 
 
