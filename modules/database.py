@@ -25,7 +25,8 @@ class Database:
                     "etablissement, adresse, ville, description, " \
                     "date_infraction, date_jugement, montant_amende) " \
                     "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)"
-        self.connection.execute(insert_bd, (proprietaire, categorie, etablissement,
-                                       adresse, ville, description,
-                                       date_infraction, date_jugement, montant))
+        self.connection.execute(insert_bd,
+                                (proprietaire, categorie, etablissement,
+                                 adresse, ville, description, date_infraction,
+                                 date_jugement, montant))
         self.connection.commit()
