@@ -1,70 +1,56 @@
-// Variable pour le bouton Effacer dans la page d'accueil pour une recherche infructueuse
-const recher_article = document.querySelector('#recher_article');
-
-// Variable pour le bouton Effacer dans la page des articles à modifier
-const nom_article = document.querySelector('#nom_article');
-const nom_paragraphe = document.querySelector('#nom_paragraphe');
-
-// Variable pour le bouton Effacer dans la page des articles à ajouter
-const ajout_article = document.querySelector('#ajout_article');
-const ajout_identifiant = document.querySelector('#ajout_identifiant');
-const nom_auteur = document.querySelector('#ajout_auteur');
-const ajout_paragraphe = document.querySelector('#ajout_paragraphe');
-const ajout_date = document.querySelector('#ajout_date');
+// Variable pour le bouton Effacer dans la page de recherche
+const recher_nom_resto = document.querySelector('#nom_resto');
+const recher_nom_proprio = document.querySelector('#nom_proprio');
+const recher_nom_rue = document.querySelector('#nom_rue');
 
 // Variable pour effacer les messages
-const aucun = document.querySelector('.aucun');
-const succes = document.querySelector('.succes');
+const message_aucun = document.querySelector('.aucun');
 
 /*
     En fonction où nous sommes, sur le site, la fonction «re_initialiser_tous_champs» sera
     appelée pour chaque type de champs que le formulaire contient.
 */
-function reset_modif(){
-    nom_article.defaultValue = "";
-    nom_paragraphe.defaultValue = "";
-    effacer_messages_erreurs();
-    re_initialiser_tous_champs("input[type=text]");
-    re_initialiser_tous_champs("textarea");
-}
-
-function reset_ajout(){
-    ajout_article.defaultValue = "";
-    ajout_identifiant.defaultValue = "";
-    nom_auteur.defaultValue = "";
-    ajout_paragraphe.defaultValue = "";
-    ajout_date.defaultValue = "";
-    effacer_messages_erreurs();
-    re_initialiser_tous_champs("input[type=text]");
-    re_initialiser_tous_champs("input[type=date]");
-    re_initialiser_tous_champs("textarea");
-}
-
 function reset_recherche(){
-    recher_article.defaultValue = "";
+    recher_nom_resto.defaultValue = "";
+    recher_nom_proprio.defaultValue = "";
+    recher_nom_rue.defaultValue = "";
     effacer_messages_erreurs();
-    re_initialiser_tous_champs("input[type=search]");
 }
 
 function effacer_messages_erreurs(){
     // Nous devons vérifier que les variables ne sont pas égales à «undefined»
-    if (aucun){
-        aucun.innerHTML = "";
-    }
-
-    if (succes){
-        succes.innerHTML = "";
+    if (message_aucun){
+        message_aucun.innerHTML = "";
     }
 }
 
-/*
-    Cette fonction aura pour but de remettre au valeur initial la bordure et couleur de fond
-    sur tous les champs d'un formulaire
-*/
-function re_initialiser_tous_champs(type_champs){
-    var tous_champs = document.querySelectorAll(type_champs);
-    tous_champs.forEach(function(un_champ){
-        un_champ.style.border = "initial";
-        un_champ.style.background = "white";
+function validation_champs_recherches(){
+    var regex_resto = "^[a-z0-9 -'A-Z]{5,65}$";
+    var regex_proprio = "^[a-z0-9 -'A-Z]{5,100}$";
+    var regex_rue = "^[a-z0-9 -'A-Z]{1,35}$"
+
+    $(recher_nom_resto).change(function () {
+        validation_regex(recher_nom_resto, regex_resto);
+    });
+
+    $(recher_nom_proprio).change(function () {
+        validation_regex(recher_nom_proprio, regex_proprio);
+    });
+
+    $(recher_nom_rue).change(function () {
+        validation_regex(recher_nom_rue, regex_rue);
     });
 }
+
+function validation_regex(champ, type_regex){
+    var re = new RegExp(type_regex);
+    if (!(re.test(champ.value))) {
+        alert("Veuillez respecter les charactères permis et la longueur permise !");
+        champ.value = "";
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Cette fonction sera appellée lorsqu'on sort d'un champ à saisir des informations.
+    validation_champs_recherches();
+});

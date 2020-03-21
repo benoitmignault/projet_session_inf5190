@@ -1,0 +1,113 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Page d'ajout pour un nouvel article qui sera entreposé dans la bibliothèque</h1>
+<div class="container">
+    <p class="desktop" id="hautPageDesktop"></p>
+    <h2>Section du formulaire pour ajouter un article</h2>
+    <div class='zone_article_recent'>
+        <form action="/admin-nouveau/article-ajout" method="post">
+            <div class="modif">
+                {% set champ = '' %}
+                {% if liste_validation['champ_titre_vide'] or liste_validation['longueur_titre_inv'] %}
+                {% set champ = 'erreur' %}
+                {% endif %}
+                <div class="information {{champ}}">
+                    <label for="ajout_article">Titre de l'article :</label>
+                    <div>
+                        <input id="ajout_article" maxlength="15" minlength="3" name="nom_article"
+                               pattern="[a-z0-9 -'A-Z]{3,15}" required
+                               title="Charactères alphanumériques, les espaces, l'apostrophe et le tiret sont permis"
+                               type="text"
+                               value="{{liste_champs['titre']}}">
+                        <span class="obligatoire">&nbsp;*</span>
+                    </div>
+                </div>
+                {% set champ = '' %}
+                {% if liste_validation['champ_identifiant_vide'] or liste_validation['longueur_identifiant_inv'] or
+                liste_validation['identifiant_deja_prise'] %}
+                {% set champ = 'erreur' %}
+                {% endif %}
+                <div class="information {{champ}}">
+                    <label for="ajout_identifiant">Identifiant :</label>
+                    <div>
+                        <input id="ajout_identifiant" maxlength="15" minlength="3" name="identifiant"
+                               pattern="[a-z0-9A-Z]{3,15}" required
+                               title="Charactères alphanumériques seulement permis"
+                               type="text" value="{{liste_champs['identifiant']}}">
+                        <span class="obligatoire">&nbsp;*</span>
+                    </div>
+                </div>
+                {% set champ = '' %}
+                {% if liste_validation['champ_date_vide'] or liste_validation['champ_date_inv'] %}
+                {% set champ = 'erreur' %}
+                {% endif %}
+                <div class="information {{champ}}">
+                    <label for="ajout_date">Date de publication :</label>
+                    <div>
+                        <input id="ajout_date" maxlength="10" minlength="10" name="date"
+                               pattern="([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])" placeholder="AAAA-MM-DD"
+                               required="" type="text" value="{{liste_champs['date_publication']}}">
+                        <span class="obligatoire">&nbsp;*</span>
+                    </div>
+                </div>
+                {% set champ = '' %}
+                {% if liste_validation['champ_auteur_vide'] or liste_validation['longueur_auteur_inv'] %}
+                {% set champ = 'erreur' %}
+                {% endif %}
+                <div class="information {{champ}}">
+                    <label for="ajout_auteur">Nom de l'auteur :</label>
+                    <div>
+                        <input id="ajout_auteur" maxlength="15" minlength="3" name="nom_auteur"
+                               pattern="[a-zA-Z -']{3,15}" required
+                               title="Charactères alphabétique, les espaces, l'apostrophe et le tiret sont permis"
+                               type="text" value="{{liste_champs['auteur']}}">
+                        <span class="obligatoire">&nbsp;*</span>
+                    </div>
+                </div>
+                {% set champ = '' %}
+                {% if liste_validation['champ_paragraphe_vide'] or liste_validation['longueur_paragraphe_inv'] %}
+                {% set champ = 'erreur' %}
+                {% endif %}
+                <div class="information {{champ}}">
+                    <label for="ajout_paragraphe">Paragraphe :</label>
+                    <div>
+                        <textarea cols="50" id="ajout_paragraphe" maxlength="100"
+                                  minlength="10" name="nom_paragraphe" required rows="4"
+                                  title="Charactères alphanumériques, les signes de ponctuations sont permis">{{liste_champs['paragraphe']}}</textarea>
+                        <span class="obligatoire">&nbsp;*</span>
+                    </div>
+                </div>
+            </div>
+            <div class="troisBTN">
+                <input class="bouton" type='submit' value="Ajouter...">
+                <input class="bouton" onClick="reset_ajout();" type='reset' value="Effacer...">
+            </div>
+            {% if liste_validation['situation_erreur'] and validation_erreur %}
+            {% for message in liste_champs['messages'] %}
+            <p class="aucun">{{message}}</p>
+            {% endfor %}
+            {% elif liste_validation['ajout_reussi'] %}
+            {% for message in liste_champs['messages'] %}
+            <p class="succes">{{message}}</p>
+            {% endfor %}
+            {% endif %}
+        </form>
+    </div>
+    <h2>Section pour tous</h2>
+    <div class='zone_admin'>
+        <div class="admin">
+            <a class="bouton seul" href="/">Page D'accueil</a>
+        </div>
+    </div>
+    <h2>Section pour l'administrateur du site</h2>
+    <div class='zone_admin'>
+        <div class="admin">
+            <a class="bouton seul" href="/admin">Afficher tous les articles</a>
+        </div>
+    </div>
+    <!-- https://publicdomainvectors.org/fr/gratuitement-des-vecteurs/Orange-fl%C3%A8che-pointant-vers-le-haut-de-dessin-vectoriel/9499.html -->
+    <div class="return">
+        <a class="desktop" href="#hautPageDesktop"><img alt="Retour vers le haut" src="/img/fleche_haut.svg"></a>
+    </div>
+</div>
+{% endblock content %}

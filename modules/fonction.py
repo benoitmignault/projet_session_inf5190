@@ -1,12 +1,24 @@
 import xml.etree.ElementTree as ET
-from re import split
+import re  # pour la gestion des patterns pour les différents champs input
+
+from flask import g
 
 import requests
 
-from .database import *
+from .database import Database  # Importer le fichier database.py
 
 # Lien qui sera utilisé pour récupérer les informations
-URL = 'http://donnees.ville.montreal.qc.ca/dataset/a5c1f0b9-261f-4247-99d8-f28da5000688/resource/92719d9b-8bf2-4dfd-b8e0-1021ffcaee2f/download/inspection-aliments-contrevenants.xml'
+URL = 'http://donnees.ville.montreal.qc.ca/dataset/a5c1f0b9-261f-4247-99d8-' \
+      'f28da5000688/resource/92719d9b-8bf2-4dfd-b8e0-1021ffcaee2f/download/' \
+      'inspection-aliments-contrevenants.xml'
+
+
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        g._database = Database()
+
+    return g._database
 
 
 def initial_champ_importation_xml():
@@ -24,7 +36,10 @@ def remplissage_champs_xml(liste_champs_xml, un_contrevenant):
     liste_champs_xml['categorie'] = un_contrevenant.find('categorie').text
     liste_champs_xml['etablissement'] = un_contrevenant.find(
         'etablissement').text
-    liste_champs_xml['adresse'] = un_contrevenant.find('adresse').text
+    adresse = un_contrevenant.find('adresse').text
+    # Ceci est en raison des données de la ville qui contient un espace après
+    # apostrophe ce qui ne sera pas utile lors de recherche d'un nom de rue
+    liste_champs_xml['adresse'] = adresse.replace("' ", "'")
     liste_champs_xml['ville'] = un_contrevenant.find('ville').text
     liste_champs_xml['description'] = un_contrevenant.find('description').text
     liste_champs_xml['date_infraction'] = convertisseur_date(
@@ -81,49 +96,34 @@ def importation_donnees():
     connection.disconnect()
 
 
+def initial_champ_recherche():
+    liste_champs = {"proprietaire": "", "etablissement": "", "rue": ""}
+
+    return liste_champs
+
+
+def initial_champ_recherche_validation():
+    liste_validation_admin = {"situation_erreur": False,
+                              "champ_proprietaire_vide": False,
+                              "champ_etablissement_vide": False,
+                              "champ_rue_vide": False,
+                              "champs_vides": False,
+                              "longueur_proprietaire_inv": False,
+                              "longueur_etablissement_inv": False,
+                              "longueur_rue_inv": False,
+                              "champ_proprietaire_inv": False,
+                              "champ_etablissement_inv": False,
+                              "champ_rue_inv": False}
+
+    return liste_validation_admin
+
+
 def validation_champs_recherche(liste_champs, liste_validation):
     if liste_champs['recher_article'] == "":
         liste_validation['champ_recher_article_vide'] = True
 
     return liste_validation
 
-
-# Fonction utiliser pour la gestion des articles lors d'ajout ou modification
-def initial_champ_admin():
-    liste_champs_admin = {"titre": "", "titre_avant": "", "paragraphe": "",
-                          "paragraphe_avant": "", "identifiant": "",
-                          "date_publication": "", "auteur": ""}
-
-    return liste_champs_admin
-
-
-# Cette fonction sera utiliser pour les modifications et ajout des articles
-def initial_champ_validation_admin():
-    liste_validation_admin = {"situation_erreur": False,
-                              "champ_titre_pareil": False,
-                              "champs_pareils": False,
-                              "update_reussi": False,
-                              "aucune_modification": False,
-                              "champ_paragraphe_pareil": False,
-                              "champs_vides": False, "champ_titre_vide": False,
-                              "champ_paragraphe_vide": False,
-                              "champ_date_vide": False,
-                              "champ_identifiant_vide": False,
-                              "champ_auteur_vide": False,
-                              "identifiant_deja_prise": False,
-                              "champ_paragraphe_inv": False,
-                              "longueur_date_inv": False,
-                              "longueur_paragraphe_inv": False,
-                              "champ_titre_inv": False,
-                              "champ_auteur_inv": False,
-                              "champ_identifiant_inv": False,
-                              "longueur_titre_inv": False,
-                              "longueur_auteur_inv": False,
-                              "longueur_identifiant_inv": False,
-                              "champ_date_inv": False, "ajout_reussi": False
-                              }
-
-    return liste_validation_admin
 
 
 # J'ai décidé de séparer mes fonction de remplissages
