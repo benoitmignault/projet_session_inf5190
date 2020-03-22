@@ -6,13 +6,16 @@
     <p class="desktop" id="hautPageDesktop"></p>
     <h2>Section pour rechercher une liste de restaurants fautifs</h2>
     <div class='zone_recherche_resto'>
-        <form action="/recherche-restaurant" method="post">
-            <p>
-                <span class="obligatoire">&nbsp;*</span>
-                Veuillez saisir au moins un des trois critères suivants
-                <span class="obligatoire">*</span>
-            </p>
-            
+        {% set champ = '' %}
+        {% if liste_validation['aucun_restaurant_trouve'] %}
+        {% set champ = 'erreur' %}
+        {% endif %}
+        <form class="{{champ}}" action="/recherche_restaurant" method="post">
+            <ul>
+                <li>Veuillez saisir au moins un des trois critères suivants</li>
+                <li>Les accents sont importants</li>
+                <li>Si vous n'etes pas sur d'un critère, la recherche va s'arranger</li>
+            </ul>
             <div class="modif">
                 {% set champ = '' %}
                 {% if liste_validation['champs_vides'] or
@@ -21,12 +24,12 @@
                 {% set champ = 'erreur' %}
                 {% endif %}
                 <div class="information {{champ}}">
-                    <label for="nom_resto">Nom d'établissement :</label>
+                    <label for="etablissement">Nom d'établissement :</label>
                     <div>
-                        <input id="nom_resto" name="nom_resto"
+                        <input id="etablissement" name="etablissement"
                                title="Charactères alphanumériques, les espaces, l'apostrophe et le tiret sont permis"
                                type="text"
-                               value="{{liste_champs['nom_resto']}}">
+                               value="{{liste_champs['etablissement']}}">
                     </div>
                 </div>
                 {% set champ = '' %}
@@ -36,13 +39,11 @@
                 {% set champ = 'erreur' %}
                 {% endif %}
                 <div class="information {{champ}}">
-                    <label for="nom_proprio">Nom du propriétaire :</label>
+                    <label for="proprietaire">Nom du propriétaire :</label>
                     <div>
-                        <input id="nom_proprio" name="nom_proprio"
-                               pattern="[a-z0-9 -'A-Z]{5,100}"
+                        <input id="proprietaire" name="proprietaire"
                                title="Charactères alphanumériques, les espaces, l'apostrophe et le tiret sont permis"
-                               type="text"
-                               value="{{liste_champs['nom_proprio']}}">
+                               type="text" value="{{liste_champs['proprietaire']}}">
                     </div>
                 </div>
                 {% set champ = '' %}
@@ -52,10 +53,12 @@
                 {% set champ = 'erreur' %}
                 {% endif %}
                 <div class="information {{champ}}">
-                    <label for="nom_rue">Nom de la rue : (Sans le type de rue)</label>
+                    <label for="nom_rue">Nom de la rue : (Sans le type de
+                        rue)</label>
                     <div>
-                        <input id="nom_rue" name="nom_rue" type="text"
+                        <input id="nom_rue" name="nom_rue"
                                title="Charactères alphanumériques, les espaces, l'apostrophe et le tiret sont permis"
+                               type="text"
                                value="{{liste_champs['nom_rue']}}">
                     </div>
                 </div>
@@ -65,12 +68,12 @@
                            type='reset'
                            value="Effacer...">
                 </div>
-                {% if liste_validation['situation_erreur'] and validation_erreur
-                %}
-                {% for message in liste_champs['messages'] %}
-                <p class="aucun">{{message}}</p>
-                {% endfor %}
-                {% endif %}
+            </div>
+            {% if liste_validation['situation_erreur'] %}
+            {% for message in liste_champs['messages'] %}
+            <p class="aucun">{{message}}</p>
+            {% endfor %}
+            {% endif %}
         </form>
     </div>
 </div>

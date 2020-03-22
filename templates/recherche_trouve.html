@@ -1,55 +1,37 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Voici le résultat de votre recherche avec le texte &rarr;
-    <span class='info_important'>{{liste_champs['recher_article']}}</span> &larr;</h1>
+<h1>Voici le résultat de votre recherche des restaurants en problèmes</h1>
 <div class="container">
-    {% if liste_champs['nb_article_trouve'] > 5 %}
     <p class="desktop" id="hautPageDesktop"></p>
-    {% endif %}
-    {% if liste_champs['nb_article_trouve'] > 1 %}
-    <h2>Section des <span>{{liste_champs['nb_article_trouve']}}</span> articles trouvés lors de la recherche</h2>
+    {% if nb_restaurant_trouve > 1 %}
+    <h2>Section des <span>{{nb_restaurant_trouve}}</span>
+        restaurants ayant reçu des amendes pour infraction</h2>
     {% else %}
-    <h2>Section de l'article trouvé lors de la recherche</h2>
+    <h2>Section du seul restaurants ayant une amende pour infraction</h2>
     {% endif %}
     {% for cle1, valeur1 in ensemble_trouve.items() %}
-    <div class='zone_article_recent'>
-        <table class="tabeau_article">
+    <div class='zone_recherche_resto'>
+        <table class="tabeau_resto">
             <tbody>
                 {% for cle2, valeur2 in valeur1.items() %}
-                {% if cle2 == 'date_publication' %}
                 <tr>
                     <td class="cle">{{cle2}} :</td>
                     <td class="valeur">{{valeur2}}</td>
                 </tr>
-                {% else %}
-                <tr>
-                    <td class="cle">{{cle2}} :</td>
-                    <td class="valeur"><a class="bouton" href="/article/{{cle1}}">{{valeur2}}</a></td>
-                </tr>
-                {% endif %}
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% endfor %}
-    <h2>Section pour tous</h2>
     <div class='zone_admin'>
         <div class="admin">
             <a class="bouton seul" href="/">Page D'accueil</a>
         </div>
     </div>
-    <h2>Section pour l'administrateur du site</h2>
-    <div class='zone_admin'>
-        <div class="admin">
-            <a class="bouton" href="/admin">Afficher tous les articles</a>
-            <a class="bouton" href="/admin-nouveau">Ajouter un nouvel article</a>
-        </div>
-    </div>
-    {% if liste_champs['nb_article_trouve'] > 5 %}
     <!-- https://publicdomainvectors.org/fr/gratuitement-des-vecteurs/Orange-fl%C3%A8che-pointant-vers-le-haut-de-dessin-vectoriel/9499.html -->
     <div class="return">
-        <a class="desktop" href="#hautPageDesktop"><img src="/img/fleche_haut.svg" alt="Retour vers le haut"></a>
+        <a class="desktop" href="#hautPageDesktop">
+            <img alt="Retour vers le haut" src="/img/fleche_haut.svg"></a>
     </div>
-    {% endif %}
 </div>
 {% endblock content %}

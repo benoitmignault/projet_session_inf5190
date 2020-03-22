@@ -1,6 +1,6 @@
 // Variable pour le bouton Effacer dans la page de recherche
-const recher_nom_resto = document.querySelector('#nom_resto');
-const recher_nom_proprio = document.querySelector('#nom_proprio');
+const recher_nom_resto = document.querySelector('#etablissement');
+const recher_nom_proprio = document.querySelector('#proprietaire');
 const recher_nom_rue = document.querySelector('#nom_rue');
 
 // Variable pour effacer les messages
@@ -15,6 +15,8 @@ function reset_recherche(){
     recher_nom_proprio.defaultValue = "";
     recher_nom_rue.defaultValue = "";
     effacer_messages_erreurs();
+    re_initialiser_tous_champs("input[type=text]");
+    re_initialiser_tous_champs("form");
 }
 
 function effacer_messages_erreurs(){
@@ -25,9 +27,9 @@ function effacer_messages_erreurs(){
 }
 
 function validation_champs_recherches(){
-    var regex_resto = "^[a-z0-9 -'A-Z]{5,65}$";
-    var regex_proprio = "^[a-z0-9 -'A-Z]{5,100}$";
-    var regex_rue = "^[a-z0-9 -'A-Z]{1,35}$"
+    var regex_resto = "^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,98}[a-z0-9A-Z.)]$";
+    var regex_proprio = "^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,63}[a-z0-9A-Z.)]$";
+    var regex_rue = "^[a-z1-9A-Z][a-z0-9- 'A-Z]{1,33}[a-z0-9A-Z]$"
 
     $(recher_nom_resto).change(function () {
         validation_regex(recher_nom_resto, regex_resto);
@@ -48,6 +50,23 @@ function validation_regex(champ, type_regex){
         alert("Veuillez respecter les charactères permis et la longueur permise !");
         champ.value = "";
     }
+}
+
+/*
+    Cette fonction aura pour but de remettre au valeur initial la bordure et couleur de fond
+    sur tous les champs d'un formulaire
+*/
+function re_initialiser_tous_champs(type_champs){
+    var tous_champs = document.querySelectorAll(type_champs);
+    tous_champs.forEach(function(un_champ){
+        if (type_champs == "input[type=text]"){
+            un_champ.style.background = "white";
+            un_champ.style.border = "1px solid #ccc";
+        } else {
+            un_champ.style.border = "2px solid black";
+        }
+
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function () {
