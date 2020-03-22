@@ -1,30 +1,53 @@
+import re  # pour la gestion des patterns pour les différents champs input
 import xml.etree.ElementTree as ET
-from re import split
 
 import requests
+from flask import g
 
-from .database import *
+from .database import Database  # Importer le fichier database.py
 
 # Lien qui sera utilisé pour récupérer les informations
-URL = 'http://donnees.ville.montreal.qc.ca/dataset/a5c1f0b9-261f-4247-99d8-f28da5000688/resource/92719d9b-8bf2-4dfd-b8e0-1021ffcaee2f/download/inspection-aliments-contrevenants.xml'
+URL = 'http://donnees.ville.montreal.qc.ca/dataset/a5c1f0b9-261f-4247-99d8-' \
+      'f28da5000688/resource/92719d9b-8bf2-4dfd-b8e0-1021ffcaee2f/download/' \
+      'inspection-aliments-contrevenants.xml'
+
+PATTERN_PROPRIO = "^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,63}" \
+                  "[a-z0-9A-Z.)]$"
+PATTERN_NOM_RESTO = "^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,98}" \
+                    "[a-z0-9A-Z.)]$"
+PATTERN_NOM_RUE = "^[a-z1-9A-Z][a-z0-9- 'A-Z]{1,33}[a-z0-9A-Z]$"
+
+
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        g._database = Database()
+
+    return g._database
 
 
 def initial_champ_importation_xml():
     liste_champs_xml = {"proprietaire": "", "categorie": "",
-                        "etablissement": "",
-                        "adresse": "", "ville": "", "description": "",
-                        "date_infraction": "", "date_jugement": "",
-                        "montant": 0}
+                        "etablissement": "", "no_civ": "", "nom_rue": "",
+                        "ville": "", "description": "", "date_infraction": "",
+                        "date_jugement": "", "montant": 0}
 
     return liste_champs_xml
 
 
-def remplissage_champs_xml(liste_champs_xml, un_contrevenant):
+def remplissage_champs_importation_xml(liste_champs_xml, un_contrevenant):
     liste_champs_xml['proprietaire'] = un_contrevenant.find('proprietaire').text
     liste_champs_xml['categorie'] = un_contrevenant.find('categorie').text
     liste_champs_xml['etablissement'] = un_contrevenant.find(
         'etablissement').text
-    liste_champs_xml['adresse'] = un_contrevenant.find('adresse').text
+    adresse = un_contrevenant.find('adresse').text
+    # Pour faire optimiser la recherche avec le nom de la rue, je met le
+    # numéro civique dans une variable à part
+    liste_champs_xml['no_civ'] = adresse.split(' ', 1)[0]
+    adresse = adresse.split(' ', 1)[1]
+    # Ceci est en raison des données de la ville qui contient un espace après
+    # apostrophe ce qui ne sera pas utile lors de recherche d'un nom de rue
+    liste_champs_xml['nom_rue'] = adresse.replace("' ", "'")
     liste_champs_xml['ville'] = un_contrevenant.find('ville').text
     liste_champs_xml['description'] = un_contrevenant.find('description').text
     liste_champs_xml['date_infraction'] = convertisseur_date(
@@ -66,12 +89,13 @@ def importation_donnees():
     connection = Database()
     connection.get_connection()
     for un_contrevenant in liste_contrevenants:
-        liste_champs_xml = remplissage_champs_xml(liste_champs_xml,
-                                                  un_contrevenant)
+        liste_champs_xml = remplissage_champs_importation_xml(liste_champs_xml,
+                                                              un_contrevenant)
         connection.insertion_contrevenant(liste_champs_xml['proprietaire'],
                                           liste_champs_xml['categorie'],
                                           liste_champs_xml['etablissement'],
-                                          liste_champs_xml['adresse'],
+                                          liste_champs_xml['no_civ'],
+                                          liste_champs_xml['nom_rue'],
                                           liste_champs_xml['ville'],
                                           liste_champs_xml['description'],
                                           liste_champs_xml['date_infraction'],
@@ -81,342 +105,174 @@ def importation_donnees():
     connection.disconnect()
 
 
-def validation_champs_recherche(liste_champs, liste_validation):
-    if liste_champs['recher_article'] == "":
-        liste_validation['champ_recher_article_vide'] = True
+def initial_champ_recherche():
+    liste_champs = {"proprietaire": "", "etablissement": "", "nom_rue": "",
+                    "nb_restaurant_trouve": 0, "messages": {}, "nb_critere": 0}
 
-    return liste_validation
-
-
-# Fonction utiliser pour la gestion des articles lors d'ajout ou modification
-def initial_champ_admin():
-    liste_champs_admin = {"titre": "", "titre_avant": "", "paragraphe": "",
-                          "paragraphe_avant": "", "identifiant": "",
-                          "date_publication": "", "auteur": ""}
-
-    return liste_champs_admin
+    return liste_champs
 
 
-# Cette fonction sera utiliser pour les modifications et ajout des articles
-def initial_champ_validation_admin():
+def initial_champ_recherche_validation():
     liste_validation_admin = {"situation_erreur": False,
-                              "champ_titre_pareil": False,
-                              "champs_pareils": False,
-                              "update_reussi": False,
-                              "aucune_modification": False,
-                              "champ_paragraphe_pareil": False,
-                              "champs_vides": False, "champ_titre_vide": False,
-                              "champ_paragraphe_vide": False,
-                              "champ_date_vide": False,
-                              "champ_identifiant_vide": False,
-                              "champ_auteur_vide": False,
-                              "identifiant_deja_prise": False,
-                              "champ_paragraphe_inv": False,
-                              "longueur_date_inv": False,
-                              "longueur_paragraphe_inv": False,
-                              "champ_titre_inv": False,
-                              "champ_auteur_inv": False,
-                              "champ_identifiant_inv": False,
-                              "longueur_titre_inv": False,
-                              "longueur_auteur_inv": False,
-                              "longueur_identifiant_inv": False,
-                              "champ_date_inv": False, "ajout_reussi": False
-                              }
+                              "champ_proprietaire_vide": False,
+                              "champ_etablissement_vide": False,
+                              "champ_rue_vide": False,
+                              "champs_vides": False,
+                              "longueur_proprietaire_inv": False,
+                              "longueur_etablissement_inv": False,
+                              "longueur_rue_inv": False,
+                              "champ_proprietaire_inv": False,
+                              "champ_etablissement_inv": False,
+                              "champ_rue_inv": False,
+                              "aucun_restaurant_trouve": False}
 
     return liste_validation_admin
 
 
-# J'ai décidé de séparer mes fonction de remplissages
-# comme ce n'est pas les mêmes champs qui seront utilisés
-# Fonction utiliser lors de modification articles
-# liste_champs représente ceux du fichier index.py liste_champs_admin
-def remplissage_champs_modif_article(request, liste_champs):
-    liste_champs['titre'] = request.form['nom_article']
-    # Je dois utiliser strip pour retirer les retours de lignes non nécessaire
-    liste_champs['paragraphe'] = request.form['nom_paragraphe'].strip()
-    liste_champs['identifiant'] = request.form['identifiant']
-    liste_champs['auteur'] = request.form['nom_auteur']
-    liste_champs['date_publication'] = request.form['date_publication']
-    liste_champs['titre_avant'] = request.form['nom_article_avant']
-    liste_champs['paragraphe_avant'] = request.form['nom_paragraphe_avant']
+def remplissage_champ_recherche(request, liste_champs):
+    liste_champs['proprietaire'] = request['proprietaire']
+    liste_champs['etablissement'] = request['etablissement']
+    liste_champs['nom_rue'] = request['nom_rue']
 
     return liste_champs
 
 
-# Fonction utiliser lors d'ajout les articles
-# liste_champs représente ceux du fichier index.py liste_champs_admin
-def remplissage_champs_ajout_article(request, liste_champs):
-    liste_champs['date_publication'] = request.form['date']
-    liste_champs['titre'] = request.form['nom_article']
-    # Je dois utiliser strip pour retirer les retours de lignes non nécessaire
-    liste_champs['paragraphe'] = request.form['nom_paragraphe'].strip()
-    liste_champs['identifiant'] = request.form['identifiant']
-    liste_champs['auteur'] = request.form['nom_auteur']
+def nombre_critiere_recherche(liste_champs):
+    nombre = 0
 
-    return liste_champs
+    if len(liste_champs['proprietaire']) != 0:
+        nombre += 1
+
+    if len(liste_champs['etablissement']) != 0:
+        nombre += 1
+
+    if len(liste_champs['nom_rue']) != 0:
+        nombre += 1
+
+    return nombre
 
 
-# liste_champs représente ceux du fichier index.py liste_champs_admin
-# liste_validation représente ceux du fichier index.py liste_validation_admin
-# Le but était de simpliment aléger la lourdeur du code
-def validation_champs_article(liste_champs, liste_validation):
-    liste_validation = validation_titre(liste_champs['titre'],
-                                        liste_validation)
-    liste_validation = validation_paragraphe(liste_champs['paragraphe'],
-                                             liste_validation)
-    liste_validation = validation_date(liste_champs['date_publication'],
-                                       liste_validation)
-    liste_validation = validation_identifiant(liste_champs['identifiant'],
-                                              liste_validation)
-    liste_validation = validation_auteur(liste_champs['auteur'],
-                                         liste_validation)
+def validation_champs_recherche(liste_champs, liste_validation):
+    liste_validation = sous_validation_champs_vide(liste_champs,
+                                                   liste_validation)
+    liste_validation = sous_validation_champs_longueur(liste_champs,
+                                                       liste_validation)
+    liste_validation = sous_validation_champs_invalide(liste_champs,
+                                                       liste_validation)
+    return liste_validation
 
-    # Validation si on a au moins un champ vide
-    if (liste_validation['champ_titre_vide'] or
-            liste_validation['champ_paragraphe_vide'] or
-            liste_validation['champ_date_vide'] or
-            liste_validation['champ_identifiant_vide'] or
-            liste_validation['champ_auteur_vide']):
+
+def sous_validation_champs_vide(liste_champs, liste_validation):
+    if liste_champs['proprietaire'] == "":
+        liste_validation['champ_proprietaire_vide'] = True
+
+    if liste_champs['etablissement'] == "":
+        liste_validation['champ_etablissement_vide'] = True
+
+    if liste_champs['nom_rue'] == "":
+        liste_validation['champ_rue_vide'] = True
+
+    if (liste_validation['champ_proprietaire_vide'] and
+            liste_validation['champ_etablissement_vide'] and
+            liste_validation['champ_rue_vide']):
         liste_validation['champs_vides'] = True
 
-    if not liste_validation['champs_vides']:
-        # Seulement si les champs ne sont pas vide,
-        # qu'on va poursuivre les validations de manière logique
-        if liste_champs['paragraphe'] == liste_champs['paragraphe_avant']:
-            liste_validation['champ_paragraphe_pareil'] = True
+    return liste_validation
 
-        if liste_champs['titre'] == liste_champs['titre_avant']:
-            liste_validation['champ_titre_pareil'] = True
 
-        if liste_validation['champ_paragraphe_pareil'] and \
-                liste_validation['champ_titre_pareil']:
-            liste_validation['aucune_modification'] = True
-            # On calcul les validités sur les longueurs des champs
+def sous_validation_champs_longueur(liste_champs, liste_validation):
+    if not liste_validation['champ_proprietaire_vide']:
+        if not (5 <= len(liste_champs['proprietaire']) <= 100):
+            liste_validation['longueur_proprietaire_inv'] = True
+
+    if not liste_validation['champ_etablissement_vide']:
+        if not (5 <= len(liste_champs['etablissement']) <= 65):
+            liste_validation['longueur_etablissement_inv'] = True
+
+    if not liste_validation['champ_rue_vide']:
+        if not (1 <= len(liste_champs['nom_rue']) <= 35):
+            liste_validation['longueur_rue_inv'] = True
 
     return liste_validation
 
 
-def validation_titre(titre, liste_validation):
-    if titre == "":
-        liste_validation['champ_titre_vide'] = True
+def sous_validation_champs_invalide(liste_champs, liste_validation):
+    if not liste_validation['champ_proprietaire_vide']:
+        match_proprio = re.compile(PATTERN_PROPRIO).match
+        if match_proprio(liste_champs['proprietaire']) is None:
+            liste_validation['champ_proprietaire_inv'] = True
 
-    else:
-        if not (3 <= len(titre) <= 15):
-            liste_validation['longueur_titre_inv'] = True
+    if not liste_validation['champ_etablissement_vide']:
+        match_resto = re.compile(PATTERN_NOM_RESTO).match
+        if match_resto(liste_champs['etablissement']) is None:
+            liste_validation['champ_etablissement_inv'] = True
 
-        match_titre = re.compile(PATTERN_TITRE).match
-        if match_titre(titre) is None:
-            liste_validation['champ_titre_inv'] = True
-
-    return liste_validation
-
-
-def validation_paragraphe(paragraphe, liste_validation):
-    if paragraphe == "":
-        liste_validation['champ_paragraphe_vide'] = True
-
-    else:
-        if not (10 <= len(paragraphe) <= 100):
-            liste_validation['longueur_paragraphe_inv'] = True
-
-        match_paragraphe = re.compile(PATTERN_PARAGRAPHE).match
-        if match_paragraphe(paragraphe) is None:
-            liste_validation['champ_paragraphe_inv'] = True
+    if not liste_validation['champ_rue_vide']:
+        match_rue = re.compile(PATTERN_NOM_RUE).match
+        if match_rue(liste_champs['nom_rue']) is None:
+            liste_validation['champ_rue_inv'] = True
 
     return liste_validation
 
 
-def validation_date(date, liste_validation):
-    if date == "":
-        liste_validation['champ_date_vide'] = True
-    else:
-        if not (len(date) == 10):
-            liste_validation['longueur_date_inv'] = True
-
-        match_date = re.compile(PATTERN_DATE).match
-        if match_date(date) is None:
-            liste_validation['champ_date_inv'] = True
-
-    return liste_validation
-
-
-def validation_identifiant(identifiant, liste_validation):
-    if identifiant == "":
-        liste_validation['champ_identifiant_vide'] = True
-
-    else:
-        if not (3 <= len(identifiant) <= 15):
-            liste_validation['longueur_identifiant_inv'] = True
-
-        match_identifiant = re.compile(PATTERN_IDENTIFIANT).match
-        if match_identifiant(identifiant) is None:
-            liste_validation['champ_identifiant_inv'] = True
-
-    return liste_validation
-
-
-def validation_auteur(auteur, liste_validation):
-    if auteur == "":
-        liste_validation['champ_auteur_vide'] = True
-
-    else:
-        if not (3 <= len(auteur) <= 15):
-            liste_validation['longueur_auteur_inv'] = True
-
-        match_auteur = re.compile(PATTERN_AUTEUR).match
-        if match_auteur(auteur) is None:
-            liste_validation['champ_auteur_inv'] = True
-
-    return liste_validation
-
-
-# L'indicateur pour savoir si on continu ou
-# si on arrête se que nous sommes entrains de faire
 def situation_erreur(liste_validation):
     for cle, valeur in liste_validation.items():
-        if valeur:
-            liste_validation['situation_erreur'] = True
+        if (cle != "champ_proprietaire_vide" and
+                cle != "champ_etablissement_vide" and
+                cle != "champ_rue_vide"):
+            if valeur:
+                liste_validation['situation_erreur'] = True
+                # Il n'est pas nécessaire de vérifier si il y a une autre erreur
+                # de validation à true.
+                break
 
     return liste_validation
 
 
-def message_erreur(liste_validation):
-    messages = {}
-    if liste_validation["champ_recher_article_vide"]:
-        messages['champ_vide'] = \
-            "Le champ ne peut rester vide si vous voulez faire une recherche !"
-
-    if liste_validation["aucun_article_trouve"]:
-        messages['zero_article_trouve'] = \
-            "Le texte utilisé pour la recherche n'a " \
-            "donné aucun article trouvé !"
-
-    if liste_validation["aucun_article_recent"]:
-        messages['zero_article_recent'] = \
-            "Aucun article est en date du jour dans l'inventaire !"
-
-    if liste_validation["aucun_article"]:
-        messages['aucun_article'] = \
-            "Aucun article a été enregistré dans l'inventaire !"
-
-    return messages
-
-
-def message_erreur_admin(liste_validation):
+def message_erreur_recherche(liste_validation):
     messages = []
-    if liste_validation['champ_titre_vide']:
-        messages.append("Le nouveau titre de l'article ne peut être vide !")
+    if liste_validation['champs_vides']:
+        messages.append("Vous devez saisir au moins un des trois critères !")
 
-    if liste_validation['champ_paragraphe_vide']:
-        messages.append(
-            "Le nouveau paragraphe de l'article ne peut être vide !")
+    elif liste_validation['aucun_restaurant_trouve']:
+        messages.append("Votre recherche n'a donnée aucun résultats !")
 
-    if liste_validation['aucune_modification']:
-        messages.append(
-            "Vous devez modifier au moins l'un des "
-            "champs suivant : Titre ou Paragraphe !")
-
-    if liste_validation['update_reussi']:
-        messages.append("La mise à jour de l'article a été un succès !")
-
-    return messages
-
-
-def message_erreur_admin_ajout(liste_validation):
-    messages = []
-    if liste_validation['ajout_reussi']:
-        messages.append("L'ajout de l'article a fonctionné !")
     else:
-        messages = message_erreur_titre(messages, liste_validation)
-        messages = message_erreur_auteur(messages, liste_validation)
-        messages = message_erreur_paragraphe(messages, liste_validation)
-        messages = message_erreur_identifiant(messages, liste_validation)
+        messages = sous_message_erreur_proprietaire(messages, liste_validation)
+        messages = sous_message_erreur_etablissement(messages, liste_validation)
+        messages = sous_message_erreur_nom_rue(messages, liste_validation)
 
     return messages
 
 
-def message_erreur_titre(messages, liste_validation):
-    if liste_validation['champ_titre_vide']:
-        messages.append("Attention ! Le titre ne peut être vide !")
+def sous_message_erreur_proprietaire(messages, liste_validation):
+    if liste_validation['champ_proprietaire_inv']:
+        messages.append("Attention ! Le nom du propriétaire doit être valide !")
 
-    if liste_validation['longueur_titre_inv']:
-        messages.append(
-            "Attention ! Le titre de l'article "
-            "doit être entre 3 et 15 caractères !")
-
-    if liste_validation['champ_titre_inv']:
-        messages.append("Attention ! le titre de l'article n'est pas valide !")
+    if liste_validation['longueur_proprietaire_inv']:
+        messages.append("Attention ! Le nom du propriétaire doit être entre "
+                        "5 et 65 caractères !")
 
     return messages
 
 
-def message_erreur_auteur(messages, liste_validation):
-    if liste_validation['champ_auteur_vide']:
-        messages.append(
-            "Attention ! Un article doit être associer à un auteur !")
+def sous_message_erreur_etablissement(messages, liste_validation):
+    if liste_validation['champ_etablissement_inv']:
+        messages.append("Attention ! L'établissement doit être valide !")
 
-    if liste_validation['champ_auteur_inv']:
-        messages.append("Attention ! le nom de l'auteur n'est pas valide !")
-
-    if liste_validation['longueur_auteur_inv']:
-        messages.append(
-            "Attention ! L'auteur de l'article doit "
-            "être entre 3 et 15 caractères !")
+    if liste_validation['longueur_etablissement_inv']:
+        messages.append("Attention ! Le nom du propriétaire doit être entre "
+                        "5 et 100 caractères !")
 
     return messages
 
 
-def message_erreur_paragraphe(messages, liste_validation):
-    if liste_validation['champ_paragraphe_vide']:
-        messages.append("Attention ! Le paragraphe  ne peut être vide !")
+def sous_message_erreur_nom_rue(messages, liste_validation):
+    if liste_validation['champ_rue_inv']:
+        messages.append("Attention ! Le nom de la rue doit être valide !")
 
-    if liste_validation['longueur_paragraphe_inv']:
-        messages.append(
-            "Attention ! La longueur du paragraphe doit être "
-            "entre 10 et 100 caractères !")
-
-    if liste_validation['champ_paragraphe_inv']:
-        messages.append(
-            "Attention ! le contenu du paragraphe de l'article "
-            "n'est pas valide !")
-
-    return messages
-
-
-def message_erreur_identifiant(messages, liste_validation):
-    if liste_validation['identifiant_deja_prise']:
-        messages.append(
-            "Attention ! L'identifiant existe déjà, veuiller "
-            "en choisir un autre !")
-
-    if liste_validation['champ_identifiant_vide']:
-        messages.append("Attention ! Le identifiant ne peut être vide !")
-
-    if liste_validation['longueur_identifiant_inv']:
-        messages.append(
-            "Attention ! L'identifiant doit être entre 3 et 15 caractères !")
-
-    if liste_validation['champ_identifiant_inv']:
-        messages.append(
-            "Attention ! l'identifiant unique pour "
-            "l'article n'est pas valide !")
-
-    return messages
-
-
-def message_erreur_date(messages, liste_validation):
-    if liste_validation['champ_date_vide']:
-        messages.append(
-            "Attention ! La date de publication ne peut être vide !")
-
-    if liste_validation['champ_date_inv']:
-        messages.append(
-            "Attention ! La date saisie n'est pas valide selon "
-            "le format «AAAA-MM-DD» !")
-
-    if liste_validation['longueur_date_inv']:
-        messages.append(
-            "Attention ! L'identifiant doit avoir 10 caractères "
-            "pas plus pas moins !")
+    if liste_validation['longueur_rue_inv']:
+        messages.append("Attention ! Le nom de la rue doit être entre "
+                        "3 et 35 caractères !")
 
     return messages

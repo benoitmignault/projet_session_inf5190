@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Voici le résultat de votre recherche des restaurants en problèmes</h1>
+<div class="container">
+    <p class="desktop" id="hautPageDesktop"></p>
+    {% if nb_restaurant_trouve > 1 %}
+    <h2>Section des <span>{{nb_restaurant_trouve}}</span>
+        restaurants ayant reçu des amendes pour infraction</h2>
+    {% else %}
+    <h2>Section du seul restaurants ayant une amende pour infraction</h2>
+    {% endif %}
+    {% for cle1, valeur1 in ensemble_trouve.items() %}
+    <div class='zone_recherche_resto'>
+        <table class="tabeau_resto">
+            <tbody>
+                {% for cle2, valeur2 in valeur1.items() %}
+                <tr>
+                    <td class="cle">{{cle2}} :</td>
+                    <td class="valeur">{{valeur2}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endfor %}
+    <div class='zone_admin'>
+        <div class="admin">
+            <a class="bouton seul" href="/">Page D'accueil</a>
+        </div>
+    </div>
+    <!-- https://publicdomainvectors.org/fr/gratuitement-des-vecteurs/Orange-fl%C3%A8che-pointant-vers-le-haut-de-dessin-vectoriel/9499.html -->
+    <div class="return">
+        <a class="desktop" href="#hautPageDesktop">
+            <img alt="Retour vers le haut" src="/img/fleche_haut.svg"></a>
+    </div>
+</div>
+{% endblock content %}

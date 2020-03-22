@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="Centre Information sur les restaurants fautfis de Montréal" name="description">
+    
+    <!-- Ici , on va déterminer quelle icône sera afficher dans l'onglet de la page du site web -->
+    {% if not erreur_404 %}
+    <!-- «Réutilisation permise» -->
+    <!-- https://pixabay.com/fr/illustrations/restaurant-inscrivez-vous-r%C3%A9tro-895428/  -->
+    <link href="/img/icone-web.png" rel="shortcut icon">
+    {% else %}
+    <!-- «Réutilisation permise» -->
+    <!-- Fichier 404-notfound.jpg est une propriété du site https://www.flickr.com/photos/guspim/2280690094/ sous licence libre -->
+    <link href="/img/icone404.jpg" rel="shortcut icon">
+    {% endif %}
+    
+    <!-- Mon design de mes différents pages web -->
+    <link href="/css/restaurant.css" rel="stylesheet" type="text/css">
+    <link href="/css/responsive.css" rel="stylesheet" type="text/css">
+    
+    {% if titre %}
+    <title>Restaurant - {{ titre }}</title>
+    {% else %}
+    <title>Restaurant - CMS</title>
+    {% endif %}
+</head>
+<body>
+    {% block content %}{% endblock %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="/js/restaurant.js"></script>
+</body>
+</html>

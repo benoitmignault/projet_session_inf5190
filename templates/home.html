@@ -1,0 +1,80 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Bienvenue sur le site des restaurants ayant reçu une / des amende(s) à
+    Montréal</h1>
+<div class="container">
+    <p class="desktop" id="hautPageDesktop"></p>
+    <h2>Section pour rechercher une liste de restaurants fautifs</h2>
+    <div class='zone_recherche_resto'>
+        {% set champ = '' %}
+        {% if liste_validation['aucun_restaurant_trouve'] %}
+        {% set champ = 'erreur' %}
+        {% endif %}
+        <form class="{{champ}}" action="/recherche_restaurant" method="post">
+            <ul>
+                <li>Veuillez saisir au moins un des trois critères suivants</li>
+                <li>Les accents sont importants</li>
+                <li>Si vous n'etes pas sur d'un critère, la recherche va s'arranger</li>
+            </ul>
+            <div class="modif">
+                {% set champ = '' %}
+                {% if liste_validation['champs_vides'] or
+                liste_validation['longueur_etablissement_inv'] or
+                liste_validation['champ_etablissement_inv'] %}
+                {% set champ = 'erreur' %}
+                {% endif %}
+                <div class="information {{champ}}">
+                    <label for="etablissement">Nom d'établissement :</label>
+                    <div>
+                        <input id="etablissement" name="etablissement"
+                               title="Charactères alphanumériques, les espaces, l'apostrophe et le tiret sont permis"
+                               type="text"
+                               value="{{liste_champs['etablissement']}}">
+                    </div>
+                </div>
+                {% set champ = '' %}
+                {% if liste_validation['champs_vides'] or
+                liste_validation['longueur_proprietaire_inv'] or
+                liste_validation['champ_proprietaire_inv'] %}
+                {% set champ = 'erreur' %}
+                {% endif %}
+                <div class="information {{champ}}">
+                    <label for="proprietaire">Nom du propriétaire :</label>
+                    <div>
+                        <input id="proprietaire" name="proprietaire"
+                               title="Charactères alphanumériques, les espaces, l'apostrophe et le tiret sont permis"
+                               type="text" value="{{liste_champs['proprietaire']}}">
+                    </div>
+                </div>
+                {% set champ = '' %}
+                {% if liste_validation['champs_vides'] or
+                liste_validation['longueur_rue_inv'] or
+                liste_validation['champ_rue_inv'] %}
+                {% set champ = 'erreur' %}
+                {% endif %}
+                <div class="information {{champ}}">
+                    <label for="nom_rue">Nom de la rue : (Sans le type de
+                        rue)</label>
+                    <div>
+                        <input id="nom_rue" name="nom_rue"
+                               title="Charactères alphanumériques, les espaces, l'apostrophe et le tiret sont permis"
+                               type="text"
+                               value="{{liste_champs['nom_rue']}}">
+                    </div>
+                </div>
+                <div class="troisBTN">
+                    <input class="bouton" type='submit' value="Rechercher...">
+                    <input class="bouton" onClick="reset_recherche();"
+                           type='reset'
+                           value="Effacer...">
+                </div>
+            </div>
+            {% if liste_validation['situation_erreur'] %}
+            {% for message in liste_champs['messages'] %}
+            <p class="aucun">{{message}}</p>
+            {% endfor %}
+            {% endif %}
+        </form>
+    </div>
+</div>
+{% endblock content %}
