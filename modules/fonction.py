@@ -1,4 +1,5 @@
 import re  # pour la gestion des patterns pour les différents champs input
+import time
 import xml.etree.ElementTree as ET
 
 import requests
@@ -18,12 +19,58 @@ PATTERN_NOM_RESTO = "^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,98}" \
 PATTERN_NOM_RUE = "^[a-z1-9A-Z][a-z0-9- 'A-Z]{1,33}[a-z0-9A-Z]$"
 
 
+# Fonction pour création la connexion qui sera utilisé dans un contexte hors
+# d'une route utilisée avec Flask
+def initialisation_connexion_hors_flask():
+    connection = Database()
+    connection.get_connection()
+
+    return connection
+
+
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
         g._database = Database()
 
     return g._database
+
+
+def mise_jour_bd():
+    print("Nous avons fait une tentative de MAJ !!!!!!!!!!")
+    liste_champs_xml = initial_champ_importation_xml()
+    liste_contrevenants = recuperation_information_url()
+    connection = initialisation_connexion_hors_flask()
+
+    for un_contrevenant in liste_contrevenants:
+
+        liste_champs_xml = remplissage_champs_importation_xml(liste_champs_xml,
+                                                              un_contrevenant)
+        ensemble_existant = connection.verifier_contrevenant_existe(
+                liste_champs_xml['proprietaire'],
+                liste_champs_xml['categorie'],
+                liste_champs_xml['etablissement'],
+                liste_champs_xml['no_civ'],
+                liste_champs_xml['nom_rue'],
+                liste_champs_xml['ville'],
+                liste_champs_xml['description'],
+                liste_champs_xml['date_infraction'],
+                liste_champs_xml['date_jugement'],
+                liste_champs_xml['montant'])
+        if len(ensemble_existant) == 0:
+            connection.insertion_contrevenant(
+                liste_champs_xml['proprietaire'],
+                liste_champs_xml['categorie'],
+                liste_champs_xml['etablissement'],
+                liste_champs_xml['no_civ'],
+                liste_champs_xml['nom_rue'],
+                liste_champs_xml['ville'],
+                liste_champs_xml['description'],
+                liste_champs_xml['date_infraction'],
+                liste_champs_xml['date_jugement'],
+                liste_champs_xml['montant'])
+
+    connection.disconnect()
 
 
 def initial_champ_importation_xml():
@@ -33,6 +80,15 @@ def initial_champ_importation_xml():
                         "date_jugement": "", "montant": 0}
 
     return liste_champs_xml
+
+
+# Fonction pour récupérer les informations venant de URL
+def recuperation_information_url():
+    resultat = requests.get(URL)
+    resultat.encoding = 'utf-8'
+    liste_contrevenants = ET.fromstring(resultat.content)
+
+    return liste_contrevenants
 
 
 def remplissage_champs_importation_xml(liste_champs_xml, un_contrevenant):
@@ -81,13 +137,9 @@ def convertisseur_date(date_a_convertir):
 
 def importation_donnees():
     liste_champs_xml = initial_champ_importation_xml()
+    liste_contrevenants = recuperation_information_url()
+    connection = initialisation_connexion_hors_flask()
 
-    resultat = requests.get(URL)
-    resultat.encoding = 'utf-8'
-    liste_contrevenants = ET.fromstring(resultat.content)
-
-    connection = Database()
-    connection.get_connection()
     for un_contrevenant in liste_contrevenants:
         liste_champs_xml = remplissage_champs_importation_xml(liste_champs_xml,
                                                               un_contrevenant)
@@ -103,6 +155,8 @@ def importation_donnees():
                                           liste_champs_xml['montant'])
 
     connection.disconnect()
+
+
 
 
 def initial_champ_recherche():

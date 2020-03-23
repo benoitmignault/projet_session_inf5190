@@ -1,3 +1,7 @@
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.combining import OrTrigger
+from apscheduler.triggers.cron import CronTrigger
+
 from flask import Flask, redirect, render_template, request, session, url_for
 
 from modules.fonction import *
@@ -89,11 +93,21 @@ def recherche_restaurant_trouve():
                            nb_restaurant_trouve=nb_restaurant_trouve)
 
 
+# Tache A3
+scheduler = BackgroundScheduler(daemon=True)
+trigger = OrTrigger([CronTrigger(day_of_week='*', hour=0, minute=0)])
+
+scheduler.add_job(mise_jour_bd, trigger)
+scheduler.start()
+
+
 # Section pour importer directement les informations de la ville via URL.
 def main():
+    # Cette fonction était pour la tache A1
     importation_donnees()
 
 
+# Cette fonction était pour la tache A1
 if __name__ == "__main__":
     main()
 

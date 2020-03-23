@@ -43,6 +43,27 @@ class Database:
 
         return ensemble_trouve
 
+    def verifier_contrevenant_existe(self, proprietaire, categorie,
+                                     etablissement, no_civ, nom_rue, ville,
+                                     description, date_infraction,
+                                     date_jugement, montant):
+        cursor = self.get_connection().cursor()
+        # Le retour du select n'a pas importance comme il ne doit pas avoir de
+        # résultat pour l'ajouter dans la BD
+        select = "select id_resto "
+        fromm = "from mauvais_restaurants "
+        where = "where proprietaire = ? and categorie = ?" \
+                " and no_civique = ? and nom_rue = ? and ville = ?" \
+                " and description = ? and date_infraction = ?" \
+                " and date_jugement = ? and montant_amende = ?" \
+                " and etablissement = ?"
+        sql = select + fromm + where
+        cursor.execute(sql, (proprietaire, categorie, no_civ, nom_rue, ville,
+                             description, date_infraction, date_jugement,
+                             montant, etablissement))
+        result = cursor.fetchall()
+        return result
+
 
 def remplissage_condition_sql(liste_champs):
     # La préparation des critères en vue d'utiliser l'opérateur like aura
