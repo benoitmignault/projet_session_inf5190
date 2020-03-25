@@ -1,5 +1,4 @@
 import re  # pour la gestion des patterns pour les différents champs input
-import time
 import xml.etree.ElementTree as ET
 
 import requests
@@ -37,7 +36,6 @@ def get_db():
 
 
 def mise_jour_bd():
-    print("Nous avons fait une tentative de MAJ !!!!!!!!!!")
     liste_champs_xml = initial_champ_importation_xml()
     liste_contrevenants = recuperation_information_url()
     connection = initialisation_connexion_hors_flask()
@@ -47,16 +45,16 @@ def mise_jour_bd():
         liste_champs_xml = remplissage_champs_importation_xml(liste_champs_xml,
                                                               un_contrevenant)
         ensemble_existant = connection.verifier_contrevenant_existe(
-                liste_champs_xml['proprietaire'],
-                liste_champs_xml['categorie'],
-                liste_champs_xml['etablissement'],
-                liste_champs_xml['no_civ'],
-                liste_champs_xml['nom_rue'],
-                liste_champs_xml['ville'],
-                liste_champs_xml['description'],
-                liste_champs_xml['date_infraction'],
-                liste_champs_xml['date_jugement'],
-                liste_champs_xml['montant'])
+            liste_champs_xml['proprietaire'],
+            liste_champs_xml['categorie'],
+            liste_champs_xml['etablissement'],
+            liste_champs_xml['no_civ'],
+            liste_champs_xml['nom_rue'],
+            liste_champs_xml['ville'],
+            liste_champs_xml['description'],
+            liste_champs_xml['date_infraction'],
+            liste_champs_xml['date_jugement'],
+            liste_champs_xml['montant'])
         if len(ensemble_existant) == 0:
             connection.insertion_contrevenant(
                 liste_champs_xml['proprietaire'],
@@ -155,8 +153,6 @@ def importation_donnees():
                                           liste_champs_xml['montant'])
 
     connection.disconnect()
-
-
 
 
 def initial_champ_recherche():

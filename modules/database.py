@@ -63,6 +63,20 @@ class Database:
                              montant, etablissement))
         result = cursor.fetchall()
         return result
+    
+    def liste_contrevenant_periode_temps(self, date_debut, date_fin):
+        cursor = self.get_connection().cursor()
+        select = "select proprietaire, categorie, etablissement, no_civique, " \
+                 "nom_rue, ville, description, date_infraction," \
+                 "date_jugement, montant_amende, id_resto "
+        fromm = "from mauvais_restaurants "
+        where = "where date_infraction BETWEEN ? AND ?"
+        sql = select + fromm + where
+        cursor.execute(sql, (date_debut,date_fin))
+        result = cursor.fetchall()
+        ensemble_trouve = recuperation_resultat_requete(result)
+
+        return ensemble_trouve
 
 
 def remplissage_condition_sql(liste_champs):
