@@ -3,10 +3,12 @@ from apscheduler.triggers.combining import OrTrigger
 from apscheduler.triggers.cron import CronTrigger
 
 from flask import Flask, redirect, render_template, request, session, url_for
+from flask_restful import Api
 
-from modules.fonction import *
+from modules.rest import *
 
 app = Flask(__name__, static_url_path='', static_folder='static')
+api = Api(app)
 
 # Déclaration de la secret key pour me permettre utiliser
 # les variables de sessions
@@ -100,6 +102,9 @@ trigger = OrTrigger([CronTrigger(day_of_week='*', hour=0, minute=0)])
 scheduler.add_job(mise_jour_bd, trigger)
 scheduler.start()
 
+# Creation de la tache A4
+api.add_resource(Contrevenant, '/contrevenants/<du><au>')
+
 
 # Section pour importer directement les informations de la ville via URL.
 def main():
@@ -111,4 +116,3 @@ def main():
 if __name__ == "__main__":
     main()
 
-# Creation de la tache A4
