@@ -5,6 +5,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 import requests
+import yaml
 from flask import g
 
 from .database import Database  # Importer le fichier database.py
@@ -72,7 +73,6 @@ def initial_champ_importation_xml():
     return liste_champs_xml
 
 
-# Fonction pour récupérer les informations venant de URL
 def recuperation_information_url():
     resultat = requests.get(URL)
     resultat.encoding = 'utf-8'
@@ -180,35 +180,57 @@ def mise_jour_donnees():
 
 
 def creation_courriel(liste_envoi):
-    # À refaire à la fin avec le fichier YAML
-    destination_address = "b.mignault@gmail.com"
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = "Voici les nouveaux contrevenants depuis " \
-                     "la derniere mise a jour !"
-    msg["From"] = SOURCE_ADRESSE
-    msg["To"] = "b.mignault@gmail.com"
-    msg['ReplyTo'] = SOURCE_ADRESSE
-    msg_corps = """
-    <html>
-    <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="utf-8">
-    </head>
-    <body>
-    <h2>Bonjour,</h2>
-    <p>
-    Voici la liste des nouveaux contrevenants depuis notre derniere 
-    mise a jour pour la ville de Montreal
-    </p>
-    <table style="border-collapse: collapse; border: 2px solid black; 
-    width: 100%"><thead>
-    <tr>
-    <th>Propriétaire</th><th>Catégorie</th><th>Établissement</th> 
-    <th>No Civique</th><th>Rue</th><th>Ville & Code Postal</th>
-    <th>Description</th><th>Date de l'infraction</th><th>Date du jugement</th>
-    <th>Montant</th>
-    </tr>
-    </thead><tbody>    
+    string_courriel = recuperation_courriel_yaml()
+
+    message = MIMEMultipart("alternative")
+    message["Subject"] = "Voici les nouveaux contrevenants depuis " \
+                         "la derniere mise a jour !"
+    message["From"] = SOURCE_ADRESSE
+    message["To"] = string_courriel
+    msg_corps = creation_html_courriel(liste_envoi)
+    message.attach(MIMEText(msg_corps, "html"))
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.ehlo()
+    server.starttls()
+    server.login(SOURCE_ADRESSE, MOT_DE_PASSE)
+    message = message.as_string().encode('utf-8')
+    server.sendmail(SOURCE_ADRESSE, string_courriel, message)
+    server.quit()
+
+
+def recuperation_courriel_yaml():
+    string_courriel = ""
+    racine_liste = []
+    # Le fichier doit se trouver à la racine du projet
+    with open(r'adresse_destination.yaml') as file:
+        adresse_list = yaml.full_load(file)
+        for item, doc in adresse_list.items():
+            racine_liste.append(doc)
+
+    for une_sous_liste in racine_liste:
+        for liste_courriel in une_sous_liste:
+            string_courriel = liste_courriel
+
+    return string_courriel
+
+
+def creation_html_courriel(liste_envoi):
+    msg_corps = """<html><head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="utf-8">
+        </head><body>
+        <h2>Bonjour,</h2>
+        <p>Voici la liste des nouveaux contrevenants depuis notre derniere 
+        mise a jour pour la ville de Montreal</p>
+        <table style="border-collapse: collapse; border: 2px solid black; 
+        width: 100%"><thead>
+        <tr>
+        <th>Propriétaire</th><th>Catégorie</th><th>Établissement</th> 
+        <th>No Civique</th><th>Rue</th><th>Ville & Code Postal</th>
+        <th>Description</th><th>Date de l'infraction</th>
+        <th>Date du jugement</th><th>Montant</th>
+        </tr>
+        </thead><tbody>    
     """
     for cle, valeur in liste_envoi.items():
         msg_corps += "<tr>"
@@ -226,15 +248,8 @@ def creation_courriel(liste_envoi):
     msg_corps += "</tbody></table>"
     msg_corps += "<p>Bonne journee</p>"
     msg_corps += "</body></html>"
-    msg.attach(MIMEText(msg_corps, "html"))
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.ehlo()
-    server.starttls()
-    server.login(SOURCE_ADRESSE, MOT_DE_PASSE)
-    # Sans l'encodage en utf-8, j'ai des erreurs
-    msg = msg.as_string().encode('utf-8')
-    server.sendmail(SOURCE_ADRESSE, destination_address, msg)
-    server.quit()
+
+    return msg_corps
 
 
 def nombre_critiere_recherche(liste_champs):
