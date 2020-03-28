@@ -95,9 +95,9 @@ def recherche_restaurant_trouve():
 
 # Tache A3
 scheduler = BackgroundScheduler(daemon=True)
-trigger = OrTrigger([CronTrigger(day_of_week='*', hour=0, minute=0)])
+trigger = OrTrigger([CronTrigger(day_of_week='*', hour=11, minute=50)])
 
-scheduler.add_job(mise_jour_bd, trigger)
+scheduler.add_job(mise_jour_donnees, trigger)
 scheduler.start()
 
 
@@ -111,4 +111,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-# Creation de la tache A3
+# Creation de la tache B1
