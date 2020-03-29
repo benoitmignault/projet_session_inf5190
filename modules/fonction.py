@@ -183,7 +183,10 @@ def mise_jour_donnees():
             """
             liste_envoi[indice] = liste_champs_xml
             indice += 1
-            liste_nom_contrevenant.append(liste_champs_xml[0])
+            # Si un contrevenant existe déjà, il est inutile de le doubler...
+            # Ajustement B2
+            if liste_champs_xml[0] not in liste_nom_contrevenant:
+                liste_nom_contrevenant.append(liste_champs_xml[0])
 
     creation_courriel(liste_envoi)
     conn_auth = connexion_twitter()
