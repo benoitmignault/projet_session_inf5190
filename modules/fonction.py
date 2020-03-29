@@ -1,14 +1,23 @@
 import re  # pour la gestion des patterns pour les différents champs input
 import smtplib
 import xml.etree.ElementTree as ET
+from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 import requests
+import tweepy
 import yaml
 from flask import g
 
 from .database import Database  # Importer le fichier database.py
+
+# Ces API seront pour la tache B2
+API_KEY = "nIOLstoH2fvZllC6Vo8QpcpKP"
+API_SECRET = "PoX7IFqCuKKMBjoYD4diGag3XgkWF4JthQ5ZsItt17TWtl3bIW"
+# Ces Access seront pour la tache B2
+ACCESS_TOKEN = "1243952698556383232-Qv98BnYtkFj8mje95QXox6yvLSUUTl"
+ACCESS_TOKEN_SECRET = "8nclhl82lk4P52CLYTIQz94vHwlod3djHRzOcdNMq4iQ8"
 
 # Lien qui sera utilisé pour récupérer les informations
 URL = 'http://donnees.ville.montreal.qc.ca/dataset/a5c1f0b9-261f-4247-99d8-' \
@@ -150,13 +159,13 @@ def importation_donnees():
 
 
 def mise_jour_donnees():
-    print("La MAJ a reussi !")
-    liste_champs_xml = initial_champ_importation_xml()
     liste_contrevenants = recuperation_information_url()
     connection = initialisation_connexion_hors_flask()
-    liste_envoi = {}
+    liste_envoi = {}  # Sera utiliser pour l'envoi de courriel
+    liste_nom_contrevenant = []  # Sera utiliser pour la section Twitter
     indice = 0
     for un_contrevenant in liste_contrevenants:
+        liste_champs_xml = initial_champ_importation_xml()
         liste_champs_xml = remplissage_champs_importation_xml(liste_champs_xml,
                                                               un_contrevenant)
         ensemble_existant = connection.verifier_contrevenant_existe(
@@ -174,9 +183,31 @@ def mise_jour_donnees():
             """
             liste_envoi[indice] = liste_champs_xml
             indice += 1
+            liste_nom_contrevenant.append(liste_champs_xml[0])
 
     creation_courriel(liste_envoi)
+    conn_auth = connexion_twitter()
+    creation_tweet(conn_auth, liste_nom_contrevenant)
     connection.disconnect()
+
+
+def connexion_twitter():
+    try:
+        conn_auth = tweepy.OAuthHandler(API_KEY, API_SECRET)
+        conn_auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+        return conn_auth
+    except Exception as e:
+        return None
+
+
+def creation_tweet(conn_auth, liste_nom_contrevenant):
+    date_maintenant = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    api = tweepy.API(conn_auth)
+    message_presentation = "\n\nVoici le nouveau contrevenant prise en " \
+                           "défault par la ville de Montréal !\n\n"
+    for nom_contrevenant in liste_nom_contrevenant:
+        api.update_status(
+            date_maintenant + message_presentation + nom_contrevenant)
 
 
 def creation_courriel(liste_envoi):
