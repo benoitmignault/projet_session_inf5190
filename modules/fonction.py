@@ -1,6 +1,7 @@
 import re  # pour la gestion des patterns pour les différents champs input
 import smtplib
 import xml.etree.ElementTree as ET
+from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -158,7 +159,6 @@ def importation_donnees():
 
 
 def mise_jour_donnees():
-    print("La MAJ a reussi !")
     liste_contrevenants = recuperation_information_url()
     connection = initialisation_connexion_hors_flask()
     liste_envoi = {}  # Sera utiliser pour l'envoi de courriel
@@ -201,11 +201,13 @@ def connexion_twitter():
 
 
 def creation_tweet(conn_auth, liste_nom_contrevenant):
+    date_maintenant = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     api = tweepy.API(conn_auth)
-    message_presentation = "Voici le nouveau contrevenant prise en défault "\
-                           "par la ville de Montréal »»» "
+    message_presentation = "\n\nVoici le nouveau contrevenant prise en " \
+                           "défault par la ville de Montréal !\n\n"
     for nom_contrevenant in liste_nom_contrevenant:
-        api.update_status(message_presentation + nom_contrevenant)
+        api.update_status(
+            date_maintenant + message_presentation + nom_contrevenant)
 
 
 def creation_courriel(liste_envoi):
