@@ -105,28 +105,33 @@ scheduler.start()
 # Première partie de A4 sera de retourner en json l'information
 # Deuxième partie de A4 sera de créer une documentation RAML
 @app.route('/api/contrevenants/debut=<date_debut>&fin=<date_fin>',
-           methods=["GET"])
+           methods=["GET", "POST"])
 def recherche_contrevenants_periode(date_debut, date_fin):
-    liste_champs_pediode = initial_champ_periode()
-    liste_validation_periode = initial_champ_periode_validation()
-    liste_champs_pediode = remplissage_champs_periode(liste_champs_pediode,
-                                                      date_debut, date_fin)
-    liste_validation_periode = validation_champs_periode(
-        liste_champs_pediode, liste_validation_periode)
-    liste_validation_periode = situation_erreur_periode(
-        liste_validation_periode)
+    # La méthode get sera utiliser via url directement
+    if request.method == "GET":
+        liste_champs_pediode = initial_champ_periode()
+        liste_validation_periode = initial_champ_periode_validation()
+        liste_champs_pediode = remplissage_champs_periode(liste_champs_pediode,
+                                                          date_debut, date_fin)
+        liste_validation_periode = validation_champs_periode(
+            liste_champs_pediode, liste_validation_periode)
+        liste_validation_periode = situation_erreur_periode(
+            liste_validation_periode)
 
-    if not liste_validation_periode['situation_erreur']:
-        conn_db = get_db()
-        ensemble_trouve = conn_db.liste_contrevenant_periode_temps(
-            liste_champs_pediode['date_debut'],
-            liste_champs_pediode['date_fin'])
+        if not liste_validation_periode['situation_erreur']:
+            conn_db = get_db()
+            ensemble_trouve = conn_db.liste_contrevenant_periode_temps(
+                liste_champs_pediode['date_debut'],
+                liste_champs_pediode['date_fin'])
 
-        return jsonify(ensemble_trouve)
-    else:
-        return "", 400
+            return jsonify(ensemble_trouve)
+        else:
+            return "", 400
 
-# Création de la branche pour A5
+    # La méthode post sera caller via l'appel AJAX
+    elif request.method == "POST":
+        pass
+
 
 # Section pour importer directement les informations de la ville via URL.
 def main():

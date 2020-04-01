@@ -3,18 +3,54 @@
 <h1>Bienvenue sur le site des restaurants ayant reçu une / des amende(s) à
     Montréal</h1>
 <div class="container">
-    <p class="desktop" id="hautPageDesktop"></p>
+    <h2>Section pour recherche rapide par date</h2>
+    <div class='zone_recherche_resto'>
+        <form id="recherche_rapide">
+            <ul>
+                <li>Veuillez saisir un interval de deux dates</li>
+            </ul>
+            <div class="modif">
+                <div class="information">
+                    <label for="date_debut">Date début :</label>
+                    <div>
+                        <input id="date_debut" name="date_debut"
+                               title="Saisir une date parmis le calendrier"
+                               type="text" value="">
+                    </div>
+                </div>
+                <div class="information">
+                    <label for="date_fin">Date fin :</label>
+                    <div>
+                        <input id="date_fin" name="date_fin"
+                               title="Saisir une date parmis le calendrier"
+                               type="text" value="">
+                    </div>
+                </div>
+                <div class="troisBTN">
+                    <input class="bouton" type='submit' value="Rechercher...">
+                    <input class="bouton" onClick="reset_recherche_rapide();"
+                           type='reset' value="Effacer...">
+                </div>
+            </div>
+            <ul class="aucun" id="aucun_recherche_rapide"></ul>
+            <!-- Section potentiel pour le retour Ajax / message erreur -->
+        </form>
+    </div>
+    
     <h2>Section pour rechercher une liste de restaurants fautifs</h2>
     <div class='zone_recherche_resto'>
         {% set champ = '' %}
         {% if liste_validation['aucun_restaurant_trouve'] %}
         {% set champ = 'erreur' %}
         {% endif %}
-        <form class="{{champ}}" action="/recherche_restaurant" method="post">
+        <form action="/recherche_restaurant" class="{{champ}}" id="recherche"
+              method="post">
             <ul>
                 <li>Veuillez saisir au moins un des trois critères suivants</li>
                 <li>Les accents sont importants</li>
-                <li>Si vous n'etes pas sur d'un critère, la recherche va s'arranger</li>
+                <li>Si vous n'etes pas sur d'un critère, la recherche va
+                    s'arranger
+                </li>
             </ul>
             <div class="modif">
                 {% set champ = '' %}
@@ -43,7 +79,8 @@
                     <div>
                         <input id="proprietaire" name="proprietaire"
                                title="Charactères alphanumériques, les espaces, l'apostrophe et le tiret sont permis"
-                               type="text" value="{{liste_champs['proprietaire']}}">
+                               type="text"
+                               value="{{liste_champs['proprietaire']}}">
                     </div>
                 </div>
                 {% set champ = '' %}
@@ -65,14 +102,15 @@
                 <div class="troisBTN">
                     <input class="bouton" type='submit' value="Rechercher...">
                     <input class="bouton" onClick="reset_recherche();"
-                           type='reset'
-                           value="Effacer...">
+                           type='reset' value="Effacer...">
                 </div>
             </div>
             {% if liste_validation['situation_erreur'] %}
-            {% for message in liste_champs['messages'] %}
-            <p class="aucun">{{message}}</p>
-            {% endfor %}
+            <ul class="aucun" id="aucun_recherche">
+                {% for message in liste_champs['messages'] %}
+                <li>{{message}}</li>
+                {% endfor %}
+            </ul>
             {% endif %}
         </form>
     </div>

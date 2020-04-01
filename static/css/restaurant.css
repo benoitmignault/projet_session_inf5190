@@ -115,8 +115,9 @@ h2 {
     font-weight: bold;
     color:red;
     font-size: 20px;
-    text-align: center;
+    /*text-align: center;*/
     margin: 5px;
+    margin-top: 15px;
 }
 
 .container h2 span{
@@ -210,6 +211,7 @@ h2 {
 .container > .zone_recherche_resto > form > .modif > .erreur > div > input[type=text]{
     border-color: red;
     background-color: #FCDEDE;
+    border: 2px solid red;
 }
 
 .container > .zone_recherche_resto > .erreur{
