@@ -70,8 +70,9 @@ class Database:
                  "nom_rue, ville, description, date_infraction," \
                  "date_jugement, montant_amende, id_resto "
         fromm = "from mauvais_restaurants "
-        where = "where date_infraction BETWEEN ? AND ?"
-        sql = select + fromm + where
+        where = "where date_infraction BETWEEN ? AND ? "
+        order = "order by date_infraction "
+        sql = select + fromm + where + order
         cursor.execute(sql, (date_debut, date_fin))
         result = cursor.fetchall()
         ensemble_trouve = recuperation_resultat_requete(result)
@@ -173,8 +174,11 @@ def execution_requete_dynamique(nb_critere, liste_critere, sql, cursor):
     return result
 
 
+# Optimisation de la fonction, en changeant l'ensemble pour un tableau
+# d'une liste de dictionnaire pour utiliser la même fonction
+# pour les taches A2 et A4
 def recuperation_resultat_requete(result):
-    ensemble_trouve = {}
+    ensemble_trouve = []
     if result is not None:
         for un_resto_trouve in result:
             sous_ensemble = {'Propriétaire': un_resto_trouve[0],
@@ -188,6 +192,6 @@ def recuperation_resultat_requete(result):
                              "Date d'infraction": un_resto_trouve[7],
                              'Date de jugement': un_resto_trouve[8],
                              "Montant de l'amende": un_resto_trouve[9]}
-            ensemble_trouve[un_resto_trouve[10]] = sous_ensemble
+            ensemble_trouve.append(sous_ensemble)
 
     return ensemble_trouve

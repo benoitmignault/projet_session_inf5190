@@ -17,14 +17,7 @@ PATTERN_NOM_RESTO = "^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,98}" \
                     "[a-z0-9A-Z.)]$"
 PATTERN_NOM_RUE = "^[a-z1-9A-Z][a-z0-9- 'A-Z]{1,33}[a-z0-9A-Z]$"
 
-
-# Fonction pour création la connexion qui sera utilisé dans un contexte hors
-# d'une route utilisée avec Flask
-def initialisation_connexion_hors_flask():
-    connection = Database()
-    connection.get_connection()
-
-    return connection
+PATTERN_DATE = "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$"
 
 
 def get_db():
@@ -33,6 +26,15 @@ def get_db():
         g._database = Database()
 
     return g._database
+
+
+# Fonction pour création la connexion qui sera utilisé dans un contexte hors
+# d'une route utilisée avec Flask
+def initialisation_connexion_hors_flask():
+    connection = Database()
+    connection.get_connection()
+
+    return connection
 
 
 def mise_jour_bd():
@@ -69,6 +71,12 @@ def mise_jour_bd():
                 liste_champs_xml['montant'])
 
     connection.disconnect()
+
+
+def initial_champ_periode():
+    liste_champs_pediode = {"date_debut": "", "date_fin": ""}
+
+    return liste_champs_pediode
 
 
 def initial_champ_importation_xml():
@@ -112,6 +120,13 @@ def remplissage_champs_importation_xml(liste_champs_xml, un_contrevenant):
     liste_champs_xml['montant'] = int(montant_en_transformation[0])
 
     return liste_champs_xml
+
+
+def remplissage_champs_periode(liste_champs_pediode, date_debut, date_fin):
+    liste_champs_pediode['date_debut'] = date_debut
+    liste_champs_pediode['date_fin'] = date_fin
+
+    return liste_champs_pediode
 
 
 def convertisseur_date(date_a_convertir):
@@ -163,20 +178,30 @@ def initial_champ_recherche():
 
 
 def initial_champ_recherche_validation():
-    liste_validation_admin = {"situation_erreur": False,
-                              "champ_proprietaire_vide": False,
-                              "champ_etablissement_vide": False,
-                              "champ_rue_vide": False,
-                              "champs_vides": False,
-                              "longueur_proprietaire_inv": False,
-                              "longueur_etablissement_inv": False,
-                              "longueur_rue_inv": False,
-                              "champ_proprietaire_inv": False,
-                              "champ_etablissement_inv": False,
-                              "champ_rue_inv": False,
-                              "aucun_restaurant_trouve": False}
+    liste_validation = {"situation_erreur": False,
+                        "champ_proprietaire_vide": False,
+                        "champ_etablissement_vide": False,
+                        "champ_rue_vide": False,
+                        "champs_vides": False,
+                        "longueur_proprietaire_inv": False,
+                        "longueur_etablissement_inv": False,
+                        "longueur_rue_inv": False,
+                        "champ_proprietaire_inv": False,
+                        "champ_etablissement_inv": False,
+                        "champ_rue_inv": False,
+                        "aucun_restaurant_trouve": False}
 
-    return liste_validation_admin
+    return liste_validation
+
+
+def initial_champ_periode_validation():
+    liste_validation_periode = {"situation_erreur": False,
+                                "champ_debut_inv": False,
+                                "champ_fin_inv": False,
+                                "champ_debut_vide": False,
+                                "champ_fin_vide": False}
+
+    return liste_validation_periode
 
 
 def remplissage_champ_recherche(request, liste_champs):
@@ -200,6 +225,25 @@ def nombre_critiere_recherche(liste_champs):
         nombre += 1
 
     return nombre
+
+
+def validation_champs_periode(liste_champs_pediode, liste_validation_periode):
+    if liste_champs_pediode['date_debut'] == "":
+        liste_validation_periode['champ_debut_vide'] = True
+
+    if liste_champs_pediode['date_fin'] == "":
+        liste_validation_periode['champ_fin_vide'] = True
+
+    match_date = re.compile(PATTERN_DATE).match
+    if not liste_validation_periode['champ_debut_vide']:
+        if match_date(liste_champs_pediode['date_debut']) is None:
+            liste_validation_periode['champ_debut_inv'] = True
+
+    if not liste_validation_periode['champ_fin_vide']:
+        if match_date(liste_champs_pediode['date_fin']) is None:
+            liste_validation_periode['champ_fin_inv'] = True
+
+    return liste_validation_periode
 
 
 def validation_champs_recherche(liste_champs, liste_validation):
@@ -277,6 +321,15 @@ def situation_erreur(liste_validation):
                 break
 
     return liste_validation
+
+
+def situation_erreur_periode(liste_validation_periode):
+    for cle, valeur in liste_validation_periode.items():
+        if valeur:
+            liste_validation_periode['situation_erreur'] = True
+            break
+
+    return liste_validation_periode
 
 
 def message_erreur_recherche(liste_validation):

@@ -9,14 +9,14 @@
     {% else %}
     <h2>Section du seul restaurants ayant une amende pour infraction</h2>
     {% endif %}
-    {% for cle1, valeur1 in ensemble_trouve.items() %}
+    {% for un_ensemble in ensemble_trouve %}
     <div class='zone_recherche_resto'>
         <table class="tabeau_resto">
             <tbody>
-                {% for cle2, valeur2 in valeur1.items() %}
+                {% for cle, valeur in un_ensemble.items() %}
                 <tr>
-                    <td class="cle">{{cle2}} :</td>
-                    <td class="valeur">{{valeur2}}</td>
+                    <td class="cle">{{cle}} :</td>
+                    <td class="valeur">{{valeur}}</td>
                 </tr>
                 {% endfor %}
             </tbody>

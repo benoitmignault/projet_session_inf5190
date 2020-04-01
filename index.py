@@ -1,14 +1,12 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.combining import OrTrigger
 from apscheduler.triggers.cron import CronTrigger
-
-from flask import Flask, redirect, render_template, request, session, url_for
-from flask_restful import Api
+from flask import Flask, redirect, render_template, request, session, url_for, \
+    jsonify
 
 from modules.rest import *
 
 app = Flask(__name__, static_url_path='', static_folder='static')
-api = Api(app)
 
 # Déclaration de la secret key pour me permettre utiliser
 # les variables de sessions
@@ -97,13 +95,36 @@ def recherche_restaurant_trouve():
 
 # Tache A3
 scheduler = BackgroundScheduler(daemon=True)
-trigger = OrTrigger([CronTrigger(day_of_week='*', hour=0, minute=0)])
+trigger = OrTrigger([CronTrigger(day_of_week='*', hour=20, minute=53)])
 
 scheduler.add_job(mise_jour_bd, trigger)
 scheduler.start()
 
+
 # Creation de la tache A4
-api.add_resource(Contrevenant, '/contrevenants/<du><au>')
+# Première partie de A4 sera de retourner en json l'information
+# Deuxième partie de A4 sera de créer une documentation RAML
+@app.route('/api/contrevenants/debut=<date_debut>&fin=<date_fin>',
+           methods=["GET"])
+def recherche_contrevenants_periode(date_debut, date_fin):
+    liste_champs_pediode = initial_champ_periode()
+    liste_validation_periode = initial_champ_periode_validation()
+    liste_champs_pediode = remplissage_champs_periode(liste_champs_pediode,
+                                                      date_debut, date_fin)
+    liste_validation_periode = validation_champs_periode(
+        liste_champs_pediode, liste_validation_periode)
+    liste_validation_periode = situation_erreur_periode(
+        liste_validation_periode)
+
+    if not liste_validation_periode['situation_erreur']:
+        conn_db = get_db()
+        ensemble_trouve = conn_db.liste_contrevenant_periode_temps(
+            liste_champs_pediode['date_debut'],
+            liste_champs_pediode['date_fin'])
+
+        return jsonify(ensemble_trouve)
+    else:
+        return "", 400
 
 
 # Section pour importer directement les informations de la ville via URL.
@@ -115,4 +136,3 @@ def main():
 # Cette fonction était pour la tache A1
 if __name__ == "__main__":
     main()
-
