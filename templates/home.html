@@ -3,6 +3,7 @@
 <h1>Bienvenue sur le site des restaurants ayant reçu une / des amende(s) à
     Montréal</h1>
 <div class="container">
+    <p class="desktop" id="hautPageDesktop"></p>
     <h2>Section pour recherche rapide par date</h2>
     <div class='zone_recherche_resto'>
         <form id="recherche_rapide">
@@ -116,6 +117,11 @@
             </ul>
             {% endif %}
         </form>
+    </div>
+    <!-- https://publicdomainvectors.org/fr/gratuitement-des-vecteurs/Orange-fl%C3%A8che-pointant-vers-le-haut-de-dessin-vectoriel/9499.html -->
+    <div class="return">
+        <a class="desktop" href="#hautPageDesktop">
+            <img alt="Retour vers le haut" src="/img/fleche_haut.svg"></a>
     </div>
 </div>
 {% endblock content %}
