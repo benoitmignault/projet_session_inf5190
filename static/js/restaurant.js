@@ -8,6 +8,7 @@ const formulaire = document.querySelector('#recherche_rapide');
 const date_debut = document.querySelector('#date_debut');
 const date_fin = document.querySelector('#date_fin');
 const message_aucun_rapide = document.querySelector('#aucun_recherche_rapide');
+const section_result = document.querySelector('#result_recher_rapide');
 
 // Variable pour effacer les messages
 const message_aucun = document.querySelector('#aucun_recherche');
@@ -28,6 +29,8 @@ function reset_recherche(){
 function reset_recherche_rapide(){
     date_debut.defaultValue = "";
     date_fin.defaultValue = "";
+    section_result.innerHTML = "";
+
     effacer_messages_erreurs(message_aucun_rapide);
     re_initialiser_tous_champs("input[type=text]");
 }
@@ -84,9 +87,9 @@ function re_initialiser_tous_champs(type_champs){
 
 function recherche_rapide_par_interval(){
     $(formulaire).submit(function (e) {
+        e.preventDefault(); // On ne veut pas que le formulaire part vers le serveur
         var erreur_general = false; // Servira à vérifier si on a eu une erreur en cours de route
         var erreur_localise = false; // Servira à vérifier si on a eu une erreur en cours de route
-        e.preventDefault();
         var pattern_date = new RegExp("^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$");
         message_aucun_rapide.innerHTML = ""; // On remet la section des messages vide
         // Section pour la gestion du champ «date_debut»
@@ -132,11 +135,21 @@ function recherche_rapide_par_interval(){
 
         // On fait l'appel AJAX seulement si l'indication général est à false.
         if (!erreur_general){
-            console.log("Yes !!!");
+            var ajax = new XMLHttpRequest();
+            ajax.onreadystatechange = function() {
+                if (ajax.readyState === XMLHttpRequest.DONE) {
+                    if (ajax.status === 200) {
+                        section_result.innerHTML = ajax.responseText;
+                    } else {
+                        section_result.innerHTML = "Attention ! Il y a eu une erreur avec la réponse du serveur !";
+                    }
+                }
+            };
+            var param = "debut="+date_debut.value+"&fin="+date_fin.value;
+            ajax.open("POST", "/api/contrevenants/"+param, true);
+            ajax.send();
         }
-
     });
-
 }
 
 document.addEventListener('DOMContentLoaded', function () {

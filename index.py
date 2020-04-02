@@ -1,8 +1,8 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.combining import OrTrigger
 from apscheduler.triggers.cron import CronTrigger
-from flask import Flask, redirect, render_template, request, session, url_for, \
-    jsonify
+from flask import Flask, jsonify, redirect, render_template, request, session, \
+    url_for
 
 from modules.rest import *
 
@@ -107,17 +107,16 @@ scheduler.start()
 @app.route('/api/contrevenants/debut=<date_debut>&fin=<date_fin>',
            methods=["GET", "POST"])
 def recherche_contrevenants_periode(date_debut, date_fin):
+    liste_champs_pediode = initial_champ_periode()
+    liste_validation_periode = initial_champ_periode_validation()
+    liste_champs_pediode = remplissage_champs_periode(liste_champs_pediode,
+                                                      date_debut, date_fin)
+    liste_validation_periode = validation_champs_periode(
+        liste_champs_pediode, liste_validation_periode)
+    liste_validation_periode = situation_erreur_periode(
+        liste_validation_periode)
     # La méthode get sera utiliser via url directement
     if request.method == "GET":
-        liste_champs_pediode = initial_champ_periode()
-        liste_validation_periode = initial_champ_periode_validation()
-        liste_champs_pediode = remplissage_champs_periode(liste_champs_pediode,
-                                                          date_debut, date_fin)
-        liste_validation_periode = validation_champs_periode(
-            liste_champs_pediode, liste_validation_periode)
-        liste_validation_periode = situation_erreur_periode(
-            liste_validation_periode)
-
         if not liste_validation_periode['situation_erreur']:
             conn_db = get_db()
             ensemble_trouve = conn_db.liste_contrevenant_periode_temps(
@@ -130,7 +129,17 @@ def recherche_contrevenants_periode(date_debut, date_fin):
 
     # La méthode post sera caller via l'appel AJAX
     elif request.method == "POST":
-        pass
+        if not liste_validation_periode['situation_erreur']:
+            conn_db = get_db()
+            ensemble_trouve = conn_db.nombre_contravention_periode_temps(
+                liste_champs_pediode['date_debut'],
+                liste_champs_pediode['date_fin'])
+
+            return render_template('recherche_rapide_ajax.html',
+                                   ensemble_trouve=ensemble_trouve), 200
+
+        else:
+            return "", 400
 
 
 # Section pour importer directement les informations de la ville via URL.

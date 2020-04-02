@@ -1,0 +1,25 @@
+<p>Voici le résultat des établissements avec leur nombre de contrevention pour
+    la période de temps voulue</p>
+<table class="tabeau_resto">
+    <thead>
+        <tr>
+            <th class="nom">Établissement</th>
+            <th class="quantite">Nombre de contravention</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for un_ensemble in ensemble_trouve %}
+        <tr>
+            {% for cle, valeur in un_ensemble.items() %}
+            {% if cle == "etablissement" %}
+            <td class="nom">
+                {% else %}
+            <td class="quantite">
+                {% endif %}
+                {{valeur}}
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
