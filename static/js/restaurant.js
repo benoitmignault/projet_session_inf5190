@@ -139,13 +139,14 @@ function recherche_rapide_par_interval(){
             ajax.onreadystatechange = function() {
                 if (ajax.readyState === XMLHttpRequest.DONE) {
                     if (ajax.status === 200) {
-                        section_result.innerHTML = ajax.responseText;
+                        console.log(JSON.parse(ajax.responseText));
+                        section_result.innerHTML = JSON.parse(ajax.responseText);
                     } else {
                         section_result.innerHTML = "Attention ! Il y a eu une erreur avec la réponse du serveur !";
                     }
                 }
             };
-            var param = "debut="+date_debut.value+"&fin="+date_fin.value;
+            var param = "du="+date_debut.value+"&au="+date_fin.value;
             ajax.open("POST", "/api/contrevenants/"+param, true);
             ajax.send();
         }
@@ -153,7 +154,6 @@ function recherche_rapide_par_interval(){
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Cette fonction sera appellée lorsqu'on sort d'un champ à saisir des informations.
     validation_champs_recherches();
     recherche_rapide_par_interval();
 });

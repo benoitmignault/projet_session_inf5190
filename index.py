@@ -95,7 +95,7 @@ def recherche_restaurant_trouve():
 
 # Tache A3
 scheduler = BackgroundScheduler(daemon=True)
-trigger = OrTrigger([CronTrigger(day_of_week='*', hour=20, minute=53)])
+trigger = OrTrigger([CronTrigger(day_of_week='*', hour=0, minute=0)])
 
 scheduler.add_job(mise_jour_bd, trigger)
 scheduler.start()
@@ -104,7 +104,7 @@ scheduler.start()
 # Creation de la tache A4
 # Première partie de A4 sera de retourner en json l'information
 # Deuxième partie de A4 sera de créer une documentation RAML
-@app.route('/api/contrevenants/debut=<date_debut>&fin=<date_fin>',
+@app.route('/api/contrevenants/du=<date_debut>&au=<date_fin>',
            methods=["GET", "POST"])
 def recherche_contrevenants_periode(date_debut, date_fin):
     liste_champs_pediode = initial_champ_periode()
@@ -115,31 +115,25 @@ def recherche_contrevenants_periode(date_debut, date_fin):
         liste_champs_pediode, liste_validation_periode)
     liste_validation_periode = situation_erreur_periode(
         liste_validation_periode)
-    # La méthode get sera utiliser via url directement
-    if request.method == "GET":
-        if not liste_validation_periode['situation_erreur']:
-            conn_db = get_db()
+
+    ensemble_trouve = []
+    if not liste_validation_periode['situation_erreur']:
+        conn_db = get_db()
+
+        if request.method == "GET":
             ensemble_trouve = conn_db.liste_contrevenant_periode_temps(
                 liste_champs_pediode['date_debut'],
                 liste_champs_pediode['date_fin'])
 
-            return jsonify(ensemble_trouve)
-        else:
-            return "", 400
-
-    # La méthode post sera caller via l'appel AJAX
-    elif request.method == "POST":
-        if not liste_validation_periode['situation_erreur']:
-            conn_db = get_db()
+        elif request.method == "POST":
             ensemble_trouve = conn_db.nombre_contravention_periode_temps(
                 liste_champs_pediode['date_debut'],
                 liste_champs_pediode['date_fin'])
 
-            return render_template('recherche_rapide_ajax.html',
-                                   ensemble_trouve=ensemble_trouve), 200
+        return jsonify(ensemble_trouve)
 
-        else:
-            return "", 400
+    else:
+        return jsonify(ensemble_trouve), 400
 
 
 # Section pour importer directement les informations de la ville via URL.

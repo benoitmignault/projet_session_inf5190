@@ -6,7 +6,7 @@
     <p class="desktop" id="hautPageDesktop"></p>
     <h2>Section pour recherche rapide par date</h2>
     <div class='zone_recherche_resto'>
-        <form id="recherche_rapide">
+        <form method="post" id="recherche_rapide">
             <ul>
                 <li>Veuillez saisir un interval de deux dates</li>
             </ul>
@@ -14,7 +14,7 @@
                 <div class="information">
                     <label for="date_debut">Date début :</label>
                     <div>
-                        <input id="date_debut" name="date_debut"
+                        <input id="date_debut" name="du"
                                title="Saisir une date parmis le calendrier"
                                type="text" value="">
                     </div>
@@ -22,7 +22,7 @@
                 <div class="information">
                     <label for="date_fin">Date fin :</label>
                     <div>
-                        <input id="date_fin" name="date_fin"
+                        <input id="date_fin" name="au"
                                title="Saisir une date parmis le calendrier"
                                type="text" value="">
                     </div>
