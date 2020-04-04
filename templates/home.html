@@ -9,7 +9,7 @@
         <form id="recherche_rapide" method="post">
             <ul>
                 <li>Veuillez saisir un interval de deux dates</li>
-                <li>Veuillez sélectionner un établissement </li>
+                <li>Veuillez sélectionner un établissement</li>
             </ul>
             <div class="modif">
                 <div class="information">
@@ -30,15 +30,17 @@
                 </div>
                 <div class="information">
                     <label for="liste_resto">Liste des établissements :</label>
-                    <select id="liste_resto" name="liste_resto"
-                            title="Saisir un établissement en particulier">
-                        <option selected value="">À Sélectionner</option>
-                        {% for un_etablissement in liste_etablissement %}
-                        <option value="{{un_etablissement}}">
-                            {{un_etablissement}}
-                        </option>
-                        {% endfor %}
-                    </select>
+                    <div>
+                        <select id="liste_resto" name="liste_resto"
+                                title="Saisir un établissement en particulier">
+                            <option selected value="">À Sélectionner</option>
+                            {% for un_etablissement in liste_etablissement %}
+                            <option value="{{un_etablissement}}">
+                                {{un_etablissement}}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
                 
                 

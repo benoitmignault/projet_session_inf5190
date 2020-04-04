@@ -107,7 +107,8 @@ h2 {
     margin-left: 30px;
 }
 
-.container > .zone_recherche_resto > form > div > div > div > input[type=text]{
+.container > .zone_recherche_resto > form > div > div > div > input[type=text],
+.container > .zone_recherche_resto > form > div > div > div > select{
     border-radius: 10px;
     padding: 5px;
     border: 1px solid #ccc;
@@ -115,6 +116,13 @@ h2 {
     margin-bottom: 5px;
     margin-right: 10px;
     width: 50%;
+}
+
+.container > .zone_recherche_resto > form > div > div > div > select{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;       /* Remove default arrow */
+    background-color: white;
 }
 
 .container > .zone_recherche_resto > form > .aucun{
