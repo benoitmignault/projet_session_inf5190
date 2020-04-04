@@ -4,7 +4,7 @@ from apscheduler.triggers.cron import CronTrigger
 from flask import Flask, jsonify, redirect, render_template, request, session, \
     url_for
 
-from modules.rest import *
+from modules.fonction import *
 
 app = Flask(__name__, static_url_path='', static_folder='static')
 
@@ -39,7 +39,11 @@ def home():
         liste_champs = initial_champ_recherche()
         liste_validation = initial_champ_recherche_validation()
 
+    conn_db = get_db()
+    liste_etablissement = conn_db.liste_tous_restaurants()
+
     return render_template('home.html', titre=titre,
+                           liste_etablissement=liste_etablissement,
                            liste_validation=liste_validation,
                            liste_champs=liste_champs)
 
