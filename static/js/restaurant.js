@@ -1,18 +1,24 @@
-// Variable pour le bouton Effacer dans la page de recherche
-const recher_nom_resto = document.querySelector('#etablissement');
-const recher_nom_proprio = document.querySelector('#proprietaire');
-const recher_nom_rue = document.querySelector('#nom_rue');
+// Variable pour la recherche par interval de date
+const form_interval = document.querySelector('#recherche_par_interval');
+const champ_date_debut = document.querySelector('#date_debut');
+const champ_date_fin = document.querySelector('#date_fin');
+const btn_reset_interval = document.querySelector('#btn_reset_interval');
+const message_erreur_interval = document.querySelector('#message_erreur_interval');
+const result_recher_interval = document.querySelector('#result_recher_interval');
 
-// Variable du formulaire qu'on voudra envoyer via appel AJAX
-const formulaire = document.querySelector('#recherche_rapide');
-const date_debut = document.querySelector('#date_debut');
-const date_fin = document.querySelector('#date_fin');
-const message_aucun_rapide = document.querySelector('#aucun_recherche_rapide');
-const section_result = document.querySelector('#result_recher_rapide');
+// Variable pour la recherche par établissement précit
+const form_etablissement = document.querySelector('#recherche_par_etablissement');
+const champ_etablissement = document.querySelector('#liste_resto');
+const btn_reset_etablissement = document.querySelector('#btn_reset_etablissement');
+const message_erreur_etablissement = document.querySelector('#message_erreur_etablissement');
+const result_recher_etablissement = document.querySelector('#result_recher_etablissement');
 
-// Variable pour effacer les messages
-const message_aucun = document.querySelector('#aucun_recherche');
-
+// Variables pour la recherche d'information générale pour être utiliser avec le bouton effacer
+const champ_nom_resto = document.querySelector('#etablissement');
+const champ_nom_proprio = document.querySelector('#proprietaire');
+const champ_nom_rue = document.querySelector('#nom_rue');
+const btn_reset_recher = document.querySelector('#btn_reset_recher');
+const message_erreur_recher = document.querySelector('#message_erreur_recher');
 /*
     En fonction où nous sommes, sur le site, la fonction «re_initialiser_tous_champs» sera
     appelée pour chaque type de champs que le formulaire contient.
@@ -86,7 +92,7 @@ function re_initialiser_tous_champs(type_champs){
 }
 
 function recherche_rapide_par_interval(){
-    $(formulaire).submit(function (e) {
+    $(form_interval).submit(function (e) {
         e.preventDefault();
         var erreur_general = false;
         var erreur_localise = false;

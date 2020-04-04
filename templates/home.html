@@ -4,12 +4,11 @@
     Montréal</h1>
 <div class="container">
     <p class="desktop" id="hautPageDesktop"></p>
-    <h2>Section pour recherche rapide par date</h2>
+    <h2>Section pour rechercher avec un intervale de date</h2>
     <div class='zone_recherche_resto'>
-        <form id="recherche_rapide" method="post">
+        <form id="recherche_par_interval">
             <ul>
-                <li>Veuillez saisir un interval de deux dates</li>
-                <li>Veuillez sélectionner un établissement</li>
+                <li>Veuillez saisir une date de début et une date de fin</li>
             </ul>
             <div class="modif">
                 <div class="information">
@@ -28,6 +27,25 @@
                                type="text" value="">
                     </div>
                 </div>
+                <div class="troisBTN">
+                    <input class="bouton" type='submit' value="Rechercher...">
+                    <input class="bouton" id="btn_reset_interval"
+                           type='reset' value="Effacer...">
+                </div>
+            </div>
+            <!-- Section des messages erreurs -->
+            <ul class="aucun" id="aucun_erreur_recher_interval"></ul>
+        </form>
+        <!-- Section pour le retour Ajax -->
+        <div id="result_recher_interval"></div>
+    </div>
+    <h2>Section pour rechercher avec un établissement en particulier</h2>
+    <div class='zone_recherche_resto'>
+        <form id="recherche_par_etablissement">
+            <ul>
+                <li>Veuillez sélectionner un établissement</li>
+            </ul>
+            <div class="modif">
                 <div class="information">
                     <label for="liste_resto">Liste des établissements :</label>
                     <div>
@@ -42,20 +60,17 @@
                         </select>
                     </div>
                 </div>
-                
-                
                 <div class="troisBTN">
                     <input class="bouton" type='submit' value="Rechercher...">
-                    <input class="bouton" onClick="reset_recherche_rapide();"
+                    <input class="bouton" id="btn_reset_etablissement"
                            type='reset' value="Effacer...">
                 </div>
             </div>
             <!-- Section des messages erreurs -->
-            <ul class="aucun" id="aucun_recherche_rapide"></ul>
+            <ul class="aucun" id="message_erreur_etablissement"></ul>
         </form>
         <!-- Section pour le retour Ajax -->
-        <div id="result_recher_rapide">
-        </div>
+        <div id="result_recher_etablissement"></div>
     </div>
     
     <h2>Section pour rechercher une liste de restaurants fautifs</h2>
@@ -122,12 +137,12 @@
                 </div>
                 <div class="troisBTN">
                     <input class="bouton" type='submit' value="Rechercher...">
-                    <input class="bouton" onClick="reset_recherche();"
-                           type='reset' value="Effacer...">
+                    <input class="bouton" id="btn_reset_recher" type='reset'
+                           value="Effacer...">
                 </div>
             </div>
             {% if liste_validation['situation_erreur'] %}
-            <ul class="aucun" id="aucun_recherche">
+            <ul class="aucun" id="message_erreur_recher">
                 {% for message in liste_champs['messages'] %}
                 <li>{{message}}</li>
                 {% endfor %}
