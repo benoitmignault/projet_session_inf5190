@@ -101,8 +101,6 @@ scheduler.add_job(mise_jour_bd, trigger)
 scheduler.start()
 
 
-# Creation de la tache A4
-# Première partie de A4 sera de retourner en json l'information
 # Deuxième partie de A4 sera de créer une documentation RAML
 @app.route('/api/contrevenants/du=<date_debut>&au=<date_fin>',
            methods=["GET", "POST"])
@@ -135,6 +133,8 @@ def recherche_contrevenants_periode(date_debut, date_fin):
     else:
         return "", 400
 
+
+# Création de la branche pour A6
 
 # Section pour importer directement les informations de la ville via URL.
 def main():
