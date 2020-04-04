@@ -87,89 +87,96 @@ function re_initialiser_tous_champs(type_champs){
 
 function recherche_rapide_par_interval(){
     $(formulaire).submit(function (e) {
-        e.preventDefault(); // On ne veut pas que le formulaire part vers le serveur
-        var erreur_general = false; // Servira à vérifier si on a eu une erreur en cours de route
-        var erreur_localise = false; // Servira à vérifier si on a eu une erreur en cours de route
+        e.preventDefault();
+        var erreur_general = false;
+        var erreur_localise = false;
         var pattern_date = new RegExp("^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$");
         message_aucun_rapide.innerHTML = ""; // On remet la section des messages vide
-        // Section pour la gestion du champ «date_debut»
-        if (date_debut.value == "") {
-            message_aucun_rapide.innerHTML += "<li>Le champ «Date début» ne peut être vide !</li>";
-            erreur_localise = true;
-        } else if (!(pattern_date.test(date_debut.value))) {
-            message_aucun_rapide.innerHTML += "<li>Le champ «Date début» ne contient pas une date au format ISO 8601 valide !</li>";
-            erreur_localise = true;
-        }
-
-        if (erreur_localise){
-            date_debut.style.border = "2px solid red";
-            date_debut.style.background = "#FCDEDE";
-            erreur_localise = false; // on reset l'indicateur pour le prochain champ
-            erreur_general = true;
-        } else {
-            // Si nous avons saisi de quoi de valide
-            date_debut.style.background = "white";
-            date_debut.style.border = "1px solid #ccc";
-        }
-        // Fin de la section du champ «date_debut»
-        // Section pour la gestion du champ «date_fin»
-        if (date_fin.value == "") {
-            message_aucun_rapide.innerHTML += "<li>Le champ «Date fin» ne peut être vide !</li>";
-            erreur_localise = true;
-        } else if (!(pattern_date.test(date_fin.value))) {
-            message_aucun_rapide.innerHTML += "<li>Le champ «Date fin» ne contient pas une date au format ISO 8601 valide !</li>";
-            erreur_localise = true;
-        }
-
-        if (erreur_localise){
-            date_fin.style.border = "2px solid red";
-            date_fin.style.background = "#FCDEDE";
-            erreur_localise = false; // on reset l'indicateur pour le prochain champ
-            erreur_general = true;
-        } else {
-            // Si nous avons saisi de quoi de valide
-            date_fin.style.background = "white";
-            date_fin.style.border = "1px solid #ccc";
-        }
-        // Fin de la section du champ «date_debut»
-
-        // On fait l'appel AJAX seulement si l'indication général est à false.
-        if (!erreur_general){
-            var ajax = new XMLHttpRequest();
-            ajax.onreadystatechange = function() {
-                if (ajax.readyState === XMLHttpRequest.DONE) {
-                    if (ajax.status === 200) {
-                        var liste = JSON.parse(ajax.responseText);
-                        //console.log(JSON.parse(ajax.responseText));
-                        console.log("Au debut");
-                        var bloc_html = "<p>Voici le résultat des établissements avec leur nombre respectif de contrevention</p>";
-                        bloc_html += "<table class=\"tabeau_resto\">";
-                        bloc_html += "<thead><tr><th class=\"nom\">Établissement</th>";
-                        bloc_html += "<th class=\"quantite\">Nombre</th></tr></thead><tbody>";
-                        console.log("Avant chaque ligne");
-                        for(var i = 0; i < liste.length; i++) {
-                            console.log(i);
-                            bloc_html += "<tr>";
-                            var resto = liste[i];
-                            console.log(resto.etablissement);
-                            console.log(resto.nombre);
-                            bloc_html += "<td class=\"nom\">" + resto.etablissement + "</td>";
-                            bloc_html += "<td class=\"quantite\">" + resto.nombre + "</td>";
-                            bloc_html += "<tr>";
-                        }
-                        console.log("À la fin");
-                        bloc_html += "</tbody></table>";
-                        section_result.innerHTML = bloc_html;
-                    } else {
-                        section_result.innerHTML = "Attention ! Il y a eu une erreur avec la réponse du serveur !";
-                    }
-                }
-            };
-            var param = "du="+date_debut.value+"&au="+date_fin.value;
-            ajax.open("POST", "/api/contrevenants/"+param, true);
-            ajax.send();
-        }
+        erreur_general = verification_date_debut (pattern_date, erreur_localise, erreur_general);
+        erreur_general = verification_date_fin (pattern_date, erreur_localise, erreur_general);
+        appel_ajax(erreur_general);
     });
+}
+
+function verification_date_debut (pattern_date, erreur_localise, erreur_general){
+    if (date_debut.value == "") {
+        message_aucun_rapide.innerHTML += "<li>Le champ «Date début» ne peut être vide !</li>";
+        erreur_localise = true;
+    } else if (!(pattern_date.test(date_debut.value))) {
+        message_aucun_rapide.innerHTML += "<li>Le champ «Date début» ne contient pas une date au format ISO 8601 valide !</li>";
+        erreur_localise = true;
+    }
+
+    if (erreur_localise){
+        date_debut.style.border = "2px solid red";
+        date_debut.style.background = "#FCDEDE";
+        erreur_localise = false; // on reset l'indicateur pour le prochain champ
+        erreur_general = true;
+    } else {
+        date_debut.style.background = "white";
+        date_debut.style.border = "1px solid #ccc";
+    }
+
+    return erreur_general;
+}
+
+function verification_date_fin (pattern_date, erreur_localise, erreur_general){
+    if (date_fin.value == "") {
+        message_aucun_rapide.innerHTML += "<li>Le champ «Date fin» ne peut être vide !</li>";
+        erreur_localise = true;
+    } else if (!(pattern_date.test(date_fin.value))) {
+        message_aucun_rapide.innerHTML += "<li>Le champ «Date fin» ne contient pas une date au format ISO 8601 valide !</li>";
+        erreur_localise = true;
+    }
+
+    if (erreur_localise){
+        date_fin.style.border = "2px solid red";
+        date_fin.style.background = "#FCDEDE";
+        erreur_localise = false; // on reset l'indicateur pour le prochain champ
+        erreur_general = true;
+    } else {
+        date_fin.style.background = "white";
+        date_fin.style.border = "1px solid #ccc";
+    }
+
+    return erreur_general;
+}
+
+function appel_ajax(erreur_general){
+    // On fait l'appel AJAX seulement si l'indication général est à false.
+    if (!erreur_general){
+        var ajax = new XMLHttpRequest();
+        ajax.onreadystatechange = function() {
+            if (ajax.readyState === XMLHttpRequest.DONE) {
+                if (ajax.status === 200) {
+                    section_result.innerHTML = creation_bloc_html(ajax);
+                } else {
+                    section_result.innerHTML = "Attention ! Il y a eu une erreur avec la réponse du serveur !";
+                }
+            }
+        };
+        var param = "du="+date_debut.value+"&au="+date_fin.value;
+        ajax.open("POST", "/api/contrevenants/"+param, true);
+        ajax.send();
+    }
+}
+
+function creation_bloc_html(ajax){
+    var liste = JSON.parse(ajax.responseText);
+    var bloc_html = "<p>Voici le résultat des établissements avec leur nombre respectif de contrevention</p>";
+    bloc_html += "<table class=\"tabeau_resto\">";
+    bloc_html += "<thead><tr><th class=\"nom\">Établissement</th>";
+    bloc_html += "<th class=\"quantite\">Nombre</th></tr></thead><tbody>";
+    for(var i = 0; i < liste.length; i++) {
+        bloc_html += "<tr>";
+        var resto = liste[i];
+        bloc_html += "<td class=\"nom\">" + resto.etablissement + "</td>";
+        bloc_html += "<td class=\"quantite\">" + resto.nombre + "</td>";
+        bloc_html += "<tr>";
+    }
+    bloc_html += "</tbody></table>";
+
+    return bloc_html;
 }
 
 document.addEventListener('DOMContentLoaded', function () {
