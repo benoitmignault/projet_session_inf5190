@@ -133,7 +133,7 @@ def recherche_contrevenants_periode(date_debut, date_fin):
         return jsonify(ensemble_trouve)
 
     else:
-        return jsonify(ensemble_trouve), 400
+        return "", 400
 
 
 # Section pour importer directement les informations de la ville via URL.

@@ -139,8 +139,27 @@ function recherche_rapide_par_interval(){
             ajax.onreadystatechange = function() {
                 if (ajax.readyState === XMLHttpRequest.DONE) {
                     if (ajax.status === 200) {
-                        console.log(JSON.parse(ajax.responseText));
-                        section_result.innerHTML = JSON.parse(ajax.responseText);
+                        var liste = JSON.parse(ajax.responseText);
+                        //console.log(JSON.parse(ajax.responseText));
+                        console.log("Au debut");
+                        var bloc_html = "<p>Voici le résultat des établissements avec leur nombre respectif de contrevention</p>";
+                        bloc_html += "<table class=\"tabeau_resto\">";
+                        bloc_html += "<thead><tr><th class=\"nom\">Établissement</th>";
+                        bloc_html += "<th class=\"quantite\">Nombre</th></tr></thead><tbody>";
+                        console.log("Avant chaque ligne");
+                        for(var i = 0; i < liste.length; i++) {
+                            console.log(i);
+                            bloc_html += "<tr>";
+                            var resto = liste[i];
+                            console.log(resto.etablissement);
+                            console.log(resto.nombre);
+                            bloc_html += "<td class=\"nom\">" + resto.etablissement + "</td>";
+                            bloc_html += "<td class=\"quantite\">" + resto.nombre + "</td>";
+                            bloc_html += "<tr>";
+                        }
+                        console.log("À la fin");
+                        bloc_html += "</tbody></table>";
+                        section_result.innerHTML = bloc_html;
                     } else {
                         section_result.innerHTML = "Attention ! Il y a eu une erreur avec la réponse du serveur !";
                     }
