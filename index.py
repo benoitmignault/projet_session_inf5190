@@ -55,7 +55,7 @@ def recherche_restaurant():
     conn_db = get_db()
     ensemble_trouve = {}
     if not liste_validation['champs_vides']:
-        ensemble_trouve = conn_db.get_restaurant_trouver(liste_champs)
+        ensemble_trouve = conn_db.liste_restaurant_trouver(liste_champs)
         liste_champs['nb_restaurant_trouve'] = len(ensemble_trouve)
         if liste_champs['nb_restaurant_trouve'] == 0:
             liste_validation['aucun_restaurant_trouve'] = True

@@ -31,7 +31,19 @@ class Database:
                                  date_infraction, date_jugement, montant))
         self.connection.commit()
 
-    def get_restaurant_trouver(self, liste_champs):
+    def liste_tous_restaurants(self):
+        cursor = self.get_connection().cursor()
+        select = "select distinct etablissement "
+        fromm = "from mauvais_restaurants "
+        order = "order by etablissement"
+        sql = select + fromm + order
+        cursor.execute(sql)
+        result = cursor.fetchall()
+        ensemble_trouve = recuperation_resultat_liste(result)
+
+        return ensemble_trouve
+
+    def liste_restaurant_trouver(self, liste_champs):
         cursor = self.get_connection().cursor()
 
         liste_critere = remplissage_condition_sql(liste_champs)
@@ -218,6 +230,18 @@ def recuperation_resultat_regrouper(result):
         for un_resto_trouve in result:
             sous_ensemble = {'etablissement': un_resto_trouve[0],
                              'nombre': un_resto_trouve[1]}
+            ensemble_trouve.append(sous_ensemble)
+
+    return ensemble_trouve
+
+
+# Cette fonction sera utiliser pour la tache A6
+def recuperation_resultat_liste(result):
+    ensemble_trouve = []
+
+    if result is not None:
+        for un_resto in result:
+            sous_ensemble = {'etablissement': un_resto[0]}
             ensemble_trouve.append(sous_ensemble)
 
     return ensemble_trouve
