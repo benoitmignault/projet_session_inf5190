@@ -241,7 +241,6 @@ def recuperation_resultat_liste(result):
 
     if result is not None:
         for un_resto in result:
-            sous_ensemble = {'etablissement': un_resto[0]}
-            ensemble_trouve.append(sous_ensemble)
+            ensemble_trouve.append(un_resto[0])
 
     return ensemble_trouve
