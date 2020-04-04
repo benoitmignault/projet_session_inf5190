@@ -64,6 +64,7 @@ h2 {
     margin: 0px;
 }
 
+.container > .zone_recherche_resto > #result_recher_rapide,
 .container > .zone_admin,
 .container > .zone_recherche_resto,
 .container > .zone_404,
@@ -79,6 +80,11 @@ h2 {
     justify-content: center;
     align-items: center;
 }
+
+.container > .zone_recherche_resto > #result_recher_rapide{
+    padding: 0px;
+}
+
 .container > .zone_404{
     width: auto;
     margin: auto;
@@ -115,8 +121,8 @@ h2 {
     font-weight: bold;
     color:red;
     font-size: 20px;
-    text-align: center;
     margin: 5px;
+    margin-top: 15px;
 }
 
 .container h2 span{
@@ -127,6 +133,12 @@ h2 {
     margin-top: 15px;
 }
 
+.container > .zone_recherche_resto > #result_recher_rapide > p{
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto,
 .container > .zone_recherche_resto > .tabeau_resto,
 .container > .zone_recherche_resto > form{
     width: 100%;
@@ -135,8 +147,42 @@ h2 {
     padding: 10px;
 }
 
+.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto{
+    border-spacing: 0;
+    padding: 0px;
+}
+
+.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto th,
+.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto td,
 .container > .zone_recherche_resto > .tabeau_resto td{
     padding: 5px;
+}
+
+.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto th,
+.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto td{
+    border-bottom: 1px solid black;
+}
+
+.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto thead .nom,
+.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto thead .quantite{
+    font-weight: bold;
+}
+
+.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto thead .nom,
+.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto tbody .nom,
+.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto thead .quantite,
+.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto tbody .quantite{
+    text-align: center;
+}
+
+.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto thead .nom,
+.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto tbody .nom{
+    width: 80%;
+}
+
+.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto thead .quantite,
+.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto tbody .quantite{
+    width: 20%;
 }
 
 .container > .zone_recherche_resto > .tabeau_resto .cle{
@@ -210,6 +256,7 @@ h2 {
 .container > .zone_recherche_resto > form > .modif > .erreur > div > input[type=text]{
     border-color: red;
     background-color: #FCDEDE;
+    border: 2px solid red;
 }
 
 .container > .zone_recherche_resto > .erreur{

@@ -3,8 +3,15 @@ const recher_nom_resto = document.querySelector('#etablissement');
 const recher_nom_proprio = document.querySelector('#proprietaire');
 const recher_nom_rue = document.querySelector('#nom_rue');
 
+// Variable du formulaire qu'on voudra envoyer via appel AJAX
+const formulaire = document.querySelector('#recherche_rapide');
+const date_debut = document.querySelector('#date_debut');
+const date_fin = document.querySelector('#date_fin');
+const message_aucun_rapide = document.querySelector('#aucun_recherche_rapide');
+const section_result = document.querySelector('#result_recher_rapide');
+
 // Variable pour effacer les messages
-const message_aucun = document.querySelector('.aucun');
+const message_aucun = document.querySelector('#aucun_recherche');
 
 /*
     En fonction où nous sommes, sur le site, la fonction «re_initialiser_tous_champs» sera
@@ -14,15 +21,24 @@ function reset_recherche(){
     recher_nom_resto.defaultValue = "";
     recher_nom_proprio.defaultValue = "";
     recher_nom_rue.defaultValue = "";
-    effacer_messages_erreurs();
+    effacer_messages_erreurs(message_aucun);
     re_initialiser_tous_champs("input[type=text]");
-    re_initialiser_tous_champs("form");
+    re_initialiser_tous_champs("#recherche");
 }
 
-function effacer_messages_erreurs(){
+function reset_recherche_rapide(){
+    date_debut.defaultValue = "";
+    date_fin.defaultValue = "";
+    section_result.innerHTML = "";
+
+    effacer_messages_erreurs(message_aucun_rapide);
+    re_initialiser_tous_champs("input[type=text]");
+}
+
+function effacer_messages_erreurs(message){
     // Nous devons vérifier que les variables ne sont pas égales à «undefined»
-    if (message_aucun){
-        message_aucun.innerHTML = "";
+    if (message){
+        message.innerHTML = "";
     }
 }
 
@@ -69,7 +85,101 @@ function re_initialiser_tous_champs(type_champs){
     });
 }
 
+function recherche_rapide_par_interval(){
+    $(formulaire).submit(function (e) {
+        e.preventDefault();
+        var erreur_general = false;
+        var erreur_localise = false;
+        var pattern_date = new RegExp("^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$");
+        message_aucun_rapide.innerHTML = ""; // On remet la section des messages vide
+        erreur_general = verification_date_debut (pattern_date, erreur_localise, erreur_general);
+        erreur_general = verification_date_fin (pattern_date, erreur_localise, erreur_general);
+        appel_ajax(erreur_general);
+    });
+}
+
+function verification_date_debut (pattern_date, erreur_localise, erreur_general){
+    if (date_debut.value == "") {
+        message_aucun_rapide.innerHTML += "<li>Le champ «Date début» ne peut être vide !</li>";
+        erreur_localise = true;
+    } else if (!(pattern_date.test(date_debut.value))) {
+        message_aucun_rapide.innerHTML += "<li>Le champ «Date début» ne contient pas une date au format ISO 8601 valide !</li>";
+        erreur_localise = true;
+    }
+
+    if (erreur_localise){
+        date_debut.style.border = "2px solid red";
+        date_debut.style.background = "#FCDEDE";
+        erreur_localise = false; // on reset l'indicateur pour le prochain champ
+        erreur_general = true;
+    } else {
+        date_debut.style.background = "white";
+        date_debut.style.border = "1px solid #ccc";
+    }
+
+    return erreur_general;
+}
+
+function verification_date_fin (pattern_date, erreur_localise, erreur_general){
+    if (date_fin.value == "") {
+        message_aucun_rapide.innerHTML += "<li>Le champ «Date fin» ne peut être vide !</li>";
+        erreur_localise = true;
+    } else if (!(pattern_date.test(date_fin.value))) {
+        message_aucun_rapide.innerHTML += "<li>Le champ «Date fin» ne contient pas une date au format ISO 8601 valide !</li>";
+        erreur_localise = true;
+    }
+
+    if (erreur_localise){
+        date_fin.style.border = "2px solid red";
+        date_fin.style.background = "#FCDEDE";
+        erreur_localise = false; // on reset l'indicateur pour le prochain champ
+        erreur_general = true;
+    } else {
+        date_fin.style.background = "white";
+        date_fin.style.border = "1px solid #ccc";
+    }
+
+    return erreur_general;
+}
+
+function appel_ajax(erreur_general){
+    // On fait l'appel AJAX seulement si l'indication général est à false.
+    if (!erreur_general){
+        var ajax = new XMLHttpRequest();
+        ajax.onreadystatechange = function() {
+            if (ajax.readyState === XMLHttpRequest.DONE) {
+                if (ajax.status === 200) {
+                    section_result.innerHTML = creation_bloc_html(ajax);
+                } else {
+                    section_result.innerHTML = "Attention ! Il y a eu une erreur avec la réponse du serveur !";
+                }
+            }
+        };
+        var param = "du="+date_debut.value+"&au="+date_fin.value;
+        ajax.open("POST", "/api/contrevenants/"+param, true);
+        ajax.send();
+    }
+}
+
+function creation_bloc_html(ajax){
+    var liste = JSON.parse(ajax.responseText);
+    var bloc_html = "<p>Voici le résultat des établissements avec leur nombre respectif de contrevention</p>";
+    bloc_html += "<table class=\"tabeau_resto\">";
+    bloc_html += "<thead><tr><th class=\"nom\">Établissement</th>";
+    bloc_html += "<th class=\"quantite\">Nombre</th></tr></thead><tbody>";
+    for(var i = 0; i < liste.length; i++) {
+        bloc_html += "<tr>";
+        var resto = liste[i];
+        bloc_html += "<td class=\"nom\">" + resto.etablissement + "</td>";
+        bloc_html += "<td class=\"quantite\">" + resto.nombre + "</td>";
+        bloc_html += "<tr>";
+    }
+    bloc_html += "</tbody></table>";
+
+    return bloc_html;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
-    // Cette fonction sera appellée lorsqu'on sort d'un champ à saisir des informations.
     validation_champs_recherches();
+    recherche_rapide_par_interval();
 });

@@ -39,7 +39,7 @@ class Database:
         result = execution_requete_dynamique(liste_champs['nb_critere'],
                                              liste_critere, sql, cursor)
 
-        ensemble_trouve = recuperation_resultat_requete(result)
+        ensemble_trouve = recuperation_resultat(result)
 
         return ensemble_trouve
 
@@ -75,7 +75,21 @@ class Database:
         sql = select + fromm + where + order
         cursor.execute(sql, (date_debut, date_fin))
         result = cursor.fetchall()
-        ensemble_trouve = recuperation_resultat_requete(result)
+        ensemble_trouve = recuperation_resultat(result)
+
+        return ensemble_trouve
+
+    def nombre_contravention_periode_temps(self, date_debut, date_fin):
+        cursor = self.get_connection().cursor()
+        select = "select etablissement, count(*) as nombre "
+        fromm = "from mauvais_restaurants "
+        where = "where date_infraction BETWEEN ? AND ? "
+        group = "group by etablissement "
+        order = "order by nombre desc, etablissement "
+        sql = select + fromm + where + group + order
+        cursor.execute(sql, (date_debut, date_fin))
+        result = cursor.fetchall()
+        ensemble_trouve = recuperation_resultat_regrouper(result)
 
         return ensemble_trouve
 
@@ -177,7 +191,7 @@ def execution_requete_dynamique(nb_critere, liste_critere, sql, cursor):
 # Optimisation de la fonction, en changeant l'ensemble pour un tableau
 # d'une liste de dictionnaire pour utiliser la même fonction
 # pour les taches A2 et A4
-def recuperation_resultat_requete(result):
+def recuperation_resultat(result):
     ensemble_trouve = []
     if result is not None:
         for un_resto_trouve in result:
@@ -192,6 +206,18 @@ def recuperation_resultat_requete(result):
                              "Date d'infraction": un_resto_trouve[7],
                              'Date de jugement': un_resto_trouve[8],
                              "Montant de l'amende": un_resto_trouve[9]}
+            ensemble_trouve.append(sous_ensemble)
+
+    return ensemble_trouve
+
+
+# Cette fonction sera utiliser pour la tache A5
+def recuperation_resultat_regrouper(result):
+    ensemble_trouve = []
+    if result is not None:
+        for un_resto_trouve in result:
+            sous_ensemble = {'etablissement': un_resto_trouve[0],
+                             'nombre': un_resto_trouve[1]}
             ensemble_trouve.append(sous_ensemble)
 
     return ensemble_trouve
