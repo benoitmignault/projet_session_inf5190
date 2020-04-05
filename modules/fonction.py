@@ -73,10 +73,16 @@ def mise_jour_bd():
     connection.disconnect()
 
 
-def initial_champ_periode():
-    liste_champs_pediode = {"date_debut": "", "date_fin": ""}
+def initial_champ_interval():
+    liste_champs = {"date_debut": "", "date_fin": ""}
 
-    return liste_champs_pediode
+    return liste_champs
+
+
+def initial_champ_etablissement():
+    liste_champs = {"date_debut": "", "date_fin": "", "etablissement": ""}
+
+    return liste_champs
 
 
 def initial_champ_importation_xml():
@@ -122,11 +128,19 @@ def remplissage_champs_importation_xml(liste_champs_xml, un_contrevenant):
     return liste_champs_xml
 
 
-def remplissage_champs_periode(liste_champs_pediode, date_debut, date_fin):
-    liste_champs_pediode['date_debut'] = date_debut
-    liste_champs_pediode['date_fin'] = date_fin
+def remplissage_champs_interval(liste_champs, date_debut, date_fin):
+    liste_champs['date_debut'] = date_debut
+    liste_champs['date_fin'] = date_fin
 
-    return liste_champs_pediode
+    return liste_champs
+
+
+def remplissage_champs_etablissement(liste_champs, date_debut, date_fin, nom):
+    liste_champs['date_debut'] = date_debut
+    liste_champs['date_fin'] = date_fin
+    liste_champs['etablissement'] = nom
+
+    return liste_champs
 
 
 def convertisseur_date(date_a_convertir):
@@ -194,14 +208,21 @@ def initial_champ_recherche_validation():
     return liste_validation
 
 
-def initial_champ_periode_validation():
-    liste_validation_periode = {"situation_erreur": False,
-                                "champ_debut_inv": False,
-                                "champ_fin_inv": False,
-                                "champ_debut_vide": False,
-                                "champ_fin_vide": False}
+def initial_champ_interval_validation():
+    liste_validation = {"situation_erreur": False, "champ_debut_inv": False,
+                        "champ_fin_inv": False, "champ_debut_vide": False,
+                        "champ_fin_vide": False}
 
-    return liste_validation_periode
+    return liste_validation
+
+
+def initial_champ_etablissement_validation():
+    liste_validation = {"situation_erreur": False, "champ_debut_inv": False,
+                        "champ_fin_inv": False, "champ_debut_vide": False,
+                        "champ_fin_vide": False,
+                        "champ_etablissement_vide": False}
+
+    return liste_validation
 
 
 def remplissage_champ_recherche(request, liste_champs):
@@ -227,23 +248,47 @@ def nombre_critiere_recherche(liste_champs):
     return nombre
 
 
-def validation_champs_periode(liste_champs_pediode, liste_validation_periode):
-    if liste_champs_pediode['date_debut'] == "":
-        liste_validation_periode['champ_debut_vide'] = True
+def validation_champs_interval(liste_champs, liste_validation):
+    liste_validation = sous_validation_champs_vide_ajax(liste_champs,
+                                                        liste_validation)
+    liste_validation = sous_validation_champs_invalide_ajax(liste_champs,
+                                                            liste_validation)
 
-    if liste_champs_pediode['date_fin'] == "":
-        liste_validation_periode['champ_fin_vide'] = True
+    return liste_validation
 
+
+def validation_champs_etablissement(liste_champs, liste_validation):
+    liste_validation = sous_validation_champs_vide_ajax(liste_champs,
+                                                        liste_validation)
+    liste_validation = sous_validation_champs_invalide_ajax(liste_champs,
+                                                            liste_validation)
+    if liste_champs['etablissement'] == "":
+        liste_validation['champ_etablissement_vide'] = True
+
+    return liste_validation
+
+
+def sous_validation_champs_vide_ajax(liste_champs, liste_validation):
+    if liste_champs['date_debut'] == "":
+        liste_validation['champ_debut_vide'] = True
+
+    if liste_champs['date_fin'] == "":
+        liste_validation['champ_fin_vide'] = True
+
+    return liste_validation
+
+
+def sous_validation_champs_invalide_ajax(liste_champs, liste_validation):
     match_date = re.compile(PATTERN_DATE).match
-    if not liste_validation_periode['champ_debut_vide']:
-        if match_date(liste_champs_pediode['date_debut']) is None:
-            liste_validation_periode['champ_debut_inv'] = True
+    if not liste_validation['champ_debut_vide']:
+        if match_date(liste_champs['date_debut']) is None:
+            liste_validation['champ_debut_inv'] = True
 
-    if not liste_validation_periode['champ_fin_vide']:
-        if match_date(liste_champs_pediode['date_fin']) is None:
-            liste_validation_periode['champ_fin_inv'] = True
+    if not liste_validation['champ_fin_vide']:
+        if match_date(liste_champs['date_fin']) is None:
+            liste_validation['champ_fin_inv'] = True
 
-    return liste_validation_periode
+    return liste_validation
 
 
 def validation_champs_recherche(liste_champs, liste_validation):
@@ -323,13 +368,13 @@ def situation_erreur(liste_validation):
     return liste_validation
 
 
-def situation_erreur_periode(liste_validation_periode):
-    for cle, valeur in liste_validation_periode.items():
+def situation_erreur_interval(liste_validation):
+    for cle, valeur in liste_validation.items():
         if valeur:
-            liste_validation_periode['situation_erreur'] = True
+            liste_validation['situation_erreur'] = True
             break
 
-    return liste_validation_periode
+    return liste_validation
 
 
 def message_erreur_recherche(liste_validation):

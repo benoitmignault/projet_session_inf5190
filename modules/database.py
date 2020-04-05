@@ -76,7 +76,7 @@ class Database:
         result = cursor.fetchall()
         return result
 
-    def liste_contrevenant_periode_temps(self, date_debut, date_fin):
+    def liste_contrevenant_interval(self, date_debut, date_fin):
         cursor = self.get_connection().cursor()
         select = "select proprietaire, categorie, etablissement, no_civique, " \
                  "nom_rue, ville, description, date_infraction," \
@@ -91,7 +91,7 @@ class Database:
 
         return ensemble_trouve
 
-    def nombre_contravention_periode_temps(self, date_debut, date_fin):
+    def nombre_contravention_interval(self, date_debut, date_fin):
         cursor = self.get_connection().cursor()
         select = "select etablissement, count(*) as nombre "
         fromm = "from mauvais_restaurants "

@@ -111,29 +111,29 @@ scheduler.start()
 # Deuxième partie de A4 sera de créer une documentation RAML
 @app.route('/api/contrevenants/du=<date_debut>&au=<date_fin>',
            methods=["GET", "POST"])
-def recherche_contrevenants_periode(date_debut, date_fin):
-    liste_champs_pediode = initial_champ_periode()
-    liste_validation_periode = initial_champ_periode_validation()
-    liste_champs_pediode = remplissage_champs_periode(liste_champs_pediode,
-                                                      date_debut, date_fin)
-    liste_validation_periode = validation_champs_periode(
-        liste_champs_pediode, liste_validation_periode)
-    liste_validation_periode = situation_erreur_periode(
-        liste_validation_periode)
+def recherche_contrevenants_interval(date_debut, date_fin):
+    liste_champs_interval = initial_champ_interval()
+    liste_validation_interval = initial_champ_interval_validation()
+    liste_champs_interval = remplissage_champs_interval(liste_champs_interval,
+                                                        date_debut, date_fin)
+    liste_validation_interval = validation_champs_interval(
+        liste_champs_interval, liste_validation_interval)
+    liste_validation_interval = situation_erreur_interval(
+        liste_validation_interval)
 
     ensemble_trouve = []
-    if not liste_validation_periode['situation_erreur']:
+    if not liste_validation_interval['situation_erreur']:
         conn_db = get_db()
 
         if request.method == "GET":
-            ensemble_trouve = conn_db.liste_contrevenant_periode_temps(
-                liste_champs_pediode['date_debut'],
-                liste_champs_pediode['date_fin'])
+            ensemble_trouve = conn_db.liste_contrevenant_interval(
+                liste_champs_interval['date_debut'],
+                liste_champs_interval['date_fin'])
 
         elif request.method == "POST":
-            ensemble_trouve = conn_db.nombre_contravention_periode_temps(
-                liste_champs_pediode['date_debut'],
-                liste_champs_pediode['date_fin'])
+            ensemble_trouve = conn_db.nombre_contravention_interval(
+                liste_champs_interval['date_debut'],
+                liste_champs_interval['date_fin'])
 
         return jsonify(ensemble_trouve)
 
@@ -141,7 +141,21 @@ def recherche_contrevenants_periode(date_debut, date_fin):
         return "", 400
 
 
-# Création de la branche pour A6
+# Cette fonction était pour la tache A6
+@app.route(
+    '/api/contrevenant/du=<date_debut>&au=<date_fin>&etablissement=<nom>',
+    methods=["GET"])
+def recherche_liste_contravention_par_etablissement(date_debut, date_fin, nom):
+    liste_champs_etablissement = initial_champ_etablissement()
+    liste_validation_etablissement = initial_champ_etablissement_validation()
+    liste_champs_etablissement = remplissage_champs_etablissement(
+        liste_champs_etablissement,
+        date_debut, date_fin, nom)
+    liste_validation_etablissement = validation_champs_etablissement(
+        liste_champs_etablissement, liste_validation_etablissement)
+    liste_validation_etablissement = situation_erreur_interval(
+        liste_validation_etablissement)
+
 
 # Section pour importer directement les informations de la ville via URL.
 def main():

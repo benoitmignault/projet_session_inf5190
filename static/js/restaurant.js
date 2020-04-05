@@ -102,7 +102,7 @@ function recherche_par_interval(){
         erreur_general = verification_date_fin (pattern_date, erreur_localise, erreur_general);
         if (partie_cache.style.display == "flex"){
             erreur_general = verification_choix_etablissement(erreur_localise, erreur_general);
-            // Le nouvel appel ajax
+            appel_ajax_interval_etablissement(erreur_general);
         } else {
             appel_ajax_interval(erreur_general);
         }
@@ -178,7 +178,7 @@ function appel_ajax_interval(erreur_general){
                 if (ajax.status === 200) {
                     var liste = JSON.parse(ajax.responseText);
                     if (liste.length > 0){
-                        var ensemble_result = creation_bloc_html(liste);
+                        var ensemble_result = creation_bloc_html_interval(liste);
                         result_interval.innerHTML = ensemble_result['result_interval'];
                         construction_des_options(ensemble_result['result_etablissement'])
                         partie_cache.style.display = "flex";
@@ -193,13 +193,31 @@ function appel_ajax_interval(erreur_general){
                 }
             }
         };
-        var param = "du="+champ_date_debut.value+"&au="+champ_date_fin.value;
+        var param = `du=${champ_date_debut.value}&au=${champ_date_fin.value}`;
         ajax.open("POST", "/api/contrevenants/"+param, true);
         ajax.send();
     } else {
         form_interval.style.border = "2px solid red";
     }
 }
+
+function appel_ajax_interval_etablissement(erreur_general){
+    if (!erreur_general){
+        var ajax = new XMLHttpRequest();
+        ajax.onreadystatechange = function() {
+
+        };
+        var param = `du=${champ_date_debut.value}&au=${champ_date_fin.value}&etablissement=${champ_etablissement.value}`;
+        ajax.open("GET", "/api/contrevenant/"+param, true);
+        ajax.send();
+
+
+
+    } else {
+        form_interval.style.border = "2px solid red";
+    }
+}
+
 
 // Cette fonction sera utilisée pour caché la section du menu déroulant si le résultat retourne rien
 // Les anciennes information du tableau des établissements avec leur nombre de contravention n'est plus valide
@@ -228,7 +246,7 @@ function destruction_des_options(){
 
 // J'ai découvert comment faire des string avec des variables
 // https://stackoverflow.com/questions/19105009/how-to-insert-variables-in-javascript-strings/44510325
-function creation_bloc_html(liste){
+function creation_bloc_html_interval(liste){
     // La liste des établissements à insérer plutard comme option du menu déroulant
     var result_etablissement = [];
     // Le bloc HTML pour le résultat de la liste des établissements ave leur nombre de contrevantions
