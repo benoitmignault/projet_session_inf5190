@@ -56,7 +56,6 @@ function initialiser_tous_champs(type_champs){
     });
 }
 
-
 function effacer_messages_erreurs(message){
     // Nous devons vérifier que les variables ne sont pas égales à «undefined»
     if (message){
@@ -148,18 +147,26 @@ function verification_date_fin(pattern_date, erreur_localise, erreur_general){
 }
 
 function appel_ajax(erreur_general){
+    destruction_des_options(); // On retire toutes les options avant d'insérer les nouvelles
     if (!erreur_general){
-        destruction_des_options(); // On retire toutes les options avant d'insérer les nouvelles
         var ajax = new XMLHttpRequest();
         ajax.onreadystatechange = function() {
             if (ajax.readyState === XMLHttpRequest.DONE) {
                 if (ajax.status === 200) {
-                    var ensemble_result = creation_bloc_html(ajax);
-                    result_interval.innerHTML = ensemble_result['result_interval'];
-                    construction_des_options(ensemble_result['result_etablissement'])
-                    partie_cache.style.display = "flex";
+                    var liste = JSON.parse(ajax.responseText);
+                    if (liste.length > 0){
+                        var ensemble_result = creation_bloc_html(liste);
+                        result_interval.innerHTML = ensemble_result['result_interval'];
+                        construction_des_options(ensemble_result['result_etablissement'])
+                        partie_cache.style.display = "flex";
+                        form_interval.style.border = "2px solid black";
+                    } else {
+                        appel_ajax_succes_mais_erreur();
+                        message_erreur_interval.innerHTML += "<li>L'interval de date ne contenait aucune donnée !</li>";
+                    }
                 } else {
-                    result_interval.innerHTML = "Attention ! Il y a eu une erreur avec la réponse du serveur !";
+                    appel_ajax_succes_mais_erreur();
+                    message_erreur_interval.innerHTML += "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
                 }
             }
         };
@@ -169,6 +176,14 @@ function appel_ajax(erreur_general){
     } else {
         form_interval.style.border = "2px solid red";
     }
+}
+
+// Cette fonction sera utilisée pour caché la section du menu déroulant si le résultat retourne rien
+// Les anciennes information du tableau des établissements avec leur nombre de contravention n'est plus valide
+function appel_ajax_succes_mais_erreur(){
+    partie_cache.style.display = "none";
+    result_interval.innerHTML = "";
+    form_interval.style.border = "2px solid red";
 }
 
 function construction_des_options(liste_options){
@@ -190,8 +205,7 @@ function destruction_des_options(){
 
 // J'ai découvert comment faire des string avec des variables
 // https://stackoverflow.com/questions/19105009/how-to-insert-variables-in-javascript-strings/44510325
-function creation_bloc_html(ajax){
-    var liste = JSON.parse(ajax.responseText);
+function creation_bloc_html(liste){
     // La liste des établissements à insérer plutard comme option du menu déroulant
     var result_etablissement = [];
     // Le bloc HTML pour le résultat de la liste des établissements ave leur nombre de contrevantions
