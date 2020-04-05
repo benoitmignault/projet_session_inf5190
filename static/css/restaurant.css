@@ -64,7 +64,7 @@ h2 {
     margin: 0px;
 }
 
-.container > .zone_recherche_resto > #result_recher_rapide,
+.container > .zone_recherche_resto > #result_interval,
 .container > .zone_admin,
 .container > .zone_recherche_resto,
 .container > .zone_404,
@@ -79,6 +79,9 @@ h2 {
     border-radius: 10px;
     justify-content: center;
     align-items: center;
+}
+.container > .zone_recherche_resto > #result_interval{
+    padding: 0px;
 }
 
 .container > .zone_recherche_resto > #result_recher_rapide{
@@ -146,50 +149,51 @@ h2 {
     font-size: 18px;
 }
 
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto,
-.container > .zone_recherche_resto > .tabeau_resto,
-.container > .zone_recherche_resto > form{
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto,
+.container > .zone_recherche_resto > #recherche_par_interval,
+.container > .zone_recherche_resto > #recherche,
+.container > .zone_recherche_resto > .tabeau_resto{
     width: 100%;
     border-radius: 10px;
     border: 2px solid black;
     padding: 10px;
 }
 
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto{
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto{
     border-spacing: 0;
     padding: 0px;
 }
 
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto th,
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto td,
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto th,
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto td,
 .container > .zone_recherche_resto > .tabeau_resto td{
     padding: 5px;
 }
 
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto th,
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto td{
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto th,
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto td{
     border-bottom: 1px solid black;
 }
 
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto thead .nom,
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto thead .quantite{
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto thead .nom,
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto thead .quantite{
     font-weight: bold;
 }
 
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto thead .nom,
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto tbody .nom,
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto thead .quantite,
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto tbody .quantite{
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto thead .nom,
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto tbody .nom,
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto thead .quantite,
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto tbody .quantite{
     text-align: center;
 }
 
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto thead .nom,
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto tbody .nom{
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto thead .nom,
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto tbody .nom{
     width: 80%;
 }
 
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto thead .quantite,
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto tbody .quantite{
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto thead .quantite,
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto tbody .quantite{
     width: 20%;
 }
 
@@ -200,7 +204,7 @@ h2 {
 }
 
 .container > .zone_recherche_resto > .tabeau_resto .valeur{
-    text-align: left;
+    text-align: justify;
     width: 70%;
 }
 
@@ -267,7 +271,7 @@ h2 {
     border: 2px solid red;
 }
 
-.container > .zone_recherche_resto > .erreur{
+.container > .zone_recherche_resto > #recherche.erreur{
     border-color: red;
 }
 

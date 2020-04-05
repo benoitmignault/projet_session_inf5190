@@ -29,12 +29,14 @@ function reset_recherche(){
 }
 
 function reset_recherche_interval(){
-    champ_date_debut.defaultValue = "";
-    champ_date_fin.defaultValue = "";
-    section_result.innerHTML = "";
-
-    effacer_messages_erreurs(message_aucun_rapide);
-    re_initialiser_tous_champs("input[type=text]");
+    $(btn_reset_interval).click(function() {
+        champ_date_debut.defaultValue = "";
+        champ_date_fin.defaultValue = "";
+        result_interval.innerHTML = "";
+        effacer_messages_erreurs(message_erreur_interval);
+        initialiser_tous_champs("input[type=text]");
+        initialiser_tous_champs("#recherche_par_interval");
+    });
 }
 
 function initialiser_tous_champs(type_champs){
@@ -82,13 +84,13 @@ function validation_regex(champ, type_regex){
     }
 }
 
-function recherche_rapide_par_interval(){
+function recherche_par_interval(){
     $(form_interval).submit(function (e) {
         e.preventDefault();
         var erreur_general = false;
         var erreur_localise = false;
         var pattern_date = new RegExp("^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$");
-        message_aucun_rapide.innerHTML = ""; // On remet la section des messages vide
+        message_erreur_interval.innerHTML = ""; // On remet la section des messages vide
         erreur_general = verification_date_debut (pattern_date, erreur_localise, erreur_general);
         erreur_general = verification_date_fin (pattern_date, erreur_localise, erreur_general);
         appel_ajax(erreur_general);
@@ -96,44 +98,44 @@ function recherche_rapide_par_interval(){
 }
 
 function verification_date_debut(pattern_date, erreur_localise, erreur_general){
-    if (date_debut.value == "") {
-        message_aucun_rapide.innerHTML += "<li>Le champ «Date début» ne peut être vide !</li>";
+    if (champ_date_debut.value == "") {
+        message_erreur_interval.innerHTML += "<li>Le champ «Date début» ne peut être vide !</li>";
         erreur_localise = true;
-    } else if (!(pattern_date.test(date_debut.value))) {
-        message_aucun_rapide.innerHTML += "<li>Le champ «Date début» ne contient pas une date au format ISO 8601 valide !</li>";
+    } else if (!(pattern_date.test(champ_date_debut.value))) {
+        message_erreur_interval.innerHTML += "<li>Le champ «Date début» ne contient pas une date au format ISO 8601 !</li>";
         erreur_localise = true;
     }
 
     if (erreur_localise){
-        date_debut.style.border = "2px solid red";
-        date_debut.style.background = "#FCDEDE";
+        champ_date_debut.style.border = "2px solid red";
+        champ_date_debut.style.background = "#FCDEDE";
         erreur_localise = false; // on reset l'indicateur pour le prochain champ
         erreur_general = true;
     } else {
-        date_debut.style.background = "white";
-        date_debut.style.border = "1px solid #ccc";
+        champ_date_debut.style.background = "white";
+        champ_date_debut.style.border = "1px solid #ccc";
     }
 
     return erreur_general;
 }
 
 function verification_date_fin(pattern_date, erreur_localise, erreur_general){
-    if (date_fin.value == "") {
-        message_aucun_rapide.innerHTML += "<li>Le champ «Date fin» ne peut être vide !</li>";
+    if (champ_date_fin.value == "") {
+        message_erreur_interval.innerHTML += "<li>Le champ «Date fin» ne peut être vide !</li>";
         erreur_localise = true;
-    } else if (!(pattern_date.test(date_fin.value))) {
-        message_aucun_rapide.innerHTML += "<li>Le champ «Date fin» ne contient pas une date au format ISO 8601 valide !</li>";
+    } else if (!(pattern_date.test(champ_date_fin.value))) {
+        message_erreur_interval.innerHTML += "<li>Le champ «Date fin» ne contient pas une date au format ISO 8601 !</li>";
         erreur_localise = true;
     }
 
     if (erreur_localise){
-        date_fin.style.border = "2px solid red";
-        date_fin.style.background = "#FCDEDE";
+        champ_date_fin.style.border = "2px solid red";
+        champ_date_fin.style.background = "#FCDEDE";
         erreur_localise = false; // on reset l'indicateur pour le prochain champ
         erreur_general = true;
     } else {
-        date_fin.style.background = "white";
-        date_fin.style.border = "1px solid #ccc";
+        champ_date_fin.style.background = "white";
+        champ_date_fin.style.border = "1px solid #ccc";
     }
 
     return erreur_general;
@@ -146,15 +148,17 @@ function appel_ajax(erreur_general){
         ajax.onreadystatechange = function() {
             if (ajax.readyState === XMLHttpRequest.DONE) {
                 if (ajax.status === 200) {
-                    section_result.innerHTML = creation_bloc_html(ajax);
+                    result_interval.innerHTML = creation_bloc_html(ajax);
                 } else {
-                    section_result.innerHTML = "Attention ! Il y a eu une erreur avec la réponse du serveur !";
+                    result_interval.innerHTML = "Attention ! Il y a eu une erreur avec la réponse du serveur !";
                 }
             }
         };
-        var param = "du="+date_debut.value+"&au="+date_fin.value;
+        var param = "du="+champ_date_debut.value+"&au="+champ_date_fin.value;
         ajax.open("POST", "/api/contrevenants/"+param, true);
         ajax.send();
+    } else {
+        form_interval.style.border = "2px solid red";
     }
 }
 
@@ -178,7 +182,7 @@ function creation_bloc_html(ajax){
 
 document.addEventListener('DOMContentLoaded', function () {
     validation_champs_recherches();
-    recherche_rapide_par_interval();
+    recherche_par_interval();
     reset_recherche();
     reset_recherche_interval();
 });
