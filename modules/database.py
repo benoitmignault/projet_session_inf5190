@@ -105,6 +105,20 @@ class Database:
 
         return ensemble_trouve
 
+    def liste_contravention_etablissement(self, date_debut, date_fin, nom):
+        cursor = self.get_connection().cursor()
+        select = "select categorie, no_civique, nom_rue, ville, description," \
+                 "date_infraction, date_jugement, montant_amende "
+        fromm = "from mauvais_restaurants "
+        where = "where date_infraction BETWEEN ? AND ? AND etablissement = ? "
+        order = "order by date_infraction "
+        sql = select + fromm + where + order
+        cursor.execute(sql, (date_debut, date_fin, nom))
+        result = cursor.fetchall()
+        ensemble_trouve = recuperation_liste_contravention_etablissement(result)
+
+        return ensemble_trouve
+
 
 def remplissage_condition_sql(liste_champs):
     # La préparation des critères en vue d'utiliser l'opérateur like aura
@@ -242,5 +256,23 @@ def recuperation_resultat_liste(result):
     if result is not None:
         for un_resto in result:
             ensemble_trouve.append(un_resto[0])
+
+    return ensemble_trouve
+
+
+# Cette fonction sera utiliser pour la tache A6
+def recuperation_liste_contravention_etablissement(result):
+    ensemble_trouve = []
+    if result is not None:
+        for une_contravention in result:
+            sous_ensemble = {'Catégorie': une_contravention[0],
+                             'Adresse': une_contravention[1] + " " +
+                                        une_contravention[2],
+                             'Ville': une_contravention[3],
+                             'Description': une_contravention[4],
+                             "Date d'infraction": une_contravention[5],
+                             'Date de jugement': une_contravention[6],
+                             "Montant de l'amende": une_contravention[7]}
+            ensemble_trouve.append(sous_ensemble)
 
     return ensemble_trouve

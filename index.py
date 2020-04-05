@@ -167,12 +167,24 @@ def recherche_liste_contravention_par_etablissement(date_debut, date_fin, nom):
     liste_validation_etablissement = situation_erreur_interval(
         liste_validation_etablissement)
 
-    ensemble_trouve = []
+    if not liste_validation_etablissement['situation_erreur']:
+        conn_db = get_db()
+
+        ensemble_trouve = conn_db.liste_contravention_etablissement(
+            liste_champs_etablissement['date_debut'],
+            liste_champs_etablissement['date_fin'],
+            liste_champs_etablissement['etablissement'])
+
+        return jsonify(ensemble_trouve)
+
+    else:
+        titre = "Erreur Système - 400"
+        erreur_400 = True
+        return render_template('erreur_400.html', titre=titre,
+                               erreur_400=erreur_400), 400
 
 
-# Section pour importer directement les informations de la ville via URL.
 def main():
-    # Cette fonction était pour la tache A1
     importation_donnees()
 
 
