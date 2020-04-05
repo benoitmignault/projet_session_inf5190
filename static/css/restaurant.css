@@ -29,7 +29,7 @@ h1 {
     margin: auto;
     margin-top: 15px;
     margin-bottom: 15px;
-    width: 87%;
+    width: 60%;
 }
 
 h2,h1 {
@@ -56,6 +56,24 @@ h2 {
     margin: auto;
 }
 
+.container_erreur{
+    margin-top: 20px;
+}
+
+.erreur_400{
+    text-align: center;
+}
+
+.erreur_400 > img{
+    max-width: 35%;
+    height: auto;
+    margin: auto;
+}
+
+.erreur_400 > .pic_400{
+    max-width: 45%;
+}
+
 .container > form{
     width: 100%;
 }
@@ -64,21 +82,34 @@ h2 {
     margin: 0px;
 }
 
-.container > .zone_recherche_resto > #result_recher_rapide,
+.container > .zone_recherche_resto > #result_interval_etablissement,
+.container > .zone_recherche_resto > #result_interval,
 .container > .zone_admin,
 .container > .zone_recherche_resto,
-.container > .zone_404,
 .container > .erreur_404{
     width: 100%;
     background-color: #c8c8c8;
     display: -webkit-flex;
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: 15px;
     padding: 10px;
     border-radius: 10px;
     justify-content: center;
     align-items: center;
+}
+.container > .recherche{
+    margin-bottom: 20px;
+}
+
+.container_erreur > .zone_404{
+    display: -webkit-flex;
+    display: flex;
+    justify-content: center;
+}
+
+.container > .zone_recherche_resto > #result_interval_etablissement,
+.container > .zone_recherche_resto > #result_interval{
+    padding: 0px;
 }
 
 .container > .zone_recherche_resto > #result_recher_rapide{
@@ -98,7 +129,8 @@ h2 {
     width: 100%;
 }
 
-.container > .zone_recherche_resto > form > ul > li{
+.container > .zone_recherche_resto > form > ul > li,
+.container > .zone_recherche_resto > form > .modif > .information > ul > li{
     font-weight: bold;
     padding-left: 15px;
     height: 15px;
@@ -107,7 +139,8 @@ h2 {
     margin-left: 30px;
 }
 
-.container > .zone_recherche_resto > form > div > div > div > input[type=text]{
+.container > .zone_recherche_resto > form > div > div > div > input[type=text],
+.container > .zone_recherche_resto > form > div > div > div > select{
     border-radius: 10px;
     padding: 5px;
     border: 1px solid #ccc;
@@ -117,12 +150,21 @@ h2 {
     width: 50%;
 }
 
-.container > .zone_recherche_resto > form > .aucun{
+.container > .zone_recherche_resto > form > div > div > div > select{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;       /* Remove default arrow */
+    background-color: white;
+}
+
+.container > .zone_recherche_resto > form > .aucun,
+.aucun{
     font-weight: bold;
     color:red;
-    font-size: 20px;
-    margin: 5px;
-    margin-top: 15px;
+}
+
+.err_400{
+    width: 10%;
 }
 
 .container h2 span{
@@ -138,61 +180,71 @@ h2 {
     font-size: 18px;
 }
 
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto,
-.container > .zone_recherche_resto > .tabeau_resto,
-.container > .zone_recherche_resto > form{
+
+.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto,
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto,
+.container > .zone_recherche_resto > #recherche_par_interval,
+.container > .zone_recherche_resto > #recherche,
+.container > .zone_recherche_resto > .tabeau_resto{
     width: 100%;
     border-radius: 10px;
     border: 2px solid black;
     padding: 10px;
 }
 
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto{
+.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto{
+    margin-bottom: 15px;
+}
+
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto{
     border-spacing: 0;
     padding: 0px;
 }
 
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto th,
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto td,
+
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto th,
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto td,
 .container > .zone_recherche_resto > .tabeau_resto td{
     padding: 5px;
 }
 
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto th,
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto td{
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto th,
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto td{
     border-bottom: 1px solid black;
 }
 
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto thead .nom,
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto thead .quantite{
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto thead .nom,
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto thead .quantite{
     font-weight: bold;
 }
 
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto thead .nom,
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto tbody .nom,
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto thead .quantite,
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto tbody .quantite{
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto thead .nom,
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto tbody .nom,
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto thead .quantite,
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto tbody .quantite{
     text-align: center;
 }
 
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto thead .nom,
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto tbody .nom{
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto thead .nom,
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto tbody .nom{
     width: 80%;
 }
 
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto thead .quantite,
-.container > .zone_recherche_resto > #result_recher_rapide > .tabeau_resto tbody .quantite{
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto thead .quantite,
+.container > .zone_recherche_resto > #result_interval > .tabeau_resto tbody .quantite{
     width: 20%;
 }
 
+.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .cle,
 .container > .zone_recherche_resto > .tabeau_resto .cle{
     font-weight: bold;
     text-align: right;
     width: 30%;
 }
 
+.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .valeur,
 .container > .zone_recherche_resto > .tabeau_resto .valeur{
-    text-align: left;
+    text-align: justify;
     width: 70%;
 }
 
@@ -227,6 +279,9 @@ h2 {
     flex-direction: column;
 }
 
+.container > .zone_recherche_resto > form > .modif > .partie_cache{
+    display: none;
+}
 .container > .zone_recherche_resto > form > .modif > .information > div {
     width: 100%;
     display: flex;
@@ -259,7 +314,7 @@ h2 {
     border: 2px solid red;
 }
 
-.container > .zone_recherche_resto > .erreur{
+.container > .zone_recherche_resto > #recherche.erreur{
     border-color: red;
 }
 
@@ -269,7 +324,7 @@ h2 {
 .container > .zone_recherche_resto > .admin_modif > .bouton,
 .container > .zone_admin > .admin > .bouton,
 .container > .zone_article_recent > .tabeau_article > tbody > tr > .valeur > .bouton,
-.container > .zone_404 > .admin > .bouton_404{
+.container_erreur > .zone_404 > .admin > .bouton_404{
     background: #507d99;
     background-image: -webkit-linear-gradient(top, #507d99, #96cceb);
     background-image: -moz-linear-gradient(top, #507d99, #96cceb);
@@ -288,13 +343,13 @@ h2 {
     text-decoration: none;
     text-align: center;
 }
-.container > .zone_404 > .admin > .bouton_404{
+.container_erreur > .zone_404 > .admin > .bouton_404{
     margin-right: 0px;
 }
 
 .container > .zone_recherche_resto > form > .troisBTN > .bouton:hover,
 .container > .zone_recherche_resto > .admin_modif > .bouton:hover,
-.container > .zone_404 > .admin > .bouton_404:hover,
+.container_erreur > .zone_404 > .admin > .bouton_404:hover,
 .container > form > .zone_recherche > .troisBTN > .bouton:hover,
 .container > .zone_admin > .admin > .bouton:hover,
 .container > .zone_recherche_resto > .tabeau_article > tbody > tr > .valeur > .bouton:hover{

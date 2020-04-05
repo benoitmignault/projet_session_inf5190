@@ -4,13 +4,21 @@ from apscheduler.triggers.cron import CronTrigger
 from flask import Flask, jsonify, redirect, render_template, request, session, \
     url_for
 
-from modules.rest import *
+from modules.fonction import *
 
 app = Flask(__name__, static_url_path='', static_folder='static')
 
 # Déclaration de la secret key pour me permettre utiliser
 # les variables de sessions
 app.secret_key = "(*&*&322387he738220)(*(*22347657"
+
+
+@app.errorhandler(404)
+def not_found(e):
+    erreur_404 = True
+    titre = "Page inexistante - 404"
+    return render_template("erreur_404.html", titre=titre,
+                           erreur_404=erreur_404)
 
 
 @app.teardown_appcontext
@@ -39,7 +47,11 @@ def home():
         liste_champs = initial_champ_recherche()
         liste_validation = initial_champ_recherche_validation()
 
+    conn_db = get_db()
+    liste_etablissement = conn_db.liste_tous_restaurants()
+
     return render_template('home.html', titre=titre,
+                           liste_etablissement=liste_etablissement,
                            liste_validation=liste_validation,
                            liste_champs=liste_champs)
 
@@ -55,10 +67,13 @@ def recherche_restaurant():
     conn_db = get_db()
     ensemble_trouve = {}
     if not liste_validation['champs_vides']:
-        ensemble_trouve = conn_db.get_restaurant_trouver(liste_champs)
+        ensemble_trouve = conn_db.liste_restaurant_trouver(liste_champs)
         liste_champs['nb_restaurant_trouve'] = len(ensemble_trouve)
         if liste_champs['nb_restaurant_trouve'] == 0:
             liste_validation['aucun_restaurant_trouve'] = True
+
+    else:
+        liste_validation['aucun_restaurant_trouve'] = True
 
     liste_validation = situation_erreur(liste_validation)
     # Utilisation des variables de sessions pour transporter
@@ -101,44 +116,75 @@ scheduler.add_job(mise_jour_bd, trigger)
 scheduler.start()
 
 
-# Creation de la tache A4
-# Première partie de A4 sera de retourner en json l'information
 # Deuxième partie de A4 sera de créer une documentation RAML
 @app.route('/api/contrevenants/du=<date_debut>&au=<date_fin>',
            methods=["GET", "POST"])
-def recherche_contrevenants_periode(date_debut, date_fin):
-    liste_champs_pediode = initial_champ_periode()
-    liste_validation_periode = initial_champ_periode_validation()
-    liste_champs_pediode = remplissage_champs_periode(liste_champs_pediode,
-                                                      date_debut, date_fin)
-    liste_validation_periode = validation_champs_periode(
-        liste_champs_pediode, liste_validation_periode)
-    liste_validation_periode = situation_erreur_periode(
-        liste_validation_periode)
+def recherche_contrevenants_interval(date_debut, date_fin):
+    liste_champs_interval = initial_champ_interval()
+    liste_validation_interval = initial_champ_interval_validation()
+    liste_champs_interval = remplissage_champs_interval(liste_champs_interval,
+                                                        date_debut, date_fin)
+    liste_validation_interval = validation_champs_interval(
+        liste_champs_interval, liste_validation_interval)
+    liste_validation_interval = situation_erreur_interval(
+        liste_validation_interval)
 
     ensemble_trouve = []
-    if not liste_validation_periode['situation_erreur']:
+    if not liste_validation_interval['situation_erreur']:
         conn_db = get_db()
 
         if request.method == "GET":
-            ensemble_trouve = conn_db.liste_contrevenant_periode_temps(
-                liste_champs_pediode['date_debut'],
-                liste_champs_pediode['date_fin'])
+            ensemble_trouve = conn_db.liste_contrevenant_interval(
+                liste_champs_interval['date_debut'],
+                liste_champs_interval['date_fin'])
 
         elif request.method == "POST":
-            ensemble_trouve = conn_db.nombre_contravention_periode_temps(
-                liste_champs_pediode['date_debut'],
-                liste_champs_pediode['date_fin'])
+            ensemble_trouve = conn_db.nombre_contravention_interval(
+                liste_champs_interval['date_debut'],
+                liste_champs_interval['date_fin'])
 
         return jsonify(ensemble_trouve)
 
     else:
-        return "", 400
+        titre = "Erreur Système - 400"
+        erreur_400 = True
+        return render_template('erreur_400.html', titre=titre,
+                               erreur_400=erreur_400), 400
 
 
-# Section pour importer directement les informations de la ville via URL.
+# Cette fonction était pour la tache A6
+@app.route(
+    '/api/contrevenant/du=<date_debut>&au=<date_fin>&etablissement=<nom>',
+    methods=["GET"])
+def recherche_liste_contravention_par_etablissement(date_debut, date_fin, nom):
+    liste_champs_etablissement = initial_champ_etablissement()
+    liste_validation_etablissement = initial_champ_etablissement_validation()
+    liste_champs_etablissement = remplissage_champs_etablissement(
+        liste_champs_etablissement,
+        date_debut, date_fin, nom)
+    liste_validation_etablissement = validation_champs_etablissement(
+        liste_champs_etablissement, liste_validation_etablissement)
+    liste_validation_etablissement = situation_erreur_interval(
+        liste_validation_etablissement)
+
+    if not liste_validation_etablissement['situation_erreur']:
+        conn_db = get_db()
+
+        ensemble_trouve = conn_db.liste_contravention_etablissement(
+            liste_champs_etablissement['date_debut'],
+            liste_champs_etablissement['date_fin'],
+            liste_champs_etablissement['etablissement'])
+
+        return jsonify(ensemble_trouve)
+
+    else:
+        titre = "Erreur Système - 400"
+        erreur_400 = True
+        return render_template('erreur_400.html', titre=titre,
+                               erreur_400=erreur_400), 400
+
+
 def main():
-    # Cette fonction était pour la tache A1
     importation_donnees()
 
 
