@@ -94,6 +94,9 @@ function validation_regex(champ, type_regex){
 // Les deux requêtes ajax passeront par la même entrée mais devront être différenciées
 // On va utiliser la vérification de l'attribut «display» de la section cachée
 function recherche_par_interval(){
+    $(champ_date_debut).change(function () {
+
+    });
     $(form_interval).submit(function (e) {
         e.preventDefault();
         var erreur_general = false;
