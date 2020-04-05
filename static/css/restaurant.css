@@ -29,7 +29,7 @@ h1 {
     margin: auto;
     margin-top: 15px;
     margin-bottom: 15px;
-    width: 87%;
+    width: 60%;
 }
 
 h2,h1 {
@@ -56,6 +56,24 @@ h2 {
     margin: auto;
 }
 
+.container_erreur{
+    margin-top: 20px;
+}
+
+.erreur_400{
+    text-align: center;
+}
+
+.erreur_400 > img{
+    max-width: 35%;
+    height: auto;
+    margin: auto;
+}
+
+.erreur_400 > .pic_400{
+    max-width: 45%;
+}
+
 .container > form{
     width: 100%;
 }
@@ -67,7 +85,6 @@ h2 {
 .container > .zone_recherche_resto > #result_interval,
 .container > .zone_admin,
 .container > .zone_recherche_resto,
-.container > .zone_404,
 .container > .erreur_404{
     width: 100%;
     background-color: #c8c8c8;
@@ -80,6 +97,13 @@ h2 {
     justify-content: center;
     align-items: center;
 }
+
+.container_erreur > .zone_404{
+    display: -webkit-flex;
+    display: flex;
+    justify-content: center;
+}
+
 .container > .zone_recherche_resto > #result_interval{
     padding: 0px;
 }
@@ -129,12 +153,14 @@ h2 {
     background-color: white;
 }
 
-.container > .zone_recherche_resto > form > .aucun{
+.container > .zone_recherche_resto > form > .aucun,
+.aucun{
     font-weight: bold;
     color:red;
-    font-size: 20px;
-    margin: 5px;
-    margin-top: 15px;
+}
+
+.err_400{
+    width: 10%;
 }
 
 .container h2 span{
@@ -285,7 +311,7 @@ h2 {
 .container > .zone_recherche_resto > .admin_modif > .bouton,
 .container > .zone_admin > .admin > .bouton,
 .container > .zone_article_recent > .tabeau_article > tbody > tr > .valeur > .bouton,
-.container > .zone_404 > .admin > .bouton_404{
+.container_erreur > .zone_404 > .admin > .bouton_404{
     background: #507d99;
     background-image: -webkit-linear-gradient(top, #507d99, #96cceb);
     background-image: -moz-linear-gradient(top, #507d99, #96cceb);
@@ -304,13 +330,13 @@ h2 {
     text-decoration: none;
     text-align: center;
 }
-.container > .zone_404 > .admin > .bouton_404{
+.container_erreur > .zone_404 > .admin > .bouton_404{
     margin-right: 0px;
 }
 
 .container > .zone_recherche_resto > form > .troisBTN > .bouton:hover,
 .container > .zone_recherche_resto > .admin_modif > .bouton:hover,
-.container > .zone_404 > .admin > .bouton_404:hover,
+.container_erreur > .zone_404 > .admin > .bouton_404:hover,
 .container > form > .zone_recherche > .troisBTN > .bouton:hover,
 .container > .zone_admin > .admin > .bouton:hover,
 .container > .zone_recherche_resto > .tabeau_article > tbody > tr > .valeur > .bouton:hover{

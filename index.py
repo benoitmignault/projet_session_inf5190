@@ -13,6 +13,14 @@ app = Flask(__name__, static_url_path='', static_folder='static')
 app.secret_key = "(*&*&322387he738220)(*(*22347657"
 
 
+@app.errorhandler(404)
+def not_found(e):
+    erreur_404 = True
+    titre = "Page inexistante - 404"
+    return render_template("erreur_404.html", titre=titre,
+                           erreur_404=erreur_404)
+
+
 @app.teardown_appcontext
 def close_connection(exception):
     db = getattr(g, '_database', None)
@@ -138,7 +146,10 @@ def recherche_contrevenants_interval(date_debut, date_fin):
         return jsonify(ensemble_trouve)
 
     else:
-        return "", 400
+        titre = "Erreur Système - 400"
+        erreur_400 = True
+        return render_template('erreur_400.html', titre=titre,
+                               erreur_400=erreur_400), 400
 
 
 # Cette fonction était pour la tache A6
@@ -155,6 +166,8 @@ def recherche_liste_contravention_par_etablissement(date_debut, date_fin, nom):
         liste_champs_etablissement, liste_validation_etablissement)
     liste_validation_etablissement = situation_erreur_interval(
         liste_validation_etablissement)
+
+    ensemble_trouve = []
 
 
 # Section pour importer directement les informations de la ville via URL.
