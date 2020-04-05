@@ -15,7 +15,8 @@
                     <label for="date_debut">Date début :</label>
                     <div>
                         <input id="date_debut" name="du"
-                               title="Saisir une date parmis le calendrier"
+                               placeholder="exemple de date valide » AAAA-MM-JJ"
+                               title="Saisir une date au format ISO 8601"
                                type="text" value="">
                     </div>
                 </div>
@@ -23,7 +24,8 @@
                     <label for="date_fin">Date fin :</label>
                     <div>
                         <input id="date_fin" name="au"
-                               title="Saisir une date parmis le calendrier"
+                               placeholder="exemple de date valide » AAAA-MM-JJ"
+                               title="Saisir une date au format ISO 8601"
                                type="text" value="">
                     </div>
                 </div>
@@ -38,8 +40,6 @@
                         <select id="liste_resto" name="liste_resto"
                                 title="Saisir un établissement en particulier">
                             <option selected value="">À Sélectionner</option>
-                            <!-- Information à remplir après l'appel Ajax de A5-->
-                            <div id="liste_etablissement"></div>
                         </select>
                     </div>
                 </div>

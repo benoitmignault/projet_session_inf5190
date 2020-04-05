@@ -7,7 +7,8 @@ const message_erreur_interval = document.querySelector('#message_erreur_interval
 const result_interval = document.querySelector('#result_interval');
 const result_interval_etablissement = document.querySelector('#result_interval_etablissement');
 
-// Variable pour la recherche par établissement précit après avoir sélectionner
+// Variable pour la recherche par établissement précis après avoir sélectionner
+const partie_cache = document.querySelector('.partie_cache');
 const champ_etablissement = document.querySelector('#liste_resto');
 
 // Variables pour la recherche d'information générale pour être utiliser avec le bouton effacer
@@ -36,6 +37,7 @@ function reset_recherche_interval(){
         effacer_messages_erreurs(message_erreur_interval);
         initialiser_tous_champs("input[type=text]");
         initialiser_tous_champs("#recherche_par_interval");
+        initialiser_tous_champs(".partie_cache");
     });
 }
 
@@ -45,11 +47,15 @@ function initialiser_tous_champs(type_champs){
         if (type_champs == "input[type=text]"){
             un_champ.style.background = "white";
             un_champ.style.border = "1px solid #ccc";
-        } else {
+        } else if (type_champs == "#recherche_par_interval"){
             un_champ.style.border = "2px solid black";
+        } else if (type_champs == ".partie_cache"){
+            partie_cache.style.display = "none";
+            destruction_des_options();
         }
     });
 }
+
 
 function effacer_messages_erreurs(message){
     // Nous devons vérifier que les variables ne sont pas égales à «undefined»
@@ -142,13 +148,16 @@ function verification_date_fin(pattern_date, erreur_localise, erreur_general){
 }
 
 function appel_ajax(erreur_general){
-    // On fait l'appel AJAX seulement si l'indication général est à false.
     if (!erreur_general){
+        destruction_des_options(); // On retire toutes les options avant d'insérer les nouvelles
         var ajax = new XMLHttpRequest();
         ajax.onreadystatechange = function() {
             if (ajax.readyState === XMLHttpRequest.DONE) {
                 if (ajax.status === 200) {
-                    result_interval.innerHTML = creation_bloc_html(ajax);
+                    var ensemble_result = creation_bloc_html(ajax);
+                    result_interval.innerHTML = ensemble_result['result_interval'];
+                    construction_des_options(ensemble_result['result_etablissement'])
+                    partie_cache.style.display = "flex";
                 } else {
                     result_interval.innerHTML = "Attention ! Il y a eu une erreur avec la réponse du serveur !";
                 }
@@ -162,22 +171,45 @@ function appel_ajax(erreur_general){
     }
 }
 
+function construction_des_options(liste_options){
+    for(var i = 0; i < liste_options.length; i++) {
+        var une_option = new Option(liste_options[i], liste_options[i]);
+        $(une_option).html(liste_options[i]);
+        $(champ_etablissement).append(une_option);
+    }
+}
+
+function destruction_des_options(){
+    $(champ_etablissement)
+    .find('option')
+    .remove()
+    .end()
+    .append('<option selected value="">À Sélectionner</option>')
+    .val('');
+}
+
+// J'ai découvert comment faire des string avec des variables
+// https://stackoverflow.com/questions/19105009/how-to-insert-variables-in-javascript-strings/44510325
 function creation_bloc_html(ajax){
     var liste = JSON.parse(ajax.responseText);
-    var bloc_html = "<p>Voici le résultat des établissements avec leur nombre respectif de contrevention</p>";
-    bloc_html += "<table class=\"tabeau_resto\">";
-    bloc_html += "<thead><tr><th class=\"nom\">Établissement</th>";
-    bloc_html += "<th class=\"quantite\">Nombre</th></tr></thead><tbody>";
+    // La liste des établissements à insérer plutard comme option du menu déroulant
+    var result_etablissement = [];
+    // Le bloc HTML pour le résultat de la liste des établissements ave leur nombre de contrevantions
+    var result_interval = "<p>Voici le résultat des établissements avec leur nombre respectif de contrevention</p>";
+    result_interval += "<table class=\"tabeau_resto\">";
+    result_interval += "<thead><tr><th class=\"nom\">Établissement</th>";
+    result_interval += "<th class=\"quantite\">Nombre</th></tr></thead><tbody>";
     for(var i = 0; i < liste.length; i++) {
-        bloc_html += "<tr>";
+        result_interval += "<tr>";
         var resto = liste[i];
-        bloc_html += "<td class=\"nom\">" + resto.etablissement + "</td>";
-        bloc_html += "<td class=\"quantite\">" + resto.nombre + "</td>";
-        bloc_html += "<tr>";
+        result_etablissement.push(resto.etablissement);
+        result_interval += `<td class='nom'>${resto.etablissement}</td>`;
+        result_interval += `<td class='quantite'>${resto.nombre}</td>`;
+        result_interval += "<tr>";
     }
-    bloc_html += "</tbody></table>";
+    result_interval += "</tbody></table>";
 
-    return bloc_html;
+    return {'result_interval': result_interval, 'result_etablissement': result_etablissement};
 }
 
 document.addEventListener('DOMContentLoaded', function () {

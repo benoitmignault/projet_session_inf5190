@@ -101,7 +101,8 @@ h2 {
     width: 100%;
 }
 
-.container > .zone_recherche_resto > form > ul > li{
+.container > .zone_recherche_resto > form > ul > li,
+.container > .zone_recherche_resto > form > .modif > .information > ul > li{
     font-weight: bold;
     padding-left: 15px;
     height: 15px;
@@ -239,6 +240,9 @@ h2 {
     flex-direction: column;
 }
 
+.container > .zone_recherche_resto > form > .modif > .partie_cache{
+    display: none;
+}
 .container > .zone_recherche_resto > form > .modif > .information > div {
     width: 100%;
     display: flex;
