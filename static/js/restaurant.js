@@ -89,6 +89,8 @@ function validation_regex(champ, type_regex){
     }
 }
 
+// Les deux requêtes ajax passeront par la même entrée mais devront être différenciées
+// On va utiliser la vérification de l'attribut «display» de la section cachée
 function recherche_par_interval(){
     $(form_interval).submit(function (e) {
         e.preventDefault();
@@ -98,7 +100,12 @@ function recherche_par_interval(){
         message_erreur_interval.innerHTML = ""; // On remet la section des messages vide
         erreur_general = verification_date_debut (pattern_date, erreur_localise, erreur_general);
         erreur_general = verification_date_fin (pattern_date, erreur_localise, erreur_general);
-        appel_ajax(erreur_general);
+        if (partie_cache.style.display == "flex"){
+            erreur_general = verification_choix_etablissement(erreur_localise, erreur_general);
+            // Le nouvel appel ajax
+        } else {
+            appel_ajax_interval(erreur_general);
+        }
     });
 }
 
@@ -114,7 +121,6 @@ function verification_date_debut(pattern_date, erreur_localise, erreur_general){
     if (erreur_localise){
         champ_date_debut.style.border = "2px solid red";
         champ_date_debut.style.background = "#FCDEDE";
-        erreur_localise = false; // on reset l'indicateur pour le prochain champ
         erreur_general = true;
     } else {
         champ_date_debut.style.background = "white";
@@ -136,7 +142,6 @@ function verification_date_fin(pattern_date, erreur_localise, erreur_general){
     if (erreur_localise){
         champ_date_fin.style.border = "2px solid red";
         champ_date_fin.style.background = "#FCDEDE";
-        erreur_localise = false; // on reset l'indicateur pour le prochain champ
         erreur_general = true;
     } else {
         champ_date_fin.style.background = "white";
@@ -146,7 +151,25 @@ function verification_date_fin(pattern_date, erreur_localise, erreur_general){
     return erreur_general;
 }
 
-function appel_ajax(erreur_general){
+function verification_choix_etablissement(erreur_localise, erreur_general){
+    if (champ_etablissement.value == "") {
+        message_erreur_interval.innerHTML += "<li>Vous devez sélectionner un établissement parmis la liste !</li>";
+        erreur_localise = true;
+    }
+
+    if (erreur_localise){
+        champ_etablissement.style.border = "2px solid red";
+        champ_etablissement.style.background = "#FCDEDE";
+        erreur_general = true;
+    } else {
+        champ_etablissement.style.background = "white";
+        champ_etablissement.style.border = "1px solid #ccc";
+    }
+
+    return erreur_general;
+}
+
+function appel_ajax_interval(erreur_general){
     destruction_des_options(); // On retire toutes les options avant d'insérer les nouvelles
     if (!erreur_general){
         var ajax = new XMLHttpRequest();
@@ -161,11 +184,11 @@ function appel_ajax(erreur_general){
                         partie_cache.style.display = "flex";
                         form_interval.style.border = "2px solid black";
                     } else {
-                        appel_ajax_succes_mais_erreur();
+                        appel_ajax_interval_succes_mais_erreur();
                         message_erreur_interval.innerHTML += "<li>L'interval de date ne contenait aucune donnée !</li>";
                     }
                 } else {
-                    appel_ajax_succes_mais_erreur();
+                    appel_ajax_interval_succes_mais_erreur();
                     message_erreur_interval.innerHTML += "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
                 }
             }
@@ -180,7 +203,7 @@ function appel_ajax(erreur_general){
 
 // Cette fonction sera utilisée pour caché la section du menu déroulant si le résultat retourne rien
 // Les anciennes information du tableau des établissements avec leur nombre de contravention n'est plus valide
-function appel_ajax_succes_mais_erreur(){
+function appel_ajax_interval_succes_mais_erreur(){
     partie_cache.style.display = "none";
     result_interval.innerHTML = "";
     form_interval.style.border = "2px solid red";
