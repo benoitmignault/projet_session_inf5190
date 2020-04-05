@@ -27,50 +27,38 @@
                                type="text" value="">
                     </div>
                 </div>
+                <div class="information partie_cache">
+                    <ul>
+                        <li>Maintenant ! Veuillez sélectionner un
+                            établissement
+                        </li>
+                    </ul>
+                    <label for="liste_resto">Liste des établissements :</label>
+                    <div>
+                        <select id="liste_resto" name="liste_resto"
+                                title="Saisir un établissement en particulier">
+                            <option selected value="">À Sélectionner</option>
+                            <!-- Information à remplir après l'appel Ajax de A5-->
+                            <div id="liste_etablissement"></div>
+                        </select>
+                    </div>
+                </div>
+                
                 <div class="troisBTN">
                     <input class="bouton" type='submit' value="Rechercher...">
                     <input class="bouton" id="btn_reset_interval"
                            type='reset' value="Effacer...">
                 </div>
             </div>
-            <!-- Section des messages erreurs -->
-            <ul class="aucun" id="aucun_erreur_recher_interval"></ul>
         </form>
-        <!-- Section pour le retour Ajax -->
-        <div id="result_recher_interval"></div>
-    </div>
-    <h2>Section pour rechercher avec un établissement en particulier</h2>
-    <div class='zone_recherche_resto'>
-        <form id="recherche_par_etablissement">
-            <ul>
-                <li>Veuillez sélectionner un établissement</li>
-            </ul>
-            <div class="modif">
-                <div class="information">
-                    <label for="liste_resto">Liste des établissements :</label>
-                    <div>
-                        <select id="liste_resto" name="liste_resto"
-                                title="Saisir un établissement en particulier">
-                            <option selected value="">À Sélectionner</option>
-                            {% for un_etablissement in liste_etablissement %}
-                            <option value="{{un_etablissement}}">
-                                {{un_etablissement}}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-                <div class="troisBTN">
-                    <input class="bouton" type='submit' value="Rechercher...">
-                    <input class="bouton" id="btn_reset_etablissement"
-                           type='reset' value="Effacer...">
-                </div>
-            </div>
-            <!-- Section des messages erreurs -->
-            <ul class="aucun" id="message_erreur_etablissement"></ul>
-        </form>
-        <!-- Section pour le retour Ajax -->
-        <div id="result_recher_etablissement"></div>
+        <!-- Section pour le retour Ajax A5 -->
+        <div id="result_interval"></div>
+        
+        <!-- Section pour le retour Ajax A6 -->
+        <div id="result_interval_etablissement"></div>
+        
+        <!-- Section des messages erreurs -->
+        <ul class="aucun" id="message_erreur_interval"></ul>
     </div>
     
     <h2>Section pour rechercher une liste de restaurants fautifs</h2>

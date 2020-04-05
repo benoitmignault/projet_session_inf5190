@@ -4,14 +4,11 @@ const champ_date_debut = document.querySelector('#date_debut');
 const champ_date_fin = document.querySelector('#date_fin');
 const btn_reset_interval = document.querySelector('#btn_reset_interval');
 const message_erreur_interval = document.querySelector('#message_erreur_interval');
-const result_recher_interval = document.querySelector('#result_recher_interval');
+const result_interval = document.querySelector('#result_interval');
+const result_interval_etablissement = document.querySelector('#result_interval_etablissement');
 
-// Variable pour la recherche par établissement précit
-const form_etablissement = document.querySelector('#recherche_par_etablissement');
+// Variable pour la recherche par établissement précit après avoir sélectionner
 const champ_etablissement = document.querySelector('#liste_resto');
-const btn_reset_etablissement = document.querySelector('#btn_reset_etablissement');
-const message_erreur_etablissement = document.querySelector('#message_erreur_etablissement');
-const result_recher_etablissement = document.querySelector('#result_recher_etablissement');
 
 // Variables pour la recherche d'information générale pour être utiliser avec le bouton effacer
 const champ_nom_resto = document.querySelector('#etablissement');
@@ -19,26 +16,37 @@ const champ_nom_proprio = document.querySelector('#proprietaire');
 const champ_nom_rue = document.querySelector('#nom_rue');
 const btn_reset_recher = document.querySelector('#btn_reset_recher');
 const message_erreur_recher = document.querySelector('#message_erreur_recher');
-/*
-    En fonction où nous sommes, sur le site, la fonction «re_initialiser_tous_champs» sera
-    appelée pour chaque type de champs que le formulaire contient.
-*/
+
 function reset_recherche(){
-    recher_nom_resto.defaultValue = "";
-    recher_nom_proprio.defaultValue = "";
-    recher_nom_rue.defaultValue = "";
-    effacer_messages_erreurs(message_aucun);
-    re_initialiser_tous_champs("input[type=text]");
-    re_initialiser_tous_champs("#recherche");
+    $(btn_reset_recher).click(function() {
+        champ_nom_resto.defaultValue = "";
+        champ_nom_proprio.defaultValue = "";
+        champ_nom_rue.defaultValue = "";
+        effacer_messages_erreurs(message_erreur_recher);
+        initialiser_tous_champs("input[type=text]");
+        initialiser_tous_champs("#recherche");
+    });
 }
 
-function reset_recherche_rapide(){
-    date_debut.defaultValue = "";
-    date_fin.defaultValue = "";
+function reset_recherche_interval(){
+    champ_date_debut.defaultValue = "";
+    champ_date_fin.defaultValue = "";
     section_result.innerHTML = "";
 
     effacer_messages_erreurs(message_aucun_rapide);
     re_initialiser_tous_champs("input[type=text]");
+}
+
+function initialiser_tous_champs(type_champs){
+    var tous_champs = document.querySelectorAll(type_champs);
+    tous_champs.forEach(function(un_champ){
+        if (type_champs == "input[type=text]"){
+            un_champ.style.background = "white";
+            un_champ.style.border = "1px solid #ccc";
+        } else {
+            un_champ.style.border = "2px solid black";
+        }
+    });
 }
 
 function effacer_messages_erreurs(message){
@@ -53,16 +61,16 @@ function validation_champs_recherches(){
     var regex_proprio = "^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,63}[a-z0-9A-Z.)]$";
     var regex_rue = "^[a-z1-9A-Z][a-z0-9- 'A-Z]{1,33}[a-z0-9A-Z]$"
 
-    $(recher_nom_resto).change(function () {
-        validation_regex(recher_nom_resto, regex_resto);
+    $(champ_nom_resto).change(function () {
+        validation_regex(champ_nom_resto, regex_resto);
     });
 
-    $(recher_nom_proprio).change(function () {
-        validation_regex(recher_nom_proprio, regex_proprio);
+    $(champ_nom_proprio).change(function () {
+        validation_regex(champ_nom_proprio, regex_proprio);
     });
 
-    $(recher_nom_rue).change(function () {
-        validation_regex(recher_nom_rue, regex_rue);
+    $(champ_nom_rue).change(function () {
+        validation_regex(champ_nom_rue, regex_rue);
     });
 }
 
@@ -72,23 +80,6 @@ function validation_regex(champ, type_regex){
         alert("Veuillez respecter les charactères permis et la longueur permise !");
         champ.value = "";
     }
-}
-
-/*
-    Cette fonction aura pour but de remettre au valeur initial la bordure et couleur de fond
-    sur tous les champs d'un formulaire
-*/
-function re_initialiser_tous_champs(type_champs){
-    var tous_champs = document.querySelectorAll(type_champs);
-    tous_champs.forEach(function(un_champ){
-        if (type_champs == "input[type=text]"){
-            un_champ.style.background = "white";
-            un_champ.style.border = "1px solid #ccc";
-        } else {
-            un_champ.style.border = "2px solid black";
-        }
-
-    });
 }
 
 function recherche_rapide_par_interval(){
@@ -104,7 +95,7 @@ function recherche_rapide_par_interval(){
     });
 }
 
-function verification_date_debut (pattern_date, erreur_localise, erreur_general){
+function verification_date_debut(pattern_date, erreur_localise, erreur_general){
     if (date_debut.value == "") {
         message_aucun_rapide.innerHTML += "<li>Le champ «Date début» ne peut être vide !</li>";
         erreur_localise = true;
@@ -126,7 +117,7 @@ function verification_date_debut (pattern_date, erreur_localise, erreur_general)
     return erreur_general;
 }
 
-function verification_date_fin (pattern_date, erreur_localise, erreur_general){
+function verification_date_fin(pattern_date, erreur_localise, erreur_general){
     if (date_fin.value == "") {
         message_aucun_rapide.innerHTML += "<li>Le champ «Date fin» ne peut être vide !</li>";
         erreur_localise = true;
@@ -188,4 +179,6 @@ function creation_bloc_html(ajax){
 document.addEventListener('DOMContentLoaded', function () {
     validation_champs_recherches();
     recherche_rapide_par_interval();
+    reset_recherche();
+    reset_recherche_interval();
 });

@@ -64,6 +64,9 @@ def recherche_restaurant():
         if liste_champs['nb_restaurant_trouve'] == 0:
             liste_validation['aucun_restaurant_trouve'] = True
 
+    else:
+        liste_validation['aucun_restaurant_trouve'] = True
+
     liste_validation = situation_erreur(liste_validation)
     # Utilisation des variables de sessions pour transporter
     # les données nécessaire dans le traitement de la prochaine route
