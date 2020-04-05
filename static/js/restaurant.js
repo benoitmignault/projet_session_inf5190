@@ -34,10 +34,12 @@ function reset_recherche_interval(){
         champ_date_debut.defaultValue = "";
         champ_date_fin.defaultValue = "";
         result_interval.innerHTML = "";
+        result_interval_etablissement.innerHTML = "";
         effacer_messages_erreurs(message_erreur_interval);
         initialiser_tous_champs("input[type=text]");
         initialiser_tous_champs("#recherche_par_interval");
         initialiser_tous_champs(".partie_cache");
+        destruction_des_options();
     });
 }
 
@@ -158,6 +160,7 @@ function verification_choix_etablissement(erreur_localise, erreur_general){
     }
 
     if (erreur_localise){
+        result_interval_etablissement.innerHTML = "";
         champ_etablissement.style.border = "2px solid red";
         champ_etablissement.style.background = "#FCDEDE";
         erreur_general = true;
@@ -179,6 +182,8 @@ function appel_ajax_interval(erreur_general){
                     var liste = JSON.parse(ajax.responseText);
                     if (liste.length > 0){
                         var ensemble_result = creation_bloc_html_interval(liste);
+                        // On remet la section de A6 vide comme nous faisons une nouvelle recherche interval
+                        result_interval_etablissement.innerHTML = "";
                         result_interval.innerHTML = ensemble_result['result_interval'];
                         construction_des_options(ensemble_result['result_etablissement'])
                         partie_cache.style.display = "flex";
@@ -205,25 +210,33 @@ function appel_ajax_interval_etablissement(erreur_general){
     if (!erreur_general){
         var ajax = new XMLHttpRequest();
         ajax.onreadystatechange = function() {
-
+            if (ajax.readyState === XMLHttpRequest.DONE) {
+                if (ajax.status === 200) {
+                    var liste = JSON.parse(ajax.responseText);
+                    // On remet la section de A5 vide comme nous avons sélectionné un établissement
+                    result_interval.innerHTML = "";
+                    result_interval_etablissement.innerHTML = creation_bloc_html_etablissement(liste);
+                    form_interval.style.border = "2px solid black";
+                } else {
+                    appel_ajax_interval_succes_mais_erreur();
+                    message_erreur_interval.innerHTML += "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
+                }
+            }
         };
         var param = `du=${champ_date_debut.value}&au=${champ_date_fin.value}&etablissement=${champ_etablissement.value}`;
         ajax.open("GET", "/api/contrevenant/"+param, true);
         ajax.send();
-
-
-
     } else {
         form_interval.style.border = "2px solid red";
     }
 }
-
 
 // Cette fonction sera utilisée pour caché la section du menu déroulant si le résultat retourne rien
 // Les anciennes information du tableau des établissements avec leur nombre de contravention n'est plus valide
 function appel_ajax_interval_succes_mais_erreur(){
     partie_cache.style.display = "none";
     result_interval.innerHTML = "";
+    result_interval_etablissement.innerHTML = "";
     form_interval.style.border = "2px solid red";
 }
 
@@ -265,6 +278,29 @@ function creation_bloc_html_interval(liste){
     result_interval += "</tbody></table>";
 
     return {'result_interval': result_interval, 'result_etablissement': result_etablissement};
+}
+
+// Utilisation de ce principe pour itérer
+// https://zellwk.com/blog/looping-through-js-objects/
+function creation_bloc_html_etablissement(liste){
+    var result_liste = "<p>Voici le résultat des amandes obtenues par l'établissement sélectionné plus haut</p>"
+    for(var i = 0; i < liste.length; i++) {
+        result_liste += "<table class=\"tabeau_resto\"><tbody>";
+        const une_amande = Object.entries(liste[i]);
+        for (const [cle, valeur] of une_amande) {
+            result_liste += "<tr>";
+            result_liste += `<td class='cle'>${cle} :</td>`;
+            if (cle == "Montant de l'amende"){
+                result_liste += `<td class='valeur'>${valeur} $</td>`;
+            } else {
+                result_liste += `<td class='valeur'>${valeur}</td>`;
+            }
+            result_liste += "<tr>";
+        }
+        result_liste += "</tbody></table>";
+    }
+
+    return result_liste;
 }
 
 document.addEventListener('DOMContentLoaded', function () {

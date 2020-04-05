@@ -82,6 +82,7 @@ h2 {
     margin: 0px;
 }
 
+.container > .zone_recherche_resto > #result_interval_etablissement,
 .container > .zone_recherche_resto > #result_interval,
 .container > .zone_admin,
 .container > .zone_recherche_resto,
@@ -91,11 +92,13 @@ h2 {
     display: -webkit-flex;
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: 15px;
     padding: 10px;
     border-radius: 10px;
     justify-content: center;
     align-items: center;
+}
+.container > .recherche{
+    margin-bottom: 20px;
 }
 
 .container_erreur > .zone_404{
@@ -104,6 +107,7 @@ h2 {
     justify-content: center;
 }
 
+.container > .zone_recherche_resto > #result_interval_etablissement,
 .container > .zone_recherche_resto > #result_interval{
     padding: 0px;
 }
@@ -176,6 +180,8 @@ h2 {
     font-size: 18px;
 }
 
+
+.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto,
 .container > .zone_recherche_resto > #result_interval > .tabeau_resto,
 .container > .zone_recherche_resto > #recherche_par_interval,
 .container > .zone_recherche_resto > #recherche,
@@ -186,10 +192,15 @@ h2 {
     padding: 10px;
 }
 
+.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto{
+    margin-bottom: 15px;
+}
+
 .container > .zone_recherche_resto > #result_interval > .tabeau_resto{
     border-spacing: 0;
     padding: 0px;
 }
+
 
 .container > .zone_recherche_resto > #result_interval > .tabeau_resto th,
 .container > .zone_recherche_resto > #result_interval > .tabeau_resto td,
@@ -224,12 +235,14 @@ h2 {
     width: 20%;
 }
 
+.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .cle,
 .container > .zone_recherche_resto > .tabeau_resto .cle{
     font-weight: bold;
     text-align: right;
     width: 30%;
 }
 
+.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .valeur,
 .container > .zone_recherche_resto > .tabeau_resto .valeur{
     text-align: justify;
     width: 70%;
