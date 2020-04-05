@@ -49,7 +49,7 @@ function initialiser_tous_champs(type_champs){
         if (type_champs == "input[type=text]"){
             un_champ.style.background = "white";
             un_champ.style.border = "1px solid #ccc";
-        } else if (type_champs == "#recherche_par_interval"){
+        } else if (type_champs == "#recherche_par_interval" || type_champs == "#recherche"){
             un_champ.style.border = "2px solid black";
         } else if (type_champs == ".partie_cache"){
             partie_cache.style.display = "none";
