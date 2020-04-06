@@ -186,7 +186,7 @@ def recherche_liste_contravention_par_etablissement(date_debut, date_fin, nom):
 
 
 # Cette fonction était pour la tache C1
-@app.route('/api/contrevenants/json', methods=["GET"])
+@app.route('/api/nombre_amende_etablissement/json', methods=["GET"])
 def recherche_contrevenants_json():
     conn_db = get_db()
     ensemble_trouve = conn_db.nombre_contravention()
@@ -195,7 +195,7 @@ def recherche_contrevenants_json():
 
 
 # Cette fonction était pour la tache C2
-@app.route('/api/contrevenants/xml', methods=["GET"])
+@app.route('/api/nombre_amende_etablissement/xml', methods=["GET"])
 def recherche_contrevenants_xml():
     conn_db = get_db()
     ensemble_trouve = conn_db.nombre_contravention()
