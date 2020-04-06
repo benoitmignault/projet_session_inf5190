@@ -193,6 +193,12 @@ def recherche_contrevenants_json():
 
 
 # Cette fonction était pour la tache C3
+@app.route('/api/contrevenants/csv', methods=["GET"])
+def recherche_contrevenants_csv():
+    conn_db = get_db()
+    ensemble_trouve = conn_db.nombre_contravention()
+
+    return ""
 
 
 def main():
