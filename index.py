@@ -1,3 +1,4 @@
+import xmlify
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.combining import OrTrigger
 from apscheduler.triggers.cron import CronTrigger
@@ -193,6 +194,13 @@ def recherche_contrevenants_json():
 
 
 # Cette fonction était pour la tache C2
+@app.route('/api/contrevenants/xml', methods=["GET"])
+def recherche_contrevenants_xml():
+    conn_db = get_db()
+    ensemble_trouve = conn_db.nombre_contravention()
+    arbre = construction_xml(ensemble_trouve)
+
+    return xmlify.dumps(ensemble_trouve)
 
 
 def main():

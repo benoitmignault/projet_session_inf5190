@@ -1,5 +1,6 @@
 import re  # pour la gestion des patterns pour les différents champs input
 import xml.etree.ElementTree as ET
+from io import BytesIO
 
 import requests
 from flask import g
@@ -101,6 +102,30 @@ def recuperation_information_url():
     liste_contrevenants = ET.fromstring(resultat.content)
 
     return liste_contrevenants
+
+
+def construction_xml(ensemble_trouve):
+    """
+    document = ET.Element('outer')
+    node = ET.SubElement(document, 'inner')
+    et = ET.ElementTree(document)
+
+    f = BytesIO()
+    et.write(f, encoding='utf-8', xml_declaration=True)
+    print(f.getvalue())  # your XML file, encoded as UTF-8
+    """
+    racine = ET.Element('contrevenants')
+    for sous_ensemble in ensemble_trouve:
+        contrevenant = ET.SubElement(racine, 'contrevenant')
+        for cle, valeur in sous_ensemble.items():
+            ET.SubElement(contrevenant, cle).text = str(valeur)
+
+    arbre = ET.ElementTree(racine)
+    file = BytesIO()
+    arbre.write(file, encoding='utf-8', xml_declaration=True)
+    # arbre.write("filename.xml", encoding='utf-8', xml_declaration=True)
+    # print(file.getvalue())  # your XML file, encoded as UTF-8
+    return arbre
 
 
 def remplissage_champs_importation_xml(liste_champs_xml, un_contrevenant):
