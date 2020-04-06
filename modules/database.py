@@ -105,6 +105,19 @@ class Database:
 
         return ensemble_trouve
 
+    def nombre_contravention(self):
+        cursor = self.get_connection().cursor()
+        select = "select etablissement, count(*) as nombre "
+        fromm = "from mauvais_restaurants "
+        group = "group by etablissement "
+        order = "order by nombre desc, etablissement "
+        sql = select + fromm +  group + order
+        cursor.execute(sql)
+        result = cursor.fetchall()
+        ensemble_trouve = recuperation_resultat_regrouper(result)
+
+        return ensemble_trouve
+
     def liste_contravention_etablissement(self, date_debut, date_fin, nom):
         cursor = self.get_connection().cursor()
         select = "select categorie, no_civique, nom_rue, ville, description," \
@@ -237,7 +250,7 @@ def recuperation_resultat(result):
     return ensemble_trouve
 
 
-# Cette fonction sera utiliser pour la tache A5
+# Cette fonction sera utiliser pour la tache A5 et C1 à C3
 def recuperation_resultat_regrouper(result):
     ensemble_trouve = []
     if result is not None:
