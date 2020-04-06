@@ -191,6 +191,7 @@ def recherche_contrevenants_json():
     ensemble_trouve = conn_db.nombre_contravention()
     return jsonify(ensemble_trouve)
 
+
 def main():
     importation_donnees()
 
