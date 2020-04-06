@@ -105,15 +105,6 @@ def recuperation_information_url():
 
 
 def construction_xml(ensemble_trouve):
-    """
-    document = ET.Element('outer')
-    node = ET.SubElement(document, 'inner')
-    et = ET.ElementTree(document)
-
-    f = BytesIO()
-    et.write(f, encoding='utf-8', xml_declaration=True)
-    print(f.getvalue())  # your XML file, encoded as UTF-8
-    """
     racine = ET.Element('contrevenants')
     for sous_ensemble in ensemble_trouve:
         contrevenant = ET.SubElement(racine, 'contrevenant')
@@ -121,11 +112,10 @@ def construction_xml(ensemble_trouve):
             ET.SubElement(contrevenant, cle).text = str(valeur)
 
     arbre = ET.ElementTree(racine)
-    file = BytesIO()
-    arbre.write(file, encoding='utf-8', xml_declaration=True)
-    # arbre.write("filename.xml", encoding='utf-8', xml_declaration=True)
-    # print(file.getvalue())  # your XML file, encoded as UTF-8
-    return arbre
+    xml_information = BytesIO()
+    arbre.write(xml_information, encoding='utf-8', xml_declaration=True)
+
+    return xml_information.getvalue()
 
 
 def remplissage_champs_importation_xml(liste_champs_xml, un_contrevenant):

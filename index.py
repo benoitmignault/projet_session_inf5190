@@ -3,7 +3,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.combining import OrTrigger
 from apscheduler.triggers.cron import CronTrigger
 from flask import Flask, jsonify, redirect, render_template, request, session, \
-    url_for
+    url_for, Response
 
 from modules.fonction import *
 
@@ -190,6 +190,7 @@ def recherche_liste_contravention_par_etablissement(date_debut, date_fin, nom):
 def recherche_contrevenants_json():
     conn_db = get_db()
     ensemble_trouve = conn_db.nombre_contravention()
+
     return jsonify(ensemble_trouve)
 
 
@@ -198,9 +199,9 @@ def recherche_contrevenants_json():
 def recherche_contrevenants_xml():
     conn_db = get_db()
     ensemble_trouve = conn_db.nombre_contravention()
-    arbre = construction_xml(ensemble_trouve)
+    xml_information = construction_xml(ensemble_trouve)
 
-    return xmlify.dumps(ensemble_trouve)
+    return Response(xml_information, mimetype='text/xml')
 
 
 def main():
