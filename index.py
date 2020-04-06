@@ -2,7 +2,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.combining import OrTrigger
 from apscheduler.triggers.cron import CronTrigger
 from flask import Flask, jsonify, redirect, render_template, request, session, \
-    url_for
+    url_for, Response
 
 from modules.fonction import *
 
@@ -197,8 +197,9 @@ def recherche_contrevenants_json():
 def recherche_contrevenants_csv():
     conn_db = get_db()
     ensemble_trouve = conn_db.nombre_contravention()
+    csv_information = construction_csv(ensemble_trouve)
 
-    return ""
+    return Response(csv_information, mimetype='text/csv')
 
 
 def main():
