@@ -12,9 +12,9 @@ baseUri: http://127.0.0.1:5000/
             body:
               text/csv:
                 example:  |
-                  {
-                  etablissement, nombre
-                  }
+                  Etablissement,Nombre
+                  RESTAURANT BASHA,23
+
     /xml:
       get:
         description: Extraire l'information des établissements avec le nombre amende(s)
@@ -22,3 +22,25 @@ baseUri: http://127.0.0.1:5000/
           200:
             body:
               text/xml:
+                example:  |
+                  <?xml version='1.0' encoding='utf-8'?>
+                  <contrevenants>
+                    <contrevenant>
+                      <etablissement>RESTAURANT BASHA</etablissement>
+                      <nombre>23</nombre>
+                    </contrevenant>
+                  </contrevenants>
+    /json:
+      get:
+        description: Extraire l'information des établissements avec le nombre amende(s)
+        responses:
+          200:
+            body:
+              application/json:
+                example:  |
+                  [
+                    {
+                      "etablissement": "RESTAURANT BASHA",
+                      "nombre": 23
+                    }
+                  ]
