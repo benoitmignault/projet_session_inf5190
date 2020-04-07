@@ -29,6 +29,11 @@ def close_connection(exception):
         db.disconnect()
 
 
+@app.route('/doc')
+def documentation():
+    return render_template('doc.html')
+
+
 @app.route('/', methods=["GET"])
 def home():
     if session.get('reset_cookie'):
