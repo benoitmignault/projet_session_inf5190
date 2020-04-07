@@ -118,7 +118,7 @@ def recherche_restaurant_trouve():
 scheduler = BackgroundScheduler(daemon=True)
 trigger = OrTrigger([CronTrigger(day_of_week='*', hour=0, minute=0)])
 
-scheduler.add_job(mise_jour_bd, trigger)
+scheduler.add_job(mise_jour_donnees, trigger)
 scheduler.start()
 
 
@@ -226,3 +226,7 @@ def main():
 # Cette fonction était pour la tache A1
 if __name__ == "__main__":
     main()
+
+    
+# Creation de la tache B2
+# Creation de la demande d'accès à Twitter
