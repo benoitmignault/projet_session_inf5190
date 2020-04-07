@@ -2,6 +2,7 @@ import csv
 import re  # pour la gestion des patterns pour les différents champs input
 import xml.etree.ElementTree as ET
 from io import StringIO
+from io import BytesIO
 
 import requests
 from flask import g
@@ -103,6 +104,20 @@ def recuperation_information_url():
     liste_contrevenants = ET.fromstring(resultat.content)
 
     return liste_contrevenants
+
+
+def construction_xml(ensemble_trouve):
+    racine = ET.Element('contrevenants')
+    for sous_ensemble in ensemble_trouve:
+        contrevenant = ET.SubElement(racine, 'contrevenant')
+        for cle, valeur in sous_ensemble.items():
+            ET.SubElement(contrevenant, cle).text = str(valeur)
+
+    arbre = ET.ElementTree(racine)
+    xml_information = BytesIO()
+    arbre.write(xml_information, encoding='utf-8', xml_declaration=True)
+
+    return xml_information.getvalue()
 
 
 def remplissage_champs_importation_xml(liste_champs_xml, un_contrevenant):
