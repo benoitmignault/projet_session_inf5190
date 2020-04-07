@@ -121,8 +121,9 @@ trigger = OrTrigger([CronTrigger(day_of_week='*', hour=0, minute=0)])
 scheduler.add_job(mise_jour_bd, trigger)
 scheduler.start()
 
+# Modification des tache A5 et A6
 
-# Deuxième partie de A4 sera de créer une documentation RAML
+
 @app.route('/api/nombre_amende_etablissement/du=<date_debut>&au=<date_fin>',
            methods=["GET", "POST"])
 def recherche_contrevenants_interval(date_debut, date_fin):
