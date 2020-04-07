@@ -30,6 +30,11 @@ def close_connection(exception):
         db.disconnect()
 
 
+@app.route('/doc')
+def documentation():
+    return render_template('doc.html')
+
+
 @app.route('/', methods=["GET"])
 def home():
     if session.get('reset_cookie'):
@@ -193,7 +198,7 @@ def recherche_contrevenants_json():
 
     return jsonify(ensemble_trouve)
 
-
+  
 # Cette fonction était pour la tache C2
 @app.route('/api/nombre_amende_etablissement/xml', methods=["GET"])
 def recherche_contrevenants_xml():
@@ -202,6 +207,16 @@ def recherche_contrevenants_xml():
     xml_information = construction_xml(ensemble_trouve)
 
     return Response(xml_information, mimetype='text/xml')
+
+  
+# Cette fonction était pour la tache C3
+@app.route('/api/nombre_amende_etablissement/csv', methods=["GET"])
+def recherche_contrevenants_csv():
+    conn_db = get_db()
+    ensemble_trouve = conn_db.nombre_contravention()
+    csv_information = construction_csv(ensemble_trouve)
+
+    return Response(csv_information, mimetype='text/csv')
 
 
 def main():

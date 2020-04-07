@@ -1,5 +1,7 @@
+import csv
 import re  # pour la gestion des patterns pour les différents champs input
 import xml.etree.ElementTree as ET
+from io import StringIO
 from io import BytesIO
 
 import requests
@@ -197,6 +199,25 @@ def importation_donnees():
                                           liste_champs_xml['montant'])
 
     connection.disconnect()
+
+
+def construction_csv(ensemble_trouve):
+    csv_information = StringIO()
+    information = csv.writer(csv_information)
+    information.writerow(["Etablissement", "Nombre"])
+    for sous_ensemble in ensemble_trouve:
+        nom_etablissement = ""
+        nombre = ""
+        for cle, valeur in sous_ensemble.items():
+            if cle == "etablissement":
+                nom_etablissement = valeur
+
+            elif cle == "nombre":
+                nombre = valeur
+
+        information.writerow([nom_etablissement, str(nombre)])
+
+    return csv_information.getvalue()
 
 
 def initial_champ_recherche():
