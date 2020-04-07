@@ -1,7 +1,6 @@
 #%RAML 1.0
 title: Une API REST sur les contrevenants de la villes de Montréal
 baseUri: http://127.0.0.1:5000/
-version: v1
 
 /api:
   /nombre_amende_etablissement:
@@ -12,3 +11,7 @@ version: v1
           200:
             body:
               text/csv:
+                example:  |
+                  {
+                  etablissement, nombre
+                  }
