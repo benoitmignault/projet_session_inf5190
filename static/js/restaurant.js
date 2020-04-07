@@ -202,7 +202,7 @@ function appel_ajax_interval(erreur_general){
             }
         };
         var param = `du=${champ_date_debut.value}&au=${champ_date_fin.value}`;
-        ajax.open("POST", "/api/contrevenants/"+param, true);
+        ajax.open("POST", "/api/nombre_amende_etablissement/"+param, true);
         ajax.send();
     } else {
         form_interval.style.border = "2px solid red";

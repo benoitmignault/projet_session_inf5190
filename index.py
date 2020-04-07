@@ -123,7 +123,7 @@ scheduler.start()
 
 
 # Deuxième partie de A4 sera de créer une documentation RAML
-@app.route('/api/contrevenants/du=<date_debut>&au=<date_fin>',
+@app.route('/api/nombre_amende_etablissement/du=<date_debut>&au=<date_fin>',
            methods=["GET", "POST"])
 def recherche_contrevenants_interval(date_debut, date_fin):
     liste_champs_interval = initial_champ_interval()
