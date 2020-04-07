@@ -1,5 +1,8 @@
+import csv
 import re  # pour la gestion des patterns pour les différents champs input
 import xml.etree.ElementTree as ET
+from io import StringIO
+from io import BytesIO
 
 import requests
 from flask import g
@@ -103,6 +106,20 @@ def recuperation_information_url():
     return liste_contrevenants
 
 
+def construction_xml(ensemble_trouve):
+    racine = ET.Element('contrevenants')
+    for sous_ensemble in ensemble_trouve:
+        contrevenant = ET.SubElement(racine, 'contrevenant')
+        for cle, valeur in sous_ensemble.items():
+            ET.SubElement(contrevenant, cle).text = str(valeur)
+
+    arbre = ET.ElementTree(racine)
+    xml_information = BytesIO()
+    arbre.write(xml_information, encoding='utf-8', xml_declaration=True)
+
+    return xml_information.getvalue()
+
+
 def remplissage_champs_importation_xml(liste_champs_xml, un_contrevenant):
     liste_champs_xml['proprietaire'] = un_contrevenant.find('proprietaire').text
     liste_champs_xml['categorie'] = un_contrevenant.find('categorie').text
@@ -182,6 +199,25 @@ def importation_donnees():
                                           liste_champs_xml['montant'])
 
     connection.disconnect()
+
+
+def construction_csv(ensemble_trouve):
+    csv_information = StringIO()
+    information = csv.writer(csv_information)
+    information.writerow(["Etablissement", "Nombre"])
+    for sous_ensemble in ensemble_trouve:
+        nom_etablissement = ""
+        nombre = ""
+        for cle, valeur in sous_ensemble.items():
+            if cle == "etablissement":
+                nom_etablissement = valeur
+
+            elif cle == "nombre":
+                nombre = valeur
+
+        information.writerow([nom_etablissement, str(nombre)])
+
+    return csv_information.getvalue()
 
 
 def initial_champ_recherche():
