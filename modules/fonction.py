@@ -1,23 +1,13 @@
+import csv
 import re  # pour la gestion des patterns pour les différents champs input
-import smtplib
 import xml.etree.ElementTree as ET
-from datetime import datetime
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+from io import StringIO
+from io import BytesIO
 
 import requests
-import tweepy
-import yaml
 from flask import g
 
 from .database import Database  # Importer le fichier database.py
-
-# Ces API seront pour la tache B2
-API_KEY = "nIOLstoH2fvZllC6Vo8QpcpKP"
-API_SECRET = "PoX7IFqCuKKMBjoYD4diGag3XgkWF4JthQ5ZsItt17TWtl3bIW"
-# Ces Access seront pour la tache B2
-ACCESS_TOKEN = "1243952698556383232-Qv98BnYtkFj8mje95QXox6yvLSUUTl"
-ACCESS_TOKEN_SECRET = "8nclhl82lk4P52CLYTIQz94vHwlod3djHRzOcdNMq4iQ8"
 
 # Lien qui sera utilisé pour récupérer les informations
 URL = 'http://donnees.ville.montreal.qc.ca/dataset/a5c1f0b9-261f-4247-99d8-' \
@@ -30,8 +20,15 @@ PATTERN_NOM_RESTO = "^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,98}" \
                     "[a-z0-9A-Z.)]$"
 PATTERN_NOM_RUE = "^[a-z1-9A-Z][a-z0-9- 'A-Z]{1,33}[a-z0-9A-Z]$"
 
-SOURCE_ADRESSE = "b.mignault.uqam.qc.ca@gmail.com"
-MOT_DE_PASSE = "Uqam123((SUPER)))"
+PATTERN_DATE = "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$"
+
+
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        g._database = Database()
+
+    return g._database
 
 
 # Fonction pour création la connexion qui sera utilisé dans un contexte hors
@@ -43,45 +40,64 @@ def initialisation_connexion_hors_flask():
     return connection
 
 
-def get_db():
-    db = getattr(g, '_database', None)
-    if db is None:
-        g._database = Database()
+def mise_jour_bd():
+    liste_champs_xml = initial_champ_importation_xml()
+    liste_contrevenants = recuperation_information_url()
+    connection = initialisation_connexion_hors_flask()
 
-    return g._database
+    for un_contrevenant in liste_contrevenants:
+
+        liste_champs_xml = remplissage_champs_importation_xml(liste_champs_xml,
+                                                              un_contrevenant)
+        ensemble_existant = connection.verifier_contrevenant_existe(
+            liste_champs_xml['proprietaire'],
+            liste_champs_xml['categorie'],
+            liste_champs_xml['etablissement'],
+            liste_champs_xml['no_civ'],
+            liste_champs_xml['nom_rue'],
+            liste_champs_xml['ville'],
+            liste_champs_xml['description'],
+            liste_champs_xml['date_infraction'],
+            liste_champs_xml['date_jugement'],
+            liste_champs_xml['montant'])
+        if len(ensemble_existant) == 0:
+            connection.insertion_contrevenant(
+                liste_champs_xml['proprietaire'],
+                liste_champs_xml['categorie'],
+                liste_champs_xml['etablissement'],
+                liste_champs_xml['no_civ'],
+                liste_champs_xml['nom_rue'],
+                liste_champs_xml['ville'],
+                liste_champs_xml['description'],
+                liste_champs_xml['date_infraction'],
+                liste_champs_xml['date_jugement'],
+                liste_champs_xml['montant'])
+
+    connection.disconnect()
 
 
-def initial_champ_recherche():
-    liste_champs = {"proprietaire": "", "etablissement": "", "nom_rue": "",
-                    "nb_restaurant_trouve": 0, "messages": {}, "nb_critere": 0}
+def initial_champ_interval():
+    liste_champs = {"date_debut": "", "date_fin": ""}
 
     return liste_champs
 
 
-def initial_champ_recherche_validation():
-    liste_validation_admin = {"situation_erreur": False,
-                              "champ_proprietaire_vide": False,
-                              "champ_etablissement_vide": False,
-                              "champ_rue_vide": False,
-                              "champs_vides": False,
-                              "longueur_proprietaire_inv": False,
-                              "longueur_etablissement_inv": False,
-                              "longueur_rue_inv": False,
-                              "champ_proprietaire_inv": False,
-                              "champ_etablissement_inv": False,
-                              "champ_rue_inv": False,
-                              "aucun_restaurant_trouve": False}
+def initial_champ_etablissement():
+    liste_champs = {"date_debut": "", "date_fin": "", "etablissement": ""}
 
-    return liste_validation_admin
+    return liste_champs
 
 
 def initial_champ_importation_xml():
-    liste_champs_xml = {0: "", 1: "", 2: "", 3: "", 4: "",
-                        5: "", 6: "", 7: "", 8: "", 9: 0}
+    liste_champs_xml = {"proprietaire": "", "categorie": "",
+                        "etablissement": "", "no_civ": "", "nom_rue": "",
+                        "ville": "", "description": "", "date_infraction": "",
+                        "date_jugement": "", "montant": 0}
 
     return liste_champs_xml
 
 
+# Fonction pour récupérer les informations venant de URL
 def recuperation_information_url():
     resultat = requests.get(URL)
     resultat.encoding = 'utf-8'
@@ -90,36 +106,58 @@ def recuperation_information_url():
     return liste_contrevenants
 
 
-def remplissage_champ_recherche(request, liste_champs):
-    liste_champs['proprietaire'] = request['proprietaire']
-    liste_champs['etablissement'] = request['etablissement']
-    liste_champs['nom_rue'] = request['nom_rue']
+def construction_xml(ensemble_trouve):
+    racine = ET.Element('contrevenants')
+    for sous_ensemble in ensemble_trouve:
+        contrevenant = ET.SubElement(racine, 'contrevenant')
+        for cle, valeur in sous_ensemble.items():
+            ET.SubElement(contrevenant, cle).text = str(valeur)
+
+    arbre = ET.ElementTree(racine)
+    xml_information = BytesIO()
+    arbre.write(xml_information, encoding='utf-8', xml_declaration=True)
+
+    return xml_information.getvalue()
+
+
+def remplissage_champs_importation_xml(liste_champs_xml, un_contrevenant):
+    liste_champs_xml['proprietaire'] = un_contrevenant.find('proprietaire').text
+    liste_champs_xml['categorie'] = un_contrevenant.find('categorie').text
+    liste_champs_xml['etablissement'] = un_contrevenant.find(
+        'etablissement').text
+    adresse = un_contrevenant.find('adresse').text
+    # Pour faire optimiser la recherche avec le nom de la rue, je met le
+    # numéro civique dans une variable à part
+    liste_champs_xml['no_civ'] = adresse.split(' ', 1)[0]
+    adresse = adresse.split(' ', 1)[1]
+    # Ceci est en raison des données de la ville qui contient un espace après
+    # apostrophe ce qui ne sera pas utile lors de recherche d'un nom de rue
+    liste_champs_xml['nom_rue'] = adresse.replace("' ", "'")
+    liste_champs_xml['ville'] = un_contrevenant.find('ville').text
+    liste_champs_xml['description'] = un_contrevenant.find('description').text
+    liste_champs_xml['date_infraction'] = convertisseur_date(
+        un_contrevenant.find('date_infraction').text)
+    liste_champs_xml['date_jugement'] = convertisseur_date(
+        un_contrevenant.find('date_jugement').text)
+    montant_en_transformation = un_contrevenant.find('montant').text.split()
+    liste_champs_xml['montant'] = int(montant_en_transformation[0])
+
+    return liste_champs_xml
+
+
+def remplissage_champs_interval(liste_champs, date_debut, date_fin):
+    liste_champs['date_debut'] = date_debut
+    liste_champs['date_fin'] = date_fin
 
     return liste_champs
 
 
-def remplissage_champs_importation_xml(liste_champs_xml, un_contrevenant):
-    liste_champs_xml[0] = un_contrevenant.find('proprietaire').text
-    liste_champs_xml[1] = un_contrevenant.find('categorie').text
-    liste_champs_xml[2] = un_contrevenant.find('etablissement').text
-    adresse = un_contrevenant.find('adresse').text
-    # Pour faire optimiser la recherche avec le nom de la rue, je met le
-    # numéro civique dans une variable à part
-    liste_champs_xml[3] = adresse.split(' ', 1)[0]
-    adresse = adresse.split(' ', 1)[1]
-    # Ceci est en raison des données de la ville qui contient un espace après
-    # apostrophe ce qui ne sera pas utile lors de recherche d'un nom de rue
-    liste_champs_xml[4] = adresse.replace("' ", "'")
-    liste_champs_xml[5] = un_contrevenant.find('ville').text
-    liste_champs_xml[6] = un_contrevenant.find('description').text
-    liste_champs_xml[7] = convertisseur_date(
-        un_contrevenant.find('date_infraction').text)
-    liste_champs_xml[8] = convertisseur_date(
-        un_contrevenant.find('date_jugement').text)
-    montant_en_transformation = un_contrevenant.find('montant').text.split()
-    liste_champs_xml[9] = int(montant_en_transformation[0])
+def remplissage_champs_etablissement(liste_champs, date_debut, date_fin, nom):
+    liste_champs['date_debut'] = date_debut
+    liste_champs['date_fin'] = date_fin
+    liste_champs['etablissement'] = nom
 
-    return liste_champs_xml
+    return liste_champs
 
 
 def convertisseur_date(date_a_convertir):
@@ -149,141 +187,86 @@ def importation_donnees():
     for un_contrevenant in liste_contrevenants:
         liste_champs_xml = remplissage_champs_importation_xml(liste_champs_xml,
                                                               un_contrevenant)
-        connection.insertion_contrevenant(
-            liste_champs_xml[0], liste_champs_xml[1], liste_champs_xml[2],
-            liste_champs_xml[3], liste_champs_xml[4], liste_champs_xml[5],
-            liste_champs_xml[6], liste_champs_xml[7], liste_champs_xml[8],
-            liste_champs_xml[9])
+        connection.insertion_contrevenant(liste_champs_xml['proprietaire'],
+                                          liste_champs_xml['categorie'],
+                                          liste_champs_xml['etablissement'],
+                                          liste_champs_xml['no_civ'],
+                                          liste_champs_xml['nom_rue'],
+                                          liste_champs_xml['ville'],
+                                          liste_champs_xml['description'],
+                                          liste_champs_xml['date_infraction'],
+                                          liste_champs_xml['date_jugement'],
+                                          liste_champs_xml['montant'])
 
     connection.disconnect()
 
 
-def mise_jour_donnees():
-    liste_contrevenants = recuperation_information_url()
-    connection = initialisation_connexion_hors_flask()
-    liste_envoi = {}  # Sera utiliser pour l'envoi de courriel
-    liste_nom_contrevenant = []  # Sera utiliser pour la section Twitter
-    indice = 0
-    for un_contrevenant in liste_contrevenants:
-        liste_champs_xml = initial_champ_importation_xml()
-        liste_champs_xml = remplissage_champs_importation_xml(liste_champs_xml,
-                                                              un_contrevenant)
-        ensemble_existant = connection.verifier_contrevenant_existe(
-            liste_champs_xml[0], liste_champs_xml[1], liste_champs_xml[2],
-            liste_champs_xml[3], liste_champs_xml[4], liste_champs_xml[5],
-            liste_champs_xml[6], liste_champs_xml[7], liste_champs_xml[8],
-            liste_champs_xml[9])
-        if len(ensemble_existant) == 0:
-            """
-            connection.insertion_contrevenant(
-            liste_champs_xml[0], liste_champs_xml[1], liste_champs_xml[2],
-            liste_champs_xml[3], liste_champs_xml[4], liste_champs_xml[5],
-            liste_champs_xml[6], liste_champs_xml[7], liste_champs_xml[8],
-            liste_champs_xml[9])
-            """
-            liste_envoi[indice] = liste_champs_xml
-            indice += 1
-            # Si un contrevenant existe déjà, il est inutile de le doubler...
-            # Ajustement B2
-            if liste_champs_xml[0] not in liste_nom_contrevenant:
-                liste_nom_contrevenant.append(liste_champs_xml[0])
+def construction_csv(ensemble_trouve):
+    csv_information = StringIO()
+    information = csv.writer(csv_information)
+    information.writerow(["Etablissement", "Nombre"])
+    for sous_ensemble in ensemble_trouve:
+        nom_etablissement = ""
+        nombre = ""
+        for cle, valeur in sous_ensemble.items():
+            if cle == "etablissement":
+                nom_etablissement = valeur
 
-    creation_courriel(liste_envoi)
-    conn_auth = connexion_twitter()
-    creation_tweet(conn_auth, liste_nom_contrevenant)
-    connection.disconnect()
+            elif cle == "nombre":
+                nombre = valeur
+
+        information.writerow([nom_etablissement, str(nombre)])
+
+    return csv_information.getvalue()
 
 
-def connexion_twitter():
-    try:
-        conn_auth = tweepy.OAuthHandler(API_KEY, API_SECRET)
-        conn_auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
-        return conn_auth
-    except Exception as e:
-        return None
+def initial_champ_recherche():
+    liste_champs = {"proprietaire": "", "etablissement": "", "nom_rue": "",
+                    "nb_restaurant_trouve": 0, "messages": {}, "nb_critere": 0}
+
+    return liste_champs
 
 
-def creation_tweet(conn_auth, liste_nom_contrevenant):
-    date_maintenant = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    api = tweepy.API(conn_auth)
-    message_presentation = "\n\nVoici le nouveau contrevenant prise en " \
-                           "défault par la ville de Montréal !\n\n"
-    for nom_contrevenant in liste_nom_contrevenant:
-        api.update_status(
-            date_maintenant + message_presentation + nom_contrevenant)
+def initial_champ_recherche_validation():
+    liste_validation = {"situation_erreur": False,
+                        "champ_proprietaire_vide": False,
+                        "champ_etablissement_vide": False,
+                        "champ_rue_vide": False,
+                        "champs_vides": False,
+                        "longueur_proprietaire_inv": False,
+                        "longueur_etablissement_inv": False,
+                        "longueur_rue_inv": False,
+                        "champ_proprietaire_inv": False,
+                        "champ_etablissement_inv": False,
+                        "champ_rue_inv": False,
+                        "aucun_restaurant_trouve": False}
+
+    return liste_validation
 
 
-def creation_courriel(liste_envoi):
-    string_courriel = recuperation_courriel_yaml()
+def initial_champ_interval_validation():
+    liste_validation = {"situation_erreur": False, "champ_debut_inv": False,
+                        "champ_fin_inv": False, "champ_debut_vide": False,
+                        "champ_fin_vide": False}
 
-    message = MIMEMultipart("alternative")
-    message["Subject"] = "Voici les nouveaux contrevenants depuis " \
-                         "la derniere mise a jour !"
-    message["From"] = SOURCE_ADRESSE
-    message["To"] = string_courriel
-    msg_corps = creation_html_courriel(liste_envoi)
-    message.attach(MIMEText(msg_corps, "html"))
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.ehlo()
-    server.starttls()
-    server.login(SOURCE_ADRESSE, MOT_DE_PASSE)
-    message = message.as_string().encode('utf-8')
-    server.sendmail(SOURCE_ADRESSE, string_courriel, message)
-    server.quit()
+    return liste_validation
 
 
-def recuperation_courriel_yaml():
-    string_courriel = ""
-    racine_liste = []
-    # Le fichier doit se trouver à la racine du projet
-    with open(r'adresse_destination.yaml') as file:
-        adresse_list = yaml.full_load(file)
-        for item, doc in adresse_list.items():
-            racine_liste.append(doc)
+def initial_champ_etablissement_validation():
+    liste_validation = {"situation_erreur": False, "champ_debut_inv": False,
+                        "champ_fin_inv": False, "champ_debut_vide": False,
+                        "champ_fin_vide": False,
+                        "champ_etablissement_vide": False}
 
-    for une_sous_liste in racine_liste:
-        for liste_courriel in une_sous_liste:
-            string_courriel = liste_courriel
-
-    return string_courriel
+    return liste_validation
 
 
-def creation_html_courriel(liste_envoi):
-    msg_corps = """<html><head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta charset="utf-8">
-        </head><body>
-        <h2>Bonjour,</h2>
-        <p>Voici la liste des nouveaux contrevenants depuis notre derniere 
-        mise a jour pour la ville de Montreal</p>
-        <table style="border-collapse: collapse; border: 2px solid black; 
-        width: 100%"><thead>
-        <tr>
-        <th>Propriétaire</th><th>Catégorie</th><th>Établissement</th> 
-        <th>No Civique</th><th>Rue</th><th>Ville & Code Postal</th>
-        <th>Description</th><th>Date de l'infraction</th>
-        <th>Date du jugement</th><th>Montant</th>
-        </tr>
-        </thead><tbody>    
-    """
-    for cle, valeur in liste_envoi.items():
-        msg_corps += "<tr>"
-        for cle2, valeur2 in valeur.items():
-            msg_corps += "<td style=\"border: 1px solid black; padding: 5px; "
-            if cle2 == 9:
-                msg_corps += "text-align: center\">" + str(valeur2) + " $</td>"
-            elif cle2 == 6:
-                msg_corps += "text-align: justify\">" + valeur2 + "</td>"
-            else:
-                msg_corps += "text-align: center\">" + valeur2 + "</td>"
+def remplissage_champ_recherche(request, liste_champs):
+    liste_champs['proprietaire'] = request['proprietaire']
+    liste_champs['etablissement'] = request['etablissement']
+    liste_champs['nom_rue'] = request['nom_rue']
 
-        msg_corps += "</tr>"
-
-    msg_corps += "</tbody></table>"
-    msg_corps += "<p>Bonne journee</p>"
-    msg_corps += "</body></html>"
-
-    return msg_corps
+    return liste_champs
 
 
 def nombre_critiere_recherche(liste_champs):
@@ -299,6 +282,49 @@ def nombre_critiere_recherche(liste_champs):
         nombre += 1
 
     return nombre
+
+
+def validation_champs_interval(liste_champs, liste_validation):
+    liste_validation = sous_validation_champs_vide_ajax(liste_champs,
+                                                        liste_validation)
+    liste_validation = sous_validation_champs_invalide_ajax(liste_champs,
+                                                            liste_validation)
+
+    return liste_validation
+
+
+def validation_champs_etablissement(liste_champs, liste_validation):
+    liste_validation = sous_validation_champs_vide_ajax(liste_champs,
+                                                        liste_validation)
+    liste_validation = sous_validation_champs_invalide_ajax(liste_champs,
+                                                            liste_validation)
+    if liste_champs['etablissement'] == "":
+        liste_validation['champ_etablissement_vide'] = True
+
+    return liste_validation
+
+
+def sous_validation_champs_vide_ajax(liste_champs, liste_validation):
+    if liste_champs['date_debut'] == "":
+        liste_validation['champ_debut_vide'] = True
+
+    if liste_champs['date_fin'] == "":
+        liste_validation['champ_fin_vide'] = True
+
+    return liste_validation
+
+
+def sous_validation_champs_invalide_ajax(liste_champs, liste_validation):
+    match_date = re.compile(PATTERN_DATE).match
+    if not liste_validation['champ_debut_vide']:
+        if match_date(liste_champs['date_debut']) is None:
+            liste_validation['champ_debut_inv'] = True
+
+    if not liste_validation['champ_fin_vide']:
+        if match_date(liste_champs['date_fin']) is None:
+            liste_validation['champ_fin_inv'] = True
+
+    return liste_validation
 
 
 def validation_champs_recherche(liste_champs, liste_validation):
@@ -374,6 +400,15 @@ def situation_erreur(liste_validation):
                 # Il n'est pas nécessaire de vérifier si il y a une autre erreur
                 # de validation à true.
                 break
+
+    return liste_validation
+
+
+def situation_erreur_interval(liste_validation):
+    for cle, valeur in liste_validation.items():
+        if valeur:
+            liste_validation['situation_erreur'] = True
+            break
 
     return liste_validation
 

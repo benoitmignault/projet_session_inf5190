@@ -4,17 +4,82 @@
     Montréal</h1>
 <div class="container">
     <p class="desktop" id="hautPageDesktop"></p>
+    <h2>Section pour rechercher avec un intervale de date</h2>
+    <div class='zone_recherche_resto'>
+        <form id="recherche_par_interval">
+            <ul>
+                <li>Veuillez saisir une date de début et une date de fin</li>
+            </ul>
+            <div class="modif">
+                <div class="information">
+                    <label for="date_debut">Date début :</label>
+                    <div>
+                        <input id="date_debut" name="du"
+                               placeholder="exemple de date valide » AAAA-MM-JJ"
+                               title="Saisir une date au format ISO 8601"
+                               type="text" value="">
+                    </div>
+                </div>
+                <div class="information">
+                    <label for="date_fin">Date fin :</label>
+                    <div>
+                        <input id="date_fin" name="au"
+                               placeholder="exemple de date valide » AAAA-MM-JJ"
+                               title="Saisir une date au format ISO 8601"
+                               type="text" value="">
+                    </div>
+                </div>
+                <div class="information partie_cache">
+                    <ul>
+                        <li>Maintenant ! Veuillez sélectionner un
+                            établissement
+                        </li>
+                    </ul>
+                    <label for="liste_resto">Liste des établissements :</label>
+                    <div>
+                        <select id="liste_resto" name="liste_resto"
+                                title="Saisir un établissement en particulier">
+                            <option selected value="">À Sélectionner</option>
+                        </select>
+                    </div>
+                    <ul>
+                        <li>Option 1 : Faire la recherche</li>
+                        <li>Option 2 : Pour une nouvelle liste établissement,
+                            veuiller appuyer sur le bouton «Effacer...»
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="troisBTN">
+                    <input class="bouton" type='submit' value="Rechercher...">
+                    <input class="bouton" id="btn_reset_interval"
+                           type='reset' value="Effacer...">
+                </div>
+            </div>
+            <!-- Section des messages erreurs -->
+            <ul class="aucun" id="message_erreur_interval"></ul>
+        </form>
+        <!-- Section pour le retour Ajax A5 -->
+        <div id="result_interval"></div>
+        
+        <!-- Section pour le retour Ajax A6 -->
+        <div id="result_interval_etablissement"></div>
+    </div>
+    
     <h2>Section pour rechercher une liste de restaurants fautifs</h2>
     <div class='zone_recherche_resto'>
         {% set champ = '' %}
         {% if liste_validation['aucun_restaurant_trouve'] %}
         {% set champ = 'erreur' %}
         {% endif %}
-        <form class="{{champ}}" action="/recherche_restaurant" method="post">
+        <form action="/recherche_restaurant" class="{{champ}}" id="recherche"
+              method="post">
             <ul>
                 <li>Veuillez saisir au moins un des trois critères suivants</li>
                 <li>Les accents sont importants</li>
-                <li>Si vous n'etes pas sur d'un critère, la recherche va s'arranger</li>
+                <li>Si vous n'etes pas sur d'un critère, la recherche va
+                    s'arranger
+                </li>
             </ul>
             <div class="modif">
                 {% set champ = '' %}
@@ -43,7 +108,8 @@
                     <div>
                         <input id="proprietaire" name="proprietaire"
                                title="Charactères alphanumériques, les espaces, l'apostrophe et le tiret sont permis"
-                               type="text" value="{{liste_champs['proprietaire']}}">
+                               type="text"
+                               value="{{liste_champs['proprietaire']}}">
                     </div>
                 </div>
                 {% set champ = '' %}
@@ -64,17 +130,23 @@
                 </div>
                 <div class="troisBTN">
                     <input class="bouton" type='submit' value="Rechercher...">
-                    <input class="bouton" onClick="reset_recherche();"
-                           type='reset'
+                    <input class="bouton" id="btn_reset_recher" type='reset'
                            value="Effacer...">
                 </div>
             </div>
             {% if liste_validation['situation_erreur'] %}
-            {% for message in liste_champs['messages'] %}
-            <p class="aucun">{{message}}</p>
-            {% endfor %}
+            <ul class="aucun" id="message_erreur_recher">
+                {% for message in liste_champs['messages'] %}
+                <li>{{message}}</li>
+                {% endfor %}
+            </ul>
             {% endif %}
         </form>
+    </div>
+    <!-- https://publicdomainvectors.org/fr/gratuitement-des-vecteurs/Orange-fl%C3%A8che-pointant-vers-le-haut-de-dessin-vectoriel/9499.html -->
+    <div class="return">
+        <a class="desktop" href="#hautPageDesktop">
+            <img alt="Retour vers le haut" src="/img/fleche_haut.svg"></a>
     </div>
 </div>
 {% endblock content %}

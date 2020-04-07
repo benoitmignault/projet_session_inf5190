@@ -1,8 +1,9 @@
+import xmlify
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.combining import OrTrigger
 from apscheduler.triggers.cron import CronTrigger
-
-from flask import Flask, redirect, render_template, request, session, url_for
+from flask import Flask, jsonify, redirect, render_template, request, session, \
+    url_for, Response
 
 from modules.fonction import *
 
@@ -13,12 +14,25 @@ app = Flask(__name__, static_url_path='', static_folder='static')
 app.secret_key = "(*&*&322387he738220)(*(*22347657"
 
 
+@app.errorhandler(404)
+def not_found(e):
+    erreur_404 = True
+    titre = "Page inexistante - 404"
+    return render_template("erreur_404.html", titre=titre,
+                           erreur_404=erreur_404)
+
+
 @app.teardown_appcontext
 def close_connection(exception):
     db = getattr(g, '_database', None)
 
     if db is not None:
         db.disconnect()
+
+
+@app.route('/doc')
+def documentation():
+    return render_template('doc.html')
 
 
 @app.route('/', methods=["GET"])
@@ -39,7 +53,11 @@ def home():
         liste_champs = initial_champ_recherche()
         liste_validation = initial_champ_recherche_validation()
 
+    conn_db = get_db()
+    liste_etablissement = conn_db.liste_tous_restaurants()
+
     return render_template('home.html', titre=titre,
+                           liste_etablissement=liste_etablissement,
                            liste_validation=liste_validation,
                            liste_champs=liste_champs)
 
@@ -55,10 +73,13 @@ def recherche_restaurant():
     conn_db = get_db()
     ensemble_trouve = {}
     if not liste_validation['champs_vides']:
-        ensemble_trouve = conn_db.get_restaurant_trouver(liste_champs)
+        ensemble_trouve = conn_db.liste_restaurant_trouver(liste_champs)
         liste_champs['nb_restaurant_trouve'] = len(ensemble_trouve)
         if liste_champs['nb_restaurant_trouve'] == 0:
             liste_validation['aucun_restaurant_trouve'] = True
+
+    else:
+        liste_validation['aucun_restaurant_trouve'] = True
 
     liste_validation = situation_erreur(liste_validation)
     # Utilisation des variables de sessions pour transporter
@@ -101,9 +122,104 @@ scheduler.add_job(mise_jour_donnees, trigger)
 scheduler.start()
 
 
-# Section pour importer directement les informations de la ville via URL.
+# Deuxième partie de A4 sera de créer une documentation RAML
+@app.route('/api/nombre_amende_etablissement/du=<date_debut>&au=<date_fin>',
+           methods=["GET", "POST"])
+def recherche_contrevenants_interval(date_debut, date_fin):
+    liste_champs_interval = initial_champ_interval()
+    liste_validation_interval = initial_champ_interval_validation()
+    liste_champs_interval = remplissage_champs_interval(liste_champs_interval,
+                                                        date_debut, date_fin)
+    liste_validation_interval = validation_champs_interval(
+        liste_champs_interval, liste_validation_interval)
+    liste_validation_interval = situation_erreur_interval(
+        liste_validation_interval)
+
+    ensemble_trouve = []
+    if not liste_validation_interval['situation_erreur']:
+        conn_db = get_db()
+
+        if request.method == "GET":
+            ensemble_trouve = conn_db.liste_contrevenant_interval(
+                liste_champs_interval['date_debut'],
+                liste_champs_interval['date_fin'])
+
+        elif request.method == "POST":
+            ensemble_trouve = conn_db.nombre_contravention_interval(
+                liste_champs_interval['date_debut'],
+                liste_champs_interval['date_fin'])
+
+        return jsonify(ensemble_trouve)
+
+    else:
+        titre = "Erreur Système - 400"
+        erreur_400 = True
+        return render_template('erreur_400.html', titre=titre,
+                               erreur_400=erreur_400), 400
+
+
+# Cette fonction était pour la tache A6
+@app.route(
+    '/api/contrevenant/du=<date_debut>&au=<date_fin>&etablissement=<nom>',
+    methods=["GET"])
+def recherche_liste_contravention_par_etablissement(date_debut, date_fin, nom):
+    liste_champs_etablissement = initial_champ_etablissement()
+    liste_validation_etablissement = initial_champ_etablissement_validation()
+    liste_champs_etablissement = remplissage_champs_etablissement(
+        liste_champs_etablissement,
+        date_debut, date_fin, nom)
+    liste_validation_etablissement = validation_champs_etablissement(
+        liste_champs_etablissement, liste_validation_etablissement)
+    liste_validation_etablissement = situation_erreur_interval(
+        liste_validation_etablissement)
+
+    if not liste_validation_etablissement['situation_erreur']:
+        conn_db = get_db()
+
+        ensemble_trouve = conn_db.liste_contravention_etablissement(
+            liste_champs_etablissement['date_debut'],
+            liste_champs_etablissement['date_fin'],
+            liste_champs_etablissement['etablissement'])
+
+        return jsonify(ensemble_trouve)
+
+    else:
+        titre = "Erreur Système - 400"
+        erreur_400 = True
+        return render_template('erreur_400.html', titre=titre,
+                               erreur_400=erreur_400), 400
+
+
+# Cette fonction était pour la tache C1
+@app.route('/api/nombre_amende_etablissement/json', methods=["GET"])
+def recherche_contrevenants_json():
+    conn_db = get_db()
+    ensemble_trouve = conn_db.nombre_contravention()
+
+    return jsonify(ensemble_trouve)
+
+  
+# Cette fonction était pour la tache C2
+@app.route('/api/nombre_amende_etablissement/xml', methods=["GET"])
+def recherche_contrevenants_xml():
+    conn_db = get_db()
+    ensemble_trouve = conn_db.nombre_contravention()
+    xml_information = construction_xml(ensemble_trouve)
+
+    return Response(xml_information, mimetype='text/xml')
+
+  
+# Cette fonction était pour la tache C3
+@app.route('/api/nombre_amende_etablissement/csv', methods=["GET"])
+def recherche_contrevenants_csv():
+    conn_db = get_db()
+    ensemble_trouve = conn_db.nombre_contravention()
+    csv_information = construction_csv(ensemble_trouve)
+
+    return Response(csv_information, mimetype='text/csv')
+
+
 def main():
-    # Cette fonction était pour la tache A1
     importation_donnees()
 
 
@@ -111,5 +227,6 @@ def main():
 if __name__ == "__main__":
     main()
 
+    
 # Creation de la tache B2
 # Creation de la demande d'accès à Twitter
