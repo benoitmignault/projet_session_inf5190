@@ -118,7 +118,7 @@ def recherche_restaurant_trouve():
 scheduler = BackgroundScheduler(daemon=True)
 trigger = OrTrigger([CronTrigger(day_of_week='*', hour=0, minute=0)])
 
-scheduler.add_job(mise_jour_donnees, trigger)
+scheduler.add_job(mise_jour_bd, trigger)
 scheduler.start()
 
 
