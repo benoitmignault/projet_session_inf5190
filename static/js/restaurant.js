@@ -8,7 +8,6 @@ const result_interval = document.querySelector('#result_interval');
 const result_interval_etablissement = document.querySelector('#result_interval_etablissement');
 
 // Variable pour la recherche par établissement précis après avoir sélectionner
-const partie_cache = document.querySelector('.partie_cache');
 const champ_etablissement = document.querySelector('#liste_resto');
 
 // Variables pour la recherche d'information générale pour être utiliser avec le bouton effacer
@@ -17,6 +16,17 @@ const champ_nom_proprio = document.querySelector('#proprietaire');
 const champ_nom_rue = document.querySelector('#nom_rue');
 const btn_reset_recher = document.querySelector('#btn_reset_recher');
 const message_erreur_recher = document.querySelector('#message_erreur_recher');
+
+const pattern_date = new RegExp("^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$");
+
+function initial_champ_ajax_validation(){
+    var liste_validation = {"champ_debut_inv": false, "aucun_choix": false,
+                        "champ_fin_inv": false, "champ_debut_vide": false,
+                        "champ_fin_vide": false, "champ_etablissement_vide": false,
+                        "les_deux_choix": false, "champs_date_vides": false};
+
+    return liste_validation;
+}
 
 function reset_recherche(){
     $(btn_reset_recher).click(function() {
@@ -38,8 +48,6 @@ function reset_recherche_interval(){
         effacer_messages_erreurs(message_erreur_interval);
         initialiser_tous_champs("input[type=text]");
         initialiser_tous_champs("#recherche_par_interval");
-        initialiser_tous_champs(".partie_cache");
-        destruction_des_options();
     });
 }
 
@@ -51,9 +59,6 @@ function initialiser_tous_champs(type_champs){
             un_champ.style.border = "1px solid #ccc";
         } else if (type_champs == "#recherche_par_interval" || type_champs == "#recherche"){
             un_champ.style.border = "2px solid black";
-        } else if (type_champs == ".partie_cache"){
-            partie_cache.style.display = "none";
-            destruction_des_options();
         }
     });
 }
@@ -93,200 +98,181 @@ function validation_regex(champ, type_regex){
 
 // Les deux requêtes ajax passeront par la même entrée mais devront être différenciées
 // On va utiliser la vérification de l'attribut «display» de la section cachée
-function recherche_par_interval(){
-    $(champ_date_debut).change(function () {
-
-    });
+function recherche_rapide(){
     $(form_interval).submit(function (e) {
         e.preventDefault();
-        var erreur_general = false;
-        var erreur_localise = false;
-        var pattern_date = new RegExp("^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$");
         message_erreur_interval.innerHTML = ""; // On remet la section des messages vide
-        erreur_general = verification_date_debut (pattern_date, erreur_localise, erreur_general);
-        erreur_general = verification_date_fin (pattern_date, erreur_localise, erreur_general);
-        if (partie_cache.style.display == "flex"){
-            erreur_general = verification_choix_etablissement(erreur_localise, erreur_general);
-            appel_ajax_interval_etablissement(erreur_general);
-        } else {
-            appel_ajax_interval(erreur_general);
+        var liste_validation = initial_champ_ajax_validation();
+        liste_validation = verification_interval(liste_validation);
+        liste_validation = verification_choix_etablissement(liste_validation);
+        message_erreur_ajax(liste_validation);
+        if (!liste_validation['champs_date_vides'] && liste_validation['champ_etablissement_vide']){
+            if (!liste_validation['champ_debut_inv'] && !liste_validation['champ_fin_inv']){
+                appel_ajax_interval();
+            }
+
+        } else if (liste_validation['champs_date_vides'] && !liste_validation['champ_etablissement_vide']) {
+            appel_ajax_interval_etablissement();
         }
     });
 }
 
-function verification_date_debut(pattern_date, erreur_localise, erreur_general){
+function verification_interval(liste_validation){
     if (champ_date_debut.value == "") {
-        message_erreur_interval.innerHTML += "<li>Le champ «Date début» ne peut être vide !</li>";
-        erreur_localise = true;
+        liste_validation['champ_debut_vide'] = true;
     } else if (!(pattern_date.test(champ_date_debut.value))) {
-        message_erreur_interval.innerHTML += "<li>Le champ «Date début» ne contient pas une date au format ISO 8601 !</li>";
-        erreur_localise = true;
+        liste_validation['champ_debut_inv'] = true;
     }
 
-    if (erreur_localise){
-        champ_date_debut.style.border = "2px solid red";
-        champ_date_debut.style.background = "#FCDEDE";
-        erreur_general = true;
-    } else {
-        champ_date_debut.style.background = "white";
-        champ_date_debut.style.border = "1px solid #ccc";
-    }
-
-    return erreur_general;
-}
-
-function verification_date_fin(pattern_date, erreur_localise, erreur_general){
     if (champ_date_fin.value == "") {
-        message_erreur_interval.innerHTML += "<li>Le champ «Date fin» ne peut être vide !</li>";
-        erreur_localise = true;
+        liste_validation['champ_fin_vide'] = true;
     } else if (!(pattern_date.test(champ_date_fin.value))) {
-        message_erreur_interval.innerHTML += "<li>Le champ «Date fin» ne contient pas une date au format ISO 8601 !</li>";
-        erreur_localise = true;
+        liste_validation['champ_fin_inv'] = true;
     }
 
-    if (erreur_localise){
-        champ_date_fin.style.border = "2px solid red";
-        champ_date_fin.style.background = "#FCDEDE";
-        erreur_general = true;
-    } else {
-        champ_date_fin.style.background = "white";
-        champ_date_fin.style.border = "1px solid #ccc";
+    if (liste_validation['champ_debut_vide'] && liste_validation['champ_fin_vide']){
+        liste_validation['champs_date_vides'] = true;
     }
 
-    return erreur_general;
+    return liste_validation;
 }
 
-function verification_choix_etablissement(erreur_localise, erreur_general){
+function verification_choix_etablissement(liste_validation){
     if (champ_etablissement.value == "") {
-        message_erreur_interval.innerHTML += "<li>Vous devez sélectionner un établissement parmis la liste !</li>";
-        erreur_localise = true;
+        liste_validation['champ_etablissement_vide'] = true;
     }
 
-    if (erreur_localise){
-        result_interval_etablissement.innerHTML = "";
-        champ_etablissement.style.border = "2px solid red";
-        champ_etablissement.style.background = "#FCDEDE";
-        erreur_general = true;
-    } else {
-        champ_etablissement.style.background = "white";
-        champ_etablissement.style.border = "1px solid #ccc";
+    if (!liste_validation['champs_date_vides'] && !liste_validation['champ_etablissement_vide']){
+        liste_validation['les_deux_choix'] = true;
     }
 
-    return erreur_general;
+    if (liste_validation['champs_date_vides'] && liste_validation['champ_etablissement_vide']){
+        liste_validation['aucun_choix'] = true;
+    }
+
+    return liste_validation;
 }
 
-function appel_ajax_interval(erreur_general){
-    destruction_des_options(); // On retire toutes les options avant d'insérer les nouvelles
-    if (!erreur_general){
-        var ajax = new XMLHttpRequest();
-        ajax.onreadystatechange = function() {
-            if (ajax.readyState === XMLHttpRequest.DONE) {
-                if (ajax.status === 200) {
-                    var liste = JSON.parse(ajax.responseText);
-                    if (liste.length > 0){
-                        var ensemble_result = creation_bloc_html_interval(liste);
-                        // On remet la section de A6 vide comme nous faisons une nouvelle recherche interval
-                        result_interval_etablissement.innerHTML = "";
-                        result_interval.innerHTML = ensemble_result['result_interval'];
-                        construction_des_options(ensemble_result['result_etablissement'])
-                        partie_cache.style.display = "flex";
-                        form_interval.style.border = "2px solid black";
-                    } else {
-                        appel_ajax_interval_succes_mais_erreur();
-                        message_erreur_interval.innerHTML += "<li>L'interval de date ne contenait aucune donnée !</li>";
-                    }
+function message_erreur_ajax(liste_validation){
+    if (liste_validation['aucun_choix']){
+        message_erreur_interval.innerHTML += "<li>Veuiller choisir au moins une des deux options !</li>";
+        modification_erreur(champ_date_debut);
+        modification_erreur(champ_date_fin);
+        modification_erreur(champ_etablissement)
+    }
+
+    if (liste_validation['les_deux_choix']){
+        message_erreur_interval.innerHTML += "<li>Veuiller choisir une seul des deux options !</li>";
+        modification_erreur(champ_date_debut);
+        modification_erreur(champ_date_fin);
+        modification_erreur(champ_etablissement)
+    }
+
+    if (liste_validation['champ_debut_inv']){
+        message_erreur_interval.innerHTML += "<li>Le champ «Date début» ne contient pas une date au format ISO 8601 !</li>";
+        modification_erreur(champ_date_debut);
+    }
+
+    if (liste_validation['champ_fin_inv']){
+        message_erreur_interval.innerHTML += "<li>Le champ «Date fin» ne contient pas une date au format ISO 8601 !</li>";champ_date_debut.style.border = "2px solid red";
+        modification_erreur(champ_date_fin);
+    }
+
+    if (liste_validation['champ_etablissement_vide'] && liste_validation['champ_debut_vide'] && !liste_validation['champ_fin_vide']){
+        message_erreur_interval.innerHTML += "<li>Le champ «Date début» ne peut être vide !</li>";
+        modification_erreur(champ_date_debut);
+    }
+
+    if (liste_validation['champ_etablissement_vide'] && !liste_validation['champ_debut_vide'] && liste_validation['champ_fin_vide']){
+        message_erreur_interval.innerHTML += "<li>Le champ «Date fin» ne peut être vide !</li>";
+        modification_erreur(champ_date_fin);
+    }
+}
+
+function modification_erreur(champ){
+    champ.style.border = "2px solid red";
+    champ.style.background = "#FCDEDE";
+}
+
+function modification_erreur(champ){
+    champ.style.background = "white";
+    champ.style.border = "1px solid #ccc";
+}
+
+function appel_ajax_interval(){
+    var ajax = new XMLHttpRequest();
+    ajax.onreadystatechange = function() {
+        if (ajax.readyState === XMLHttpRequest.DONE) {
+            if (ajax.status === 200) {
+                var liste = JSON.parse(ajax.responseText);
+                if (liste.length > 0){
+                    var resultat = creation_bloc_html_interval(liste);
+                    result_interval.innerHTML = resultat;
                 } else {
                     appel_ajax_interval_succes_mais_erreur();
-                    message_erreur_interval.innerHTML += "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
+                    message_erreur_interval.innerHTML += "<li>L'interval de date ne contenait aucune donnée !</li>";
                 }
+            } else {
+                appel_ajax_interval_succes_mais_erreur();
+                message_erreur_interval.innerHTML += "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
             }
-        };
-        var param = `du=${champ_date_debut.value}&au=${champ_date_fin.value}`;
-        ajax.open("POST", "/api/nombre_amende_etablissement/"+param, true);
-        ajax.send();
-    } else {
-        form_interval.style.border = "2px solid red";
-    }
+        }
+    };
+
+    var param = `du=${champ_date_debut.value}&au=${champ_date_fin.value}`;
+    ajax.open("GET", "/api/nombre_amende_etablissement/"+param, true);
+    ajax.send();
 }
 
 function appel_ajax_interval_etablissement(erreur_general){
-    if (!erreur_general){
-        var ajax = new XMLHttpRequest();
-        ajax.onreadystatechange = function() {
-            if (ajax.readyState === XMLHttpRequest.DONE) {
-                if (ajax.status === 200) {
-                    var liste = JSON.parse(ajax.responseText);
-                    // On remet la section de A5 vide comme nous avons sélectionné un établissement
-                    result_interval.innerHTML = "";
-                    result_interval_etablissement.innerHTML = creation_bloc_html_etablissement(liste);
-                    form_interval.style.border = "2px solid black";
-                } else {
-                    appel_ajax_interval_succes_mais_erreur();
-                    message_erreur_interval.innerHTML += "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
-                }
+    var ajax = new XMLHttpRequest();
+    ajax.onreadystatechange = function() {
+        if (ajax.readyState === XMLHttpRequest.DONE) {
+            if (ajax.status === 200) {
+                var liste = JSON.parse(ajax.responseText);
+                result_interval_etablissement.innerHTML = creation_bloc_html_etablissement(liste);
+            } else {
+                appel_ajax_interval_succes_mais_erreur();
+                message_erreur_interval.innerHTML += "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
             }
-        };
-        var param = `du=${champ_date_debut.value}&au=${champ_date_fin.value}&etablissement=${champ_etablissement.value}`;
-        ajax.open("GET", "/api/contrevenant/"+param, true);
-        ajax.send();
-    } else {
-        form_interval.style.border = "2px solid red";
-    }
+        }
+    };
+    var param = `etablissement=${champ_etablissement.value}`;
+    ajax.open("GET", "/api/liste_amendes_etablissement/"+param, true);
+    ajax.send();
 }
 
 // Cette fonction sera utilisée pour caché la section du menu déroulant si le résultat retourne rien
 // Les anciennes information du tableau des établissements avec leur nombre de contravention n'est plus valide
 function appel_ajax_interval_succes_mais_erreur(){
-    partie_cache.style.display = "none";
     result_interval.innerHTML = "";
     result_interval_etablissement.innerHTML = "";
     form_interval.style.border = "2px solid red";
 }
 
-function construction_des_options(liste_options){
-    for(var i = 0; i < liste_options.length; i++) {
-        var une_option = new Option(liste_options[i], liste_options[i]);
-        $(une_option).html(liste_options[i]);
-        $(champ_etablissement).append(une_option);
-    }
-}
-
-function destruction_des_options(){
-    $(champ_etablissement)
-    .find('option')
-    .remove()
-    .end()
-    .append('<option selected value="">À Sélectionner</option>')
-    .val('');
-}
-
 // J'ai découvert comment faire des string avec des variables
 // https://stackoverflow.com/questions/19105009/how-to-insert-variables-in-javascript-strings/44510325
 function creation_bloc_html_interval(liste){
-    // La liste des établissements à insérer plutard comme option du menu déroulant
-    var result_etablissement = [];
     // Le bloc HTML pour le résultat de la liste des établissements ave leur nombre de contrevantions
-    var result_interval = "<p>Voici le résultat des établissements avec leur nombre respectif de contrevention</p>";
-    result_interval += "<table class=\"tabeau_resto\">";
+    var result_interval = "<table class=\"tabeau_resto\">";
     result_interval += "<thead><tr><th class=\"nom\">Établissement</th>";
     result_interval += "<th class=\"quantite\">Nombre</th></tr></thead><tbody>";
     for(var i = 0; i < liste.length; i++) {
         result_interval += "<tr>";
         var resto = liste[i];
-        result_etablissement.push(resto.etablissement);
         result_interval += `<td class='nom'>${resto.etablissement}</td>`;
         result_interval += `<td class='quantite'>${resto.nombre}</td>`;
         result_interval += "<tr>";
     }
     result_interval += "</tbody></table>";
 
-    return {'result_interval': result_interval, 'result_etablissement': result_etablissement};
+    return result_interval;
 }
 
 // Utilisation de ce principe pour itérer
 // https://zellwk.com/blog/looping-through-js-objects/
 function creation_bloc_html_etablissement(liste){
-    var result_liste = "<p>Voici le résultat des amandes obtenues par l'établissement sélectionné plus haut</p>"
+    var result_liste = "";
     for(var i = 0; i < liste.length; i++) {
         result_liste += "<table class=\"tabeau_resto\"><tbody>";
         const une_amande = Object.entries(liste[i]);
@@ -308,7 +294,7 @@ function creation_bloc_html_etablissement(liste){
 
 document.addEventListener('DOMContentLoaded', function () {
     validation_champs_recherches();
-    recherche_par_interval();
+    recherche_rapide();
     reset_recherche();
     reset_recherche_interval();
 });

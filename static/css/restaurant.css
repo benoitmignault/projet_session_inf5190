@@ -198,9 +198,10 @@ h2 {
     margin-bottom: 10px;
 }
 
+.container > .zone_recherche_resto > p,
 .container > .zone_recherche_resto > form > .modif > fieldset > p{
-    text-align: left;
     padding-left : 50px;
+    font-weight: bold;
 }
 
 .container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto,

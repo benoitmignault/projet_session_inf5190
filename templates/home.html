@@ -13,8 +13,6 @@
             <div class="modif">
                 <fieldset>
                     <p>Option 1 - Une recherche par interval de temps</p>
-                    <p>Résultat 1 - Une liste des établissements avec leur
-                        nombre amendes</p>
                     <div class="information">
                         <label for="date_debut">Date début :</label>
                         <div>
@@ -36,8 +34,6 @@
                 </fieldset>
                 <fieldset>
                     <p>Option 2 - Une recherche par établissement</p>
-                    <p>Résultat 2 - Toutes l'information sur les amendes d'un
-                        établissement sélectionnémendes</p>
                     <div class="information">
                         <label for="liste_resto">Liste des établissements
                             :</label>
@@ -46,6 +42,12 @@
                                     title="Saisir un établissement en particulier">
                                 <option selected value="">À Sélectionner
                                 </option>
+                                {% for un_etablissement in liste_etablissement
+                                %}
+                                <option value="{{un_etablissement}}">
+                                    {{un_etablissement}}
+                                </option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div>
@@ -60,9 +62,12 @@
             <ul class="aucun" id="message_erreur_interval"></ul>
         </form>
         <!-- Section pour le retour Ajax A5 -->
+        <p>Résultat 1 - Une liste des établissements avec leur nombre
+            amendes</p>
         <div id="result_interval"></div>
-        
         <!-- Section pour le retour Ajax A6 -->
+        <p>Résultat 2 - Toutes l'information sur les amendes d'un
+                établissement sélectionnémendes</p>
         <div id="result_interval_etablissement"></div>
     </div>
     

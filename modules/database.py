@@ -118,15 +118,15 @@ class Database:
 
         return ensemble_trouve
 
-    def liste_contravention_etablissement(self, date_debut, date_fin, nom):
+    def liste_contravention_etablissement(self, nom):
         cursor = self.get_connection().cursor()
         select = "select categorie, no_civique, nom_rue, ville, description," \
                  "date_infraction, date_jugement, montant_amende "
         fromm = "from mauvais_restaurants "
-        where = "where date_infraction BETWEEN ? AND ? AND etablissement = ? "
+        where = "where etablissement = ? "
         order = "order by date_infraction "
         sql = select + fromm + where + order
-        cursor.execute(sql, (date_debut, date_fin, nom))
+        cursor.execute(sql, (nom,))
         result = cursor.fetchall()
         ensemble_trouve = recuperation_liste_contravention_etablissement(result)
 
