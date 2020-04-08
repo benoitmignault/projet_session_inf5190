@@ -47,6 +47,7 @@ function reset_recherche_interval(){
         result_interval_etablissement.innerHTML = "";
         effacer_messages_erreurs(message_erreur_interval);
         initialiser_tous_champs("input[type=text]");
+        initialiser_tous_champs("#liste_resto");
         initialiser_tous_champs("#recherche_par_interval");
     });
 }
@@ -54,7 +55,7 @@ function reset_recherche_interval(){
 function initialiser_tous_champs(type_champs){
     var tous_champs = document.querySelectorAll(type_champs);
     tous_champs.forEach(function(un_champ){
-        if (type_champs == "input[type=text]"){
+        if (type_champs == "input[type=text]" || type_champs == "#liste_resto"){
             un_champ.style.background = "white";
             un_champ.style.border = "1px solid #ccc";
         } else if (type_champs == "#recherche_par_interval" || type_champs == "#recherche"){
@@ -106,13 +107,23 @@ function recherche_rapide(){
         liste_validation = verification_interval(liste_validation);
         liste_validation = verification_choix_etablissement(liste_validation);
         message_erreur_ajax(liste_validation);
+        ajustement_style_champs(liste_validation);
         if (!liste_validation['champs_date_vides'] && liste_validation['champ_etablissement_vide']){
-            if (!liste_validation['champ_debut_inv'] && !liste_validation['champ_fin_inv']){
+            result_interval.innerHTML = "";
+            result_interval_etablissement.innerHTML = "";
+            if (!liste_validation['champ_debut_inv'] && !liste_validation['champ_fin_inv'] &&
+                !liste_validation['champ_debut_vide'] && !liste_validation['champ_fin_vide']){
                 appel_ajax_interval();
             }
 
         } else if (liste_validation['champs_date_vides'] && !liste_validation['champ_etablissement_vide']) {
+            result_interval.innerHTML = "";
+            result_interval_etablissement.innerHTML = "";
             appel_ajax_interval_etablissement();
+        // Si non, nous avons eu une erreur et on efface les vieux résultats pour éviter de la confusion
+        } else {
+            result_interval.innerHTML = "";
+            result_interval_etablissement.innerHTML = "";
         }
     });
 }
@@ -142,7 +153,7 @@ function verification_choix_etablissement(liste_validation){
         liste_validation['champ_etablissement_vide'] = true;
     }
 
-    if (!liste_validation['champs_date_vides'] && !liste_validation['champ_etablissement_vide']){
+    if ( (!liste_validation['champ_debut_vide'] || !liste_validation['champ_fin_vide']) && !liste_validation['champ_etablissement_vide']){
         liste_validation['les_deux_choix'] = true;
     }
 
@@ -154,38 +165,57 @@ function verification_choix_etablissement(liste_validation){
 }
 
 function message_erreur_ajax(liste_validation){
-    if (liste_validation['aucun_choix']){
-        message_erreur_interval.innerHTML += "<li>Veuiller choisir au moins une des deux options !</li>";
+    if (liste_validation['aucun_choix'] || liste_validation['les_deux_choix']){
+        if (liste_validation['aucun_choix']){
+            message_erreur_interval.innerHTML += "<li>Veuiller choisir au moins une des deux options !</li>";
+        } else if (liste_validation['les_deux_choix']){
+            message_erreur_interval.innerHTML += "<li>Veuiller choisir une seul des deux options !</li>";
+        }
+    } else {
+        if (liste_validation['champ_debut_inv']){
+            message_erreur_interval.innerHTML += "<li>Le champ «Date début» ne contient pas une date au format ISO 8601 !</li>";
+        }
+
+        if (liste_validation['champ_fin_inv']){
+            message_erreur_interval.innerHTML += "<li>Le champ «Date fin» ne contient pas une date au format ISO 8601 !</li>";
+        }
+
+        if (liste_validation['champ_etablissement_vide'] && liste_validation['champ_debut_vide'] && !liste_validation['champ_fin_vide']){
+            message_erreur_interval.innerHTML += "<li>Le champ «Date début» ne peut être vide !</li>";
+        }
+
+        if (liste_validation['champ_etablissement_vide'] && !liste_validation['champ_debut_vide'] && liste_validation['champ_fin_vide']){
+            message_erreur_interval.innerHTML += "<li>Le champ «Date fin» ne peut être vide !</li>";
+        }
+    }
+}
+
+function ajustement_style_champs(liste_validation){
+    if (liste_validation['champ_debut_inv'] || (liste_validation['champ_debut_vide'] && liste_validation['champ_etablissement_vide'])){
+        modification_erreur(champ_date_debut);
+    } else {
+        modification_correct(champ_date_debut);
+    }
+
+    if (liste_validation['champ_fin_inv'] || (liste_validation['champ_fin_vide'] && liste_validation['champ_etablissement_vide'])){
+        modification_erreur(champ_date_fin);
+    } else {
+        modification_correct(champ_date_fin);
+    }
+
+    if (liste_validation['champ_etablissement_vide'] && (liste_validation['aucun_choix'] || liste_validation['les_deux_choix'])){
+        modification_erreur(champ_etablissement);
+    } else {
+        modification_correct(champ_etablissement);
+    }
+
+    if (liste_validation['aucun_choix'] || liste_validation['les_deux_choix']){
         modification_erreur(champ_date_debut);
         modification_erreur(champ_date_fin);
-        modification_erreur(champ_etablissement)
-    }
-
-    if (liste_validation['les_deux_choix']){
-        message_erreur_interval.innerHTML += "<li>Veuiller choisir une seul des deux options !</li>";
-        modification_erreur(champ_date_debut);
-        modification_erreur(champ_date_fin);
-        modification_erreur(champ_etablissement)
-    }
-
-    if (liste_validation['champ_debut_inv']){
-        message_erreur_interval.innerHTML += "<li>Le champ «Date début» ne contient pas une date au format ISO 8601 !</li>";
-        modification_erreur(champ_date_debut);
-    }
-
-    if (liste_validation['champ_fin_inv']){
-        message_erreur_interval.innerHTML += "<li>Le champ «Date fin» ne contient pas une date au format ISO 8601 !</li>";champ_date_debut.style.border = "2px solid red";
-        modification_erreur(champ_date_fin);
-    }
-
-    if (liste_validation['champ_etablissement_vide'] && liste_validation['champ_debut_vide'] && !liste_validation['champ_fin_vide']){
-        message_erreur_interval.innerHTML += "<li>Le champ «Date début» ne peut être vide !</li>";
-        modification_erreur(champ_date_debut);
-    }
-
-    if (liste_validation['champ_etablissement_vide'] && !liste_validation['champ_debut_vide'] && liste_validation['champ_fin_vide']){
-        message_erreur_interval.innerHTML += "<li>Le champ «Date fin» ne peut être vide !</li>";
-        modification_erreur(champ_date_fin);
+        modification_erreur(champ_etablissement);
+        form_interval.style.border = "2px solid red";
+    } else {
+        form_interval.style.border = "2px solid black";
     }
 }
 
@@ -194,9 +224,9 @@ function modification_erreur(champ){
     champ.style.background = "#FCDEDE";
 }
 
-function modification_erreur(champ){
-    champ.style.background = "white";
+function modification_correct(champ){
     champ.style.border = "1px solid #ccc";
+    champ.style.background = "white";
 }
 
 function appel_ajax_interval(){
