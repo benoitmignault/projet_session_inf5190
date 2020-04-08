@@ -107,6 +107,20 @@ h2 {
     justify-content: center;
 }
 
+.container > .zone_recherche_resto > form > .modif > fieldset{
+    border-color: black;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+}
+
+
+.container > .zone_recherche_resto > form > .modif > p{
+    margin: 0;
+    margin-bottom: 15px;
+}
+
+
 .container > .zone_recherche_resto > #result_interval_etablissement,
 .container > .zone_recherche_resto > #result_interval{
     padding: 0px;
@@ -140,7 +154,8 @@ h2 {
 }
 
 .container > .zone_recherche_resto > form > div > div > div > input[type=text],
-.container > .zone_recherche_resto > form > div > div > div > select{
+.container > .zone_recherche_resto > form > div > fieldset > div > div > input[type=text],
+.container > .zone_recherche_resto > form > div > fieldset > div > div > select{
     border-radius: 10px;
     padding: 5px;
     border: 1px solid #ccc;
@@ -150,7 +165,7 @@ h2 {
     width: 50%;
 }
 
-.container > .zone_recherche_resto > form > div > div > div > select{
+.container > .zone_recherche_resto > form > div > fieldset > div > div > select{
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;       /* Remove default arrow */
@@ -175,11 +190,18 @@ h2 {
     margin-top: 15px;
 }
 
-.container > .zone_recherche_resto > #result_recher_rapide > p{
-    font-weight: bold;
+.container > .zone_recherche_resto > form > p{
+    text-align: center;
     font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+    margin-bottom: 10px;
 }
 
+.container > .zone_recherche_resto > form > .modif > fieldset > p{
+    text-align: left;
+    padding-left : 50px;
+}
 
 .container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto,
 .container > .zone_recherche_resto > #result_interval > .tabeau_resto,
@@ -270,7 +292,8 @@ h2 {
     flex-direction: column;
 }
 
-.container > .zone_recherche_resto > form > .modif > .information {
+.container > .zone_recherche_resto > form > .modif > fieldset > .information,
+.container > .zone_recherche_resto > form > .modif > .information{
     width: 100%;
     margin-bottom: 10px;
     display: flex;
@@ -279,31 +302,23 @@ h2 {
     flex-direction: column;
 }
 
-.container > .zone_recherche_resto > form > .modif > .partie_cache{
-    display: none;
-}
-.container > .zone_recherche_resto > form > .modif > .information > div {
+.container > .zone_recherche_resto > form > .modif > fieldset > .information > div,
+.container > .zone_recherche_resto > form > .modif > .information > div{
     width: 100%;
     display: flex;
     display: -webkit-flex;
     -webkit-flex-direction: row;
     flex-direction: row;
 }
-.container > .zone_recherche_resto > form > p{
-    text-align: center;
-    font-size: 18px;
-}
-.container > .zone_recherche_resto > form > p .obligatoire {
-    color: #FF0000;
-}
-
-.container > .zone_recherche_resto > form > .modif > .information > label {
+.container > .zone_recherche_resto > form > .modif > fieldset > .information > label,
+.container > .zone_recherche_resto > form > .modif > .information > label{
     text-align: left;
     font-size: 18px;
     font-weight: bold;
     margin-right: 10px;
 }
 
+.container > .zone_recherche_resto > form > .modif > fieldset > .information > label:hover,
 .container > .zone_recherche_resto > form > .modif > .information > label:hover{
     cursor: pointer;
 }
@@ -318,12 +333,9 @@ h2 {
     border-color: red;
 }
 
-
-.container > form > .zone_recherche > .troisBTN > .bouton,
 .container > .zone_recherche_resto > form > .modif > .troisBTN > .bouton,
 .container > .zone_recherche_resto > .admin_modif > .bouton,
 .container > .zone_admin > .admin > .bouton,
-.container > .zone_article_recent > .tabeau_article > tbody > tr > .valeur > .bouton,
 .container_erreur > .zone_404 > .admin > .bouton_404{
     background: #507d99;
     background-image: -webkit-linear-gradient(top, #507d99, #96cceb);
@@ -343,16 +355,15 @@ h2 {
     text-decoration: none;
     text-align: center;
 }
+
 .container_erreur > .zone_404 > .admin > .bouton_404{
     margin-right: 0px;
 }
 
-.container > .zone_recherche_resto > form > .troisBTN > .bouton:hover,
+.container > .zone_recherche_resto > form > . modif > .troisBTN > .bouton:hover,
 .container > .zone_recherche_resto > .admin_modif > .bouton:hover,
 .container_erreur > .zone_404 > .admin > .bouton_404:hover,
-.container > form > .zone_recherche > .troisBTN > .bouton:hover,
-.container > .zone_admin > .admin > .bouton:hover,
-.container > .zone_recherche_resto > .tabeau_article > tbody > tr > .valeur > .bouton:hover{
+.container > .zone_admin > .admin > .bouton:hover{
     background: #c7dced;
     background-image: -webkit-linear-gradient(top, #c7dced, #6f8491);
     background-image: -moz-linear-gradient(top, #c7dced, #6f8491);
