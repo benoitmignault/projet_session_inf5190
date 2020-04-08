@@ -1,8 +1,7 @@
 import csv
 import re  # pour la gestion des patterns pour les différents champs input
 import xml.etree.ElementTree as ET
-from io import StringIO
-from io import BytesIO
+from io import BytesIO, StringIO
 
 import requests
 from flask import g
@@ -82,12 +81,6 @@ def initial_champ_interval():
     return liste_champs
 
 
-def initial_champ_etablissement():
-    liste_champs = {"date_debut": "", "date_fin": "", "etablissement": ""}
-
-    return liste_champs
-
-
 def initial_champ_importation_xml():
     liste_champs_xml = {"proprietaire": "", "categorie": "",
                         "etablissement": "", "no_civ": "", "nom_rue": "",
@@ -148,14 +141,6 @@ def remplissage_champs_importation_xml(liste_champs_xml, un_contrevenant):
 def remplissage_champs_interval(liste_champs, date_debut, date_fin):
     liste_champs['date_debut'] = date_debut
     liste_champs['date_fin'] = date_fin
-
-    return liste_champs
-
-
-def remplissage_champs_etablissement(liste_champs, date_debut, date_fin, nom):
-    liste_champs['date_debut'] = date_debut
-    liste_champs['date_fin'] = date_fin
-    liste_champs['etablissement'] = nom
 
     return liste_champs
 
@@ -252,15 +237,6 @@ def initial_champ_interval_validation():
     return liste_validation
 
 
-def initial_champ_etablissement_validation():
-    liste_validation = {"situation_erreur": False, "champ_debut_inv": False,
-                        "champ_fin_inv": False, "champ_debut_vide": False,
-                        "champ_fin_vide": False,
-                        "champ_etablissement_vide": False}
-
-    return liste_validation
-
-
 def remplissage_champ_recherche(request, liste_champs):
     liste_champs['proprietaire'] = request['proprietaire']
     liste_champs['etablissement'] = request['etablissement']
@@ -289,17 +265,6 @@ def validation_champs_interval(liste_champs, liste_validation):
                                                         liste_validation)
     liste_validation = sous_validation_champs_invalide_ajax(liste_champs,
                                                             liste_validation)
-
-    return liste_validation
-
-
-def validation_champs_etablissement(liste_champs, liste_validation):
-    liste_validation = sous_validation_champs_vide_ajax(liste_champs,
-                                                        liste_validation)
-    liste_validation = sous_validation_champs_invalide_ajax(liste_champs,
-                                                            liste_validation)
-    if liste_champs['etablissement'] == "":
-        liste_validation['champ_etablissement_vide'] = True
 
     return liste_validation
 

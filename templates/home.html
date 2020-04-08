@@ -4,52 +4,54 @@
     Montréal</h1>
 <div class="container">
     <p class="desktop" id="hautPageDesktop"></p>
-    <h2>Section pour rechercher avec un intervale de date</h2>
+    <h2>Section pour rechercher le nombre et la liste des amendes d'un
+        établissement</h2>
     <div class='zone_recherche_resto'>
         <form id="recherche_par_interval">
-            <ul>
-                <li>Veuillez saisir une date de début et une date de fin</li>
-            </ul>
+            <p>Il vous est mit à votre disposition deux moyens de
+                recherches</p>
             <div class="modif">
-                <div class="information">
-                    <label for="date_debut">Date début :</label>
-                    <div>
-                        <input id="date_debut" name="du"
-                               placeholder="exemple de date valide » AAAA-MM-JJ"
-                               title="Saisir une date au format ISO 8601"
-                               type="text" value="">
+                <fieldset>
+                    <p>Option 1 - Une recherche par interval de temps</p>
+                    <div class="information">
+                        <label for="date_debut">Date début :</label>
+                        <div>
+                            <input id="date_debut" name="du"
+                                   placeholder="exemple de date valide » AAAA-MM-JJ"
+                                   title="Saisir une date au format ISO 8601"
+                                   type="text" value="">
+                        </div>
                     </div>
-                </div>
-                <div class="information">
-                    <label for="date_fin">Date fin :</label>
-                    <div>
-                        <input id="date_fin" name="au"
-                               placeholder="exemple de date valide » AAAA-MM-JJ"
-                               title="Saisir une date au format ISO 8601"
-                               type="text" value="">
+                    <div class="information">
+                        <label for="date_fin">Date fin :</label>
+                        <div>
+                            <input id="date_fin" name="au"
+                                   placeholder="exemple de date valide » AAAA-MM-JJ"
+                                   title="Saisir une date au format ISO 8601"
+                                   type="text" value="">
+                        </div>
                     </div>
-                </div>
-                <div class="information partie_cache">
-                    <ul>
-                        <li>Maintenant ! Veuillez sélectionner un
-                            établissement
-                        </li>
-                    </ul>
-                    <label for="liste_resto">Liste des établissements :</label>
-                    <div>
-                        <select id="liste_resto" name="liste_resto"
-                                title="Saisir un établissement en particulier">
-                            <option selected value="">À Sélectionner</option>
-                        </select>
+                </fieldset>
+                <fieldset>
+                    <p>Option 2 - Une recherche par établissement</p>
+                    <div class="information">
+                        <label for="liste_resto">Liste des établissements
+                            :</label>
+                        <div>
+                            <select id="liste_resto" name="liste_resto"
+                                    title="Saisir un établissement en particulier">
+                                <option selected value="">À Sélectionner
+                                </option>
+                                {% for un_etablissement in liste_etablissement
+                                %}
+                                <option value="{{un_etablissement}}">
+                                    {{un_etablissement}}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
-                    <ul>
-                        <li>Option 1 : Faire la recherche</li>
-                        <li>Option 2 : Pour une nouvelle liste établissement,
-                            veuiller appuyer sur le bouton «Effacer...»
-                        </li>
-                    </ul>
-                </div>
-                
+                </fieldset>
                 <div class="troisBTN">
                     <input class="bouton" type='submit' value="Rechercher...">
                     <input class="bouton" id="btn_reset_interval"
@@ -60,13 +62,16 @@
             <ul class="aucun" id="message_erreur_interval"></ul>
         </form>
         <!-- Section pour le retour Ajax A5 -->
+        <p>Résultat 1 - Une liste des établissements avec leur nombre
+            amendes</p>
         <div id="result_interval"></div>
-        
         <!-- Section pour le retour Ajax A6 -->
+        <p>Résultat 2 - Toutes l'information sur les amendes d'un
+                établissement sélectionnémendes</p>
         <div id="result_interval_etablissement"></div>
     </div>
     
-    <h2>Section pour rechercher une liste de restaurants fautifs</h2>
+    <h2>Section pour rechercher une liste des établissements fautifs</h2>
     <div class='zone_recherche_resto'>
         {% set champ = '' %}
         {% if liste_validation['aucun_restaurant_trouve'] %}

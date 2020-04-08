@@ -1,9 +1,8 @@
-import xmlify
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.combining import OrTrigger
 from apscheduler.triggers.cron import CronTrigger
-from flask import Flask, jsonify, redirect, render_template, request, session, \
-    url_for, Response
+from flask import Flask, Response, jsonify, redirect, render_template, request, \
+    session, url_for
 
 from modules.fonction import *
 
@@ -122,9 +121,11 @@ scheduler.add_job(mise_jour_bd, trigger)
 scheduler.start()
 
 
-# Deuxième partie de A4 sera de créer une documentation RAML
+# Modification des tache A5 et A6
+
+
 @app.route('/api/nombre_amende_etablissement/du=<date_debut>&au=<date_fin>',
-           methods=["GET", "POST"])
+           methods=["GET"])
 def recherche_contrevenants_interval(date_debut, date_fin):
     liste_champs_interval = initial_champ_interval()
     liste_validation_interval = initial_champ_interval_validation()
@@ -138,17 +139,10 @@ def recherche_contrevenants_interval(date_debut, date_fin):
     ensemble_trouve = []
     if not liste_validation_interval['situation_erreur']:
         conn_db = get_db()
-
-        if request.method == "GET":
-            ensemble_trouve = conn_db.liste_contrevenant_interval(
-                liste_champs_interval['date_debut'],
-                liste_champs_interval['date_fin'])
-
-        elif request.method == "POST":
-            ensemble_trouve = conn_db.nombre_contravention_interval(
-                liste_champs_interval['date_debut'],
-                liste_champs_interval['date_fin'])
-
+        ensemble_trouve = conn_db.nombre_contravention_interval(
+            liste_champs_interval['date_debut'],
+            liste_champs_interval['date_fin'])
+        print(ensemble_trouve)
         return jsonify(ensemble_trouve)
 
     else:
@@ -159,27 +153,12 @@ def recherche_contrevenants_interval(date_debut, date_fin):
 
 
 # Cette fonction était pour la tache A6
-@app.route(
-    '/api/contrevenant/du=<date_debut>&au=<date_fin>&etablissement=<nom>',
-    methods=["GET"])
-def recherche_liste_contravention_par_etablissement(date_debut, date_fin, nom):
-    liste_champs_etablissement = initial_champ_etablissement()
-    liste_validation_etablissement = initial_champ_etablissement_validation()
-    liste_champs_etablissement = remplissage_champs_etablissement(
-        liste_champs_etablissement,
-        date_debut, date_fin, nom)
-    liste_validation_etablissement = validation_champs_etablissement(
-        liste_champs_etablissement, liste_validation_etablissement)
-    liste_validation_etablissement = situation_erreur_interval(
-        liste_validation_etablissement)
-
-    if not liste_validation_etablissement['situation_erreur']:
+@app.route('/api/liste_amendes_etablissement/etablissement=<nom>',
+           methods=["GET"])
+def recherche_liste_contravention_par_etablissement(nom):
+    if nom != "":
         conn_db = get_db()
-
-        ensemble_trouve = conn_db.liste_contravention_etablissement(
-            liste_champs_etablissement['date_debut'],
-            liste_champs_etablissement['date_fin'],
-            liste_champs_etablissement['etablissement'])
+        ensemble_trouve = conn_db.liste_contravention_etablissement(nom)
 
         return jsonify(ensemble_trouve)
 
@@ -198,7 +177,7 @@ def recherche_contrevenants_json():
 
     return jsonify(ensemble_trouve)
 
-  
+
 # Cette fonction était pour la tache C2
 @app.route('/api/nombre_amende_etablissement/xml', methods=["GET"])
 def recherche_contrevenants_xml():
@@ -208,7 +187,7 @@ def recherche_contrevenants_xml():
 
     return Response(xml_information, mimetype='text/xml')
 
-  
+
 # Cette fonction était pour la tache C3
 @app.route('/api/nombre_amende_etablissement/csv', methods=["GET"])
 def recherche_contrevenants_csv():
@@ -227,6 +206,5 @@ def main():
 if __name__ == "__main__":
     main()
 
-    
 # Creation de la tache B2
 # Creation de la demande d'accès à Twitter
