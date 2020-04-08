@@ -198,6 +198,9 @@ def recherche_contrevenants_csv():
     return Response(csv_information, mimetype='text/csv')
 
 
+# Cette branche est pour la tache D1
+
+
 def main():
     importation_donnees()
 
