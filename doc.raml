@@ -30,6 +30,7 @@ baseUri: http://127.0.0.1:5000/
                       <nombre>23</nombre>
                     </contrevenant>
                   </contrevenants>
+
     /json:
       get:
         description: Extraire l'information des établissements avec le nombre amende(s)
@@ -44,6 +45,7 @@ baseUri: http://127.0.0.1:5000/
                       "nombre": 23
                     }
                   ]
+
     get:
       description: Extraire l'information des établissements avec l'interval des dates
       queryParameters:
@@ -61,17 +63,72 @@ baseUri: http://127.0.0.1:5000/
           200:
             body:
               application/json:
-                example:  |
-                    [
-                      {
-                        "Adresse": "4219 Rue Notre-Dame Ouest ",
-                        "Catégorie": "Restaurant",
-                        "Date d'infraction": "2015-09-30",
-                        "Date de jugement": "2017-03-16",
-                        "Description": "Le lieu ou le véhicule doit être exempt de contaminants, de polluants, de toute espèce d'animaux y compris les insectes et les rongeurs ou de leurs excréments.",
-                        "Montant de l'amende": 750,
-                        "Propriétaire": "9313-2603 QUEBEC INC.  (Fermé)",
-                        "Ville": "Montréal H4C 1R4",
-                        "Établissement": "NOUVEAU RESTO MAK MAK"
-                      }
-                    ]
+                example: |
+                  [
+                    {
+                      "Adresse": "4219 Rue Notre-Dame Ouest ",
+                      "Catégorie": "Restaurant",
+                      "Date d'infraction": "2015-09-30",
+                      "Date de jugement": "2017-03-16",
+                      "Description": "Le lieu ou le véhicule doit être exempt de contaminants, de polluants, de toute espèce d'animaux y compris les insectes et les rongeurs ou de leurs excréments.",
+                      "Montant de l'amende": 750,
+                      "Propriétaire": "9313-2603 QUEBEC INC.  (Fermé)",
+                      "Ville": "Montréal H4C 1R4",
+                      "Établissement": "NOUVEAU RESTO MAK MAK"
+                    }
+                  ]
+
+  /nouvelle_plainte:
+    get:
+      description: Déposer une plainte auprès de la ville contre un établissement
+      queryParameters:
+        etablissement:
+          type: string
+          description: Nom de l'établissement
+          example: AILE BUFFALO BILL
+          required: true
+        no_civique:
+          type: integer
+          description: Numéro civique de l'adresse
+          example: 4084
+          required: true
+        nom_rue:
+          type: string
+          description: Nom de la rue de l'adresse
+          example: Rue Saint-Denis
+          required: true
+        ville:
+          type: string
+          description: Le nom de la ville et ainsi que le code postal
+          example: Montréal H2W 2M5
+          required: true
+        date_visite:
+          type: string
+          description: Le moment ou la visite a eu lieu
+          example: 2018-05-28
+          required: true
+        prenom_plaignant:
+          type: string
+          description: Prénom de la personne qui a déposé une plainte
+          example: Benoît
+          required: true
+        nom_plaignant:
+          type: string
+          description: Nom de la personne qui a déposé une plainte
+          example: Mignault
+          required: true
+        description:
+          type: string
+          description: Une explication en quoi la plainte a été déposée
+          example: Nous avons remarqué la présence de petits animaux dans la cuisine.
+          required: true
+      responses:
+          201:
+            body:
+              application/json:
+                example: |
+                  [
+                    {
+                      "voici le numero de la plainte": 13
+                    }
+                  ]

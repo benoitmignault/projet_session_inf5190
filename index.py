@@ -129,9 +129,7 @@ scheduler.add_job(mise_jour_bd, trigger)
 scheduler.start()
 
 
-# Modification des tache A5 et A6
-
-
+# Cette fonction est pour la route A4 et A5
 @app.route('/api/nombre_amende_etablissement/du=<date_debut>&au=<date_fin>',
            methods=["GET"])
 def recherche_contrevenants_interval(date_debut, date_fin):

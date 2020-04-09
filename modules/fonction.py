@@ -82,9 +82,9 @@ def initial_champ_interval():
 
 
 def initial_champ_nouvelle_plainte():
-    liste_champs = {"id_plainte": 0, "etablissement": "", "no_civique": "", "nom_rue": "",
-                    "ville": "", "date_visite": "", "prenom_plaignant": "",
-                    "nom_plaignant": "", "description": ""}
+    liste_champs = {"id_plainte": 0, "etablissement": "", "no_civique": 0,
+                    "nom_rue": "", "nom_plaignant": "", "description": "",
+                    "ville": "", "date_visite": "", "prenom_plaignant": ""}
 
     return liste_champs
 
