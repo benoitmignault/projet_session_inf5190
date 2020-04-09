@@ -3,11 +3,14 @@ from apscheduler.triggers.combining import OrTrigger
 from apscheduler.triggers.cron import CronTrigger
 from flask import Flask, Response, jsonify, redirect, render_template, request, \
     session, url_for
+from flask_json_schema import JsonSchema
+from flask_json_schema import JsonValidationError
 
 from modules.fonction import *
+from validateur_json_schema import nouvelle_plainte_etablissement
 
 app = Flask(__name__, static_url_path='', static_folder='static')
-
+schema = JsonSchema(app)
 # Déclaration de la secret key pour me permettre utiliser
 # les variables de sessions
 app.secret_key = "(*&*&322387he738220)(*(*22347657"
@@ -19,6 +22,12 @@ def not_found(e):
     titre = "Page inexistante - 404"
     return render_template("erreur_404.html", titre=titre,
                            erreur_404=erreur_404)
+
+
+@app.errorhandler(JsonValidationError)
+def validation_error(e):
+    errors = [validation_error.message for validation_error in e.errors]
+    return jsonify({'error': e.message, 'errors': errors}), 400
 
 
 @app.teardown_appcontext
@@ -197,6 +206,23 @@ def recherche_contrevenants_csv():
 
 
 # Cette branche est pour la tache D1
+@app.route('/api/nouvelle_plainte', methods=["POST"])
+@schema.validate(nouvelle_plainte_etablissement)
+def creation_plainte():
+    liste_champs_plainte = initial_champ_nouvelle_plainte();
+    liste_champs_plainte = remplissage_champ_nouvelle_plainte(
+        request, liste_champs_plainte)
+    conn_db = get_db()
+    conn_db.inserer_nouvelle_plainte(liste_champs_plainte['etablissement'],
+                                     liste_champs_plainte['no_civique'],
+                                     liste_champs_plainte['nom_rue'],
+                                     liste_champs_plainte['ville'],
+                                     liste_champs_plainte['date_visite'],
+                                     liste_champs_plainte['prenom_plaignant'],
+                                     liste_champs_plainte['nom_plaignant'],
+                                     liste_champs_plainte['description'])
+
+    return jsonify(liste_champs_plainte), 201
 
 
 def main():

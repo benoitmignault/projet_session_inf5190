@@ -81,6 +81,14 @@ def initial_champ_interval():
     return liste_champs
 
 
+def initial_champ_nouvelle_plainte():
+    liste_champs = {"etablissement": "", "no_civique": "", "nom_rue": "",
+                    "ville": "", "date_visite": "", "prenom_plaignant": "",
+                    "nom_plaignant": "", "description": ""}
+
+    return liste_champs
+
+
 def initial_champ_importation_xml():
     liste_champs_xml = {"proprietaire": "", "categorie": "",
                         "etablissement": "", "no_civ": "", "nom_rue": "",
@@ -241,6 +249,20 @@ def remplissage_champ_recherche(request, liste_champs):
     liste_champs['proprietaire'] = request['proprietaire']
     liste_champs['etablissement'] = request['etablissement']
     liste_champs['nom_rue'] = request['nom_rue']
+
+    return liste_champs
+
+
+def remplissage_champ_nouvelle_plainte(request, liste_champs):
+    data = request.get_json()
+    liste_champs['etablissement'] = data['etablissement']
+    liste_champs['no_civique'] = data['no_civique']
+    liste_champs['nom_rue'] = data['nom_rue']
+    liste_champs['ville'] = data['ville']
+    liste_champs['date_visite'] = data['date_visite']
+    liste_champs['prenom_plaignant'] = data['prenom_plaignant']
+    liste_champs['nom_plaignant'] = data['nom_plaignant']
+    liste_champs['description'] = data['description']
 
     return liste_champs
 

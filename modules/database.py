@@ -111,7 +111,7 @@ class Database:
         fromm = "from mauvais_restaurants "
         group = "group by etablissement "
         order = "order by nombre desc, etablissement "
-        sql = select + fromm +  group + order
+        sql = select + fromm + group + order
         cursor.execute(sql)
         result = cursor.fetchall()
         ensemble_trouve = recuperation_resultat_regrouper(result)
@@ -131,6 +131,20 @@ class Database:
         ensemble_trouve = recuperation_liste_contravention_etablissement(result)
 
         return ensemble_trouve
+
+    def inserer_nouvelle_plainte(self, etablissement, no_civique,
+                                 nom_rue, ville, date_visite, prenom_plaignant,
+                                 nom_plaignant, description):
+        connection = self.get_connection()
+        insert_bd = "INSERT INTO departement_plaintes " \
+                    "(etablissement, no_civique, nom_rue, ville, date_visite," \
+                    "prenom_plaignant, nom_plaignant, description) " \
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+        connection.execute(insert_bd,
+                                (etablissement, no_civique, nom_rue,
+                                 ville, date_visite, prenom_plaignant,
+                                 nom_plaignant, description))
+        connection.commit()
 
 
 def remplissage_condition_sql(liste_champs):
