@@ -86,7 +86,6 @@ def recherche_restaurant():
     if liste_validation['situation_erreur']:
         liste_champs['messages'] = message_erreur_recherche(liste_validation)
         session['erreur_recherche'] = True
-        # print(liste_validation['situation_erreur'])
         session['liste_champs'] = liste_champs
         session['titre'] = "Problème avec la recherche !"
         session['liste_validation'] = liste_validation
@@ -142,7 +141,6 @@ def recherche_contrevenants_interval(date_debut, date_fin):
         ensemble_trouve = conn_db.nombre_contravention_interval(
             liste_champs_interval['date_debut'],
             liste_champs_interval['date_fin'])
-        print(ensemble_trouve)
         return jsonify(ensemble_trouve)
 
     else:
