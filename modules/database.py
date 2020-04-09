@@ -145,6 +145,11 @@ class Database:
                                  ville, date_visite, prenom_plaignant,
                                  nom_plaignant, description))
         connection.commit()
+        cursor = connection.cursor()
+        cursor.execute("select max(id_plainte) from departement_plaintes")
+        result = cursor.fetchall()
+
+        return result[0][0]
 
 
 def remplissage_condition_sql(liste_champs):
