@@ -203,26 +203,31 @@ def recherche_contrevenants_csv():
     return Response(csv_information, mimetype='text/csv')
 
 
-# Cette branche est pour la tache D1
-@app.route('/api/nouvelle_plainte', methods=["POST"])
+# Cette fonction est pour la tache D1
+@app.route('/api/nouvelle_plainte', methods=["GET", "POST"])
 @schema.validate(nouvelle_plainte_etablissement)
 def creation_plainte():
-    liste_champs_plainte = initial_champ_nouvelle_plainte();
-    liste_champs_plainte = remplissage_champ_nouvelle_plainte(
-        request, liste_champs_plainte)
-    conn_db = get_db()
-    liste_champs_plainte['id_plainte'] = conn_db.inserer_nouvelle_plainte(
-        liste_champs_plainte['etablissement'],
-        liste_champs_plainte['no_civique'],
-        liste_champs_plainte['nom_rue'],
-        liste_champs_plainte['ville'],
-        liste_champs_plainte['date_visite'],
-        liste_champs_plainte['prenom_plaignant'],
-        liste_champs_plainte['nom_plaignant'],
-        liste_champs_plainte['description'])
+    if request.method == "POST":
+        liste_champs_plainte = initial_champ_nouvelle_plainte();
+        liste_champs_plainte = remplissage_champ_nouvelle_plainte(
+            request, liste_champs_plainte)
+        conn_db = get_db()
+        liste_champs_plainte['id_plainte'] = conn_db.inserer_nouvelle_plainte(
+            liste_champs_plainte['etablissement'],
+            liste_champs_plainte['no_civique'],
+            liste_champs_plainte['nom_rue'],
+            liste_champs_plainte['ville'],
+            liste_champs_plainte['date_visite'],
+            liste_champs_plainte['prenom_plaignant'],
+            liste_champs_plainte['nom_plaignant'],
+            liste_champs_plainte['description'])
 
-    return jsonify({"voici le numero de la plainte": liste_champs_plainte
-        ['id_plainte']}), 201
+        return jsonify({"voici le numero de la plainte": liste_champs_plainte
+            ['id_plainte']}), 201
+
+    elif request.method == "GET":
+        titre = "Nouvelle plainte"
+        return render_template("formulaire_plainte.html", titre=titre)
 
 
 def main():

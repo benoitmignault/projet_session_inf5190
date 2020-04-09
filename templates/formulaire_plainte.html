@@ -1,0 +1,112 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+    <p class="desktop" id="hautPageDesktop"></p>
+    <h2>Section pour déposer la plainte en question</h2>
+    <div class='zone_recherche_resto'>
+        <form method="post" action="/api/nouvelle_plainte"
+              id="nouvelle_plainte">
+            <ul>
+                <li>Veuillez remplir tous les champs SVP</li>
+            </ul>
+            <div class="modif">
+                <div class="information">
+                    <label for="etablissement">Nom d'établissement :</label>
+                    <div>
+                        <input id="etablissement" name="etablissement"
+                               title="Charactères alphanumériques, les espaces,
+                               l'apostrophe et le tiret sont permis"
+                               type="text"
+                               value="">
+                    </div>
+                </div>
+                <fieldset>
+                    <legend>Veuiller saisir l'adresse de l'établissement
+                    </legend>
+                    <div class="information">
+                        <label for="no_civique">Numéro civique :</label>
+                        <div>
+                            <input id="no_civique" name="no_civique" value=""
+                                   title="Charactères numériques seulement"
+                                   type="number">
+                        </div>
+                    </div>
+                    <div class="information">
+                        <label for="nom_rue">Nom de la rue :</label>
+                        <div>
+                            <input id="nom_rue" name="nom_rue" type="text"
+                                   title="Charactères alphanumériques, les espaces,
+                                   l'apostrophe et le tiret sont permis"
+                                   value="">
+                        </div>
+                    </div>
+                    <div class="information">
+                        <label for="nom_ville">Nom de la ville :</label>
+                        <div>
+                            <input id="nom_ville" name="nom_ville" type="text"
+                                   title="Charactères alphabétiques, les espaces,
+                               l'apostrophe et le tiret sont permis" value="">
+                        </div>
+                    </div>
+                    <div class="information">
+                        <label for="code_postal">Code postal :</label>
+                        <div>
+                            <input id="code_postal" name="code_postal"
+                                   type="text"
+                                   title="Charactères alphanumériques avec un espace"
+                                   value="">
+                        </div>
+                    </div>
+                </fieldset>
+                <div class="information">
+                    <label for="date_visite">Date de la déposition :</label>
+                    <div>
+                        <input id="date_visite" name="date_visite"
+                               title="Charactères numériques avec 3 tirets
+                               entre les chiffres" type="text" value="">
+                    </div>
+                </div>
+                <div class="information">
+                    <label for="prenom_plaignant">Prénom du dépositeur :</label>
+                    <div>
+                        <input id="prenom_plaignant" name="prenom_plaignant"
+                               title="Charactères alphanumériques, les espaces,
+                                   l'apostrophe et le tiret sont permis"
+                               type="text" value="">
+                    </div>
+                </div>
+                <div class="information">
+                    <label for="nom_plaignant">Nom du dépositeur :</label>
+                    <div>
+                        <input id="nom_plaignant" name="nom_plaignant"
+                               title="Charactères alphanumériques, les espaces,
+                                   l'apostrophe et le tiret sont permis"
+                               type="text" value="">
+                    </div>
+                </div>
+                <div class="information">
+                    <label for="description">Description du problème :</label>
+                    <div>
+                        <textarea rows="4" cols="50" id="description"
+                                  name="description">
+                        </textarea>
+                    </div>
+                </div>
+                <div class="troisBTN">
+                    <input class="bouton" type='submit' value="Rechercher...">
+                    <input class="bouton" id="btn_reset_plainte" type='reset'
+                           value="Effacer...">
+                </div>
+            </div>
+            <ul class="aucun" id="message_erreur_plainte"></ul>
+        </form>
+        <!-- Section pour le retour Ajax A5 -->
+        <div id="result_plainte"></div>
+    </div>
+    <!-- https://publicdomainvectors.org/fr/gratuitement-des-vecteurs/Orange-fl%C3%A8che-pointant-vers-le-haut-de-dessin-vectoriel/9499.html -->
+    <div class="return">
+        <a class="desktop" href="#hautPageDesktop">
+            <img alt="Retour vers le haut" src="/img/fleche_haut.svg"></a>
+    </div>
+</div>
+{% endblock content %}
