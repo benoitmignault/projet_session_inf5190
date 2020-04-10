@@ -208,7 +208,8 @@ def recherche_contrevenants_csv():
 @schema.validate(nouvelle_plainte_etablissement)
 def creation_plainte():
     if request.method == "POST":
-        liste_champs_plainte = initial_champ_nouvelle_plainte();
+        print(request.get_json())
+        liste_champs_plainte = initial_champ_nouvelle_plainte()
         liste_champs_plainte = remplissage_champ_nouvelle_plainte(
             request, liste_champs_plainte)
         conn_db = get_db()

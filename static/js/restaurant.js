@@ -8,7 +8,7 @@ const result_interval = document.querySelector('#result_interval');
 const result_interval_etablissement = document.querySelector('#result_interval_etablissement');
 
 // Variable pour la recherche par établissement précis après avoir sélectionner
-const champ_etablissement = document.querySelector('#liste_resto');
+const champ_liste_resto = document.querySelector('#liste_resto');
 
 // Variables pour la recherche d'information générale pour être utiliser avec le bouton effacer
 const champ_nom_resto = document.querySelector('#etablissement');
@@ -17,12 +17,25 @@ const champ_nom_rue = document.querySelector('#nom_rue');
 const btn_reset_recher = document.querySelector('#btn_reset_recher');
 const message_erreur_recher = document.querySelector('#message_erreur_recher');
 
+// Variable pour l'ajout d'une demande de plainte
+const form_nouvelle_plainte = document.querySelector('#nouvelle_plainte');
+const message_erreur_plainte = document.querySelector('#message_erreur_plainte');
+const champ_etablissement = document.querySelector('#etablissement');
+const champ_no_civique = document.querySelector('#no_civique');
+const champ_nom_rue_plainte = document.querySelector('#nom_rue');
+const champ_nom_ville = document.querySelector('#nom_ville');
+const champ_code_postal = document.querySelector('#code_postal');
+const champ_date_visite = document.querySelector('#date_visite');
+const champ_prenom_plaignant = document.querySelector('#prenom_plaignant');
+const champ_nom_plaignant = document.querySelector('#nom_plaignant');
+const champ_description = document.querySelector('#description');
+
 const pattern_date = new RegExp("^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$");
 
 function initial_champ_ajax_validation(){
     var liste_validation = {"champ_debut_inv": false, "aucun_choix": false,
                         "champ_fin_inv": false, "champ_debut_vide": false,
-                        "champ_fin_vide": false, "champ_etablissement_vide": false,
+                        "champ_fin_vide": false, "champ_liste_resto_vide": false,
                         "les_deux_choix": false, "champs_date_vides": false};
 
     return liste_validation;
@@ -97,8 +110,6 @@ function validation_regex(champ, type_regex){
     }
 }
 
-// Les deux requêtes ajax passeront par la même entrée mais devront être différenciées
-// On va utiliser la vérification de l'attribut «display» de la section cachée
 function recherche_rapide(){
     $(form_interval).submit(function (e) {
         e.preventDefault();
@@ -108,7 +119,7 @@ function recherche_rapide(){
         liste_validation = verification_choix_etablissement(liste_validation);
         message_erreur_ajax(liste_validation);
         ajustement_style_champs(liste_validation);
-        if (!liste_validation['champs_date_vides'] && liste_validation['champ_etablissement_vide']){
+        if (!liste_validation['champs_date_vides'] && liste_validation['champ_liste_resto_vide']){
             result_interval.innerHTML = "";
             result_interval_etablissement.innerHTML = "";
             if (!liste_validation['champ_debut_inv'] && !liste_validation['champ_fin_inv'] &&
@@ -116,7 +127,7 @@ function recherche_rapide(){
                 appel_ajax_interval();
             }
 
-        } else if (liste_validation['champs_date_vides'] && !liste_validation['champ_etablissement_vide']) {
+        } else if (liste_validation['champs_date_vides'] && !liste_validation['champ_liste_resto_vide']) {
             result_interval.innerHTML = "";
             result_interval_etablissement.innerHTML = "";
             appel_ajax_interval_etablissement();
@@ -128,6 +139,15 @@ function recherche_rapide(){
     });
 }
 
+function demande_plainte(){
+    $(form_nouvelle_plainte).submit(function (e) {
+        e.preventDefault();
+        message_erreur_plainte.innerHTML = ""; // On remet la section des messages vide
+        appel_ajax_nouvelle_plainte();
+
+    });
+
+}
 function verification_interval(liste_validation){
     if (champ_date_debut.value == "") {
         liste_validation['champ_debut_vide'] = true;
@@ -149,15 +169,15 @@ function verification_interval(liste_validation){
 }
 
 function verification_choix_etablissement(liste_validation){
-    if (champ_etablissement.value == "") {
-        liste_validation['champ_etablissement_vide'] = true;
+    if (champ_liste_resto.value == "") {
+        liste_validation['champ_liste_resto_vide'] = true;
     }
 
-    if ( (!liste_validation['champ_debut_vide'] || !liste_validation['champ_fin_vide']) && !liste_validation['champ_etablissement_vide']){
+    if ( (!liste_validation['champ_debut_vide'] || !liste_validation['champ_fin_vide']) && !liste_validation['champ_liste_resto_vide']){
         liste_validation['les_deux_choix'] = true;
     }
 
-    if (liste_validation['champs_date_vides'] && liste_validation['champ_etablissement_vide']){
+    if (liste_validation['champs_date_vides'] && liste_validation['champ_liste_resto_vide']){
         liste_validation['aucun_choix'] = true;
     }
 
@@ -180,39 +200,39 @@ function message_erreur_ajax(liste_validation){
             message_erreur_interval.innerHTML += "<li>Le champ «Date fin» ne contient pas une date au format ISO 8601 !</li>";
         }
 
-        if (liste_validation['champ_etablissement_vide'] && liste_validation['champ_debut_vide'] && !liste_validation['champ_fin_vide']){
+        if (liste_validation['champ_liste_resto_vide'] && liste_validation['champ_debut_vide'] && !liste_validation['champ_fin_vide']){
             message_erreur_interval.innerHTML += "<li>Le champ «Date début» ne peut être vide !</li>";
         }
 
-        if (liste_validation['champ_etablissement_vide'] && !liste_validation['champ_debut_vide'] && liste_validation['champ_fin_vide']){
+        if (liste_validation['champ_liste_resto_vide'] && !liste_validation['champ_debut_vide'] && liste_validation['champ_fin_vide']){
             message_erreur_interval.innerHTML += "<li>Le champ «Date fin» ne peut être vide !</li>";
         }
     }
 }
 
 function ajustement_style_champs(liste_validation){
-    if (liste_validation['champ_debut_inv'] || (liste_validation['champ_debut_vide'] && liste_validation['champ_etablissement_vide'])){
+    if (liste_validation['champ_debut_inv'] || (liste_validation['champ_debut_vide'] && liste_validation['champ_liste_resto_vide'])){
         modification_erreur(champ_date_debut);
     } else {
         modification_correct(champ_date_debut);
     }
 
-    if (liste_validation['champ_fin_inv'] || (liste_validation['champ_fin_vide'] && liste_validation['champ_etablissement_vide'])){
+    if (liste_validation['champ_fin_inv'] || (liste_validation['champ_fin_vide'] && liste_validation['champ_liste_resto_vide'])){
         modification_erreur(champ_date_fin);
     } else {
         modification_correct(champ_date_fin);
     }
 
-    if (liste_validation['champ_etablissement_vide'] && (liste_validation['aucun_choix'] || liste_validation['les_deux_choix'])){
-        modification_erreur(champ_etablissement);
+    if (liste_validation['champ_liste_resto_vide'] && (liste_validation['aucun_choix'] || liste_validation['les_deux_choix'])){
+        modification_erreur(champ_liste_resto);
     } else {
-        modification_correct(champ_etablissement);
+        modification_correct(champ_liste_resto);
     }
 
     if (liste_validation['aucun_choix'] || liste_validation['les_deux_choix']){
         modification_erreur(champ_date_debut);
         modification_erreur(champ_date_fin);
-        modification_erreur(champ_etablissement);
+        modification_erreur(champ_liste_resto);
         form_interval.style.border = "2px solid red";
     } else {
         form_interval.style.border = "2px solid black";
@@ -248,13 +268,12 @@ function appel_ajax_interval(){
             }
         }
     };
-
     var param = `du=${champ_date_debut.value}&au=${champ_date_fin.value}`;
     ajax.open("GET", "/api/nombre_amende_etablissement/"+param, true);
     ajax.send();
 }
 
-function appel_ajax_interval_etablissement(erreur_general){
+function appel_ajax_interval_etablissement(){
     var ajax = new XMLHttpRequest();
     ajax.onreadystatechange = function() {
         if (ajax.readyState === XMLHttpRequest.DONE) {
@@ -267,13 +286,32 @@ function appel_ajax_interval_etablissement(erreur_general){
             }
         }
     };
-    var param = `etablissement=${champ_etablissement.value}`;
+    var param = `etablissement=${champ_liste_resto.value}`;
     ajax.open("GET", "/api/liste_amendes_etablissement/"+param, true);
     ajax.send();
 }
 
-// Cette fonction sera utilisée pour caché la section du menu déroulant si le résultat retourne rien
-// Les anciennes information du tableau des établissements avec leur nombre de contravention n'est plus valide
+function appel_ajax_nouvelle_plainte(){
+    console.log("je suis dans la fct ajax");
+    var ajax = new XMLHttpRequest();
+    var data = {
+            "etablissement": "AILE BUFFALO BILL",
+            "no_civique": 4084,
+            "nom_rue": "Rue Saint-Denis",
+            "ville": "Montréal H2W 2M5",
+            "date_visite": "2018-05-28",
+            "prenom_plaignant": "Benoît",
+            "nom_plaignant": "Mignault",
+            "description": "Nous avons remarqué la présence de petits animaux dans la cuisine"
+        };
+    var data_json = JSON.stringify(data);
+    console.log(data_json);
+    ajax.open("POST", "/api/nouvelle_plainte", true);
+    ajax.setRequestHeader("Content-Type", "application/json");
+    ajax.send(data_json);
+}
+
+
 function appel_ajax_interval_succes_mais_erreur(){
     result_interval.innerHTML = "";
     result_interval_etablissement.innerHTML = "";
@@ -325,6 +363,7 @@ function creation_bloc_html_etablissement(liste){
 document.addEventListener('DOMContentLoaded', function () {
     validation_champs_recherches();
     recherche_rapide();
+    demande_plainte();
     reset_recherche();
     reset_recherche_interval();
 });

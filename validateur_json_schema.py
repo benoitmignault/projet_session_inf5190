@@ -9,9 +9,7 @@ nouvelle_plainte_etablissement = {
             "maxLength": 65
         },
         'no_civique': {
-            'type': 'string',
-            "minLength": 1,
-            "maxLength": 5
+            'type': 'integer'
         },
         'nom_rue': {
             'type': 'string',

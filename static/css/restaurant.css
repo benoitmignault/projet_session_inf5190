@@ -97,6 +97,11 @@ h2 {
     justify-content: center;
     align-items: center;
 }
+
+.container > .zone_recherche_resto{
+    margin-bottom: 15px;
+}
+
 .container > .recherche{
     margin-bottom: 20px;
 }
