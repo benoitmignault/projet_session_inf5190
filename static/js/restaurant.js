@@ -419,8 +419,10 @@ function appel_ajax_interval(){
             }
         }
     };
-    var param = `du=${champ_date_debut.value}&au=${champ_date_fin.value}`;
-    ajax.open("GET", "/api/nombre_amende_etablissement/"+param, true);
+    var date_debut_encode = encodeURIComponent(champ_date_debut.value);
+    var date_fin_encode = encodeURIComponent(champ_date_fin.value);
+    var param = `?du=${date_debut_encode}&au=${date_fin_encode}`;
+    ajax.open("GET", "/api/nombre_amende_etablissement/interval"+param, true);
     ajax.send();
 }
 
@@ -437,8 +439,9 @@ function appel_ajax_interval_etablissement(){
             }
         }
     };
-    var nom_encode = champ_liste_resto.value;
-    ajax.open("GET", "/api/liste_amendes_etablissement/etablissement?choix=" + encodeURIComponent(nom_encode), true);
+    var nom_encode = encodeURIComponent(champ_liste_resto.value);
+    var param = `?choix=${nom_encode}`;
+    ajax.open("GET", "/api/liste_amendes_etablissement/etablissement" + param, true);
     ajax.send();
 }
 

@@ -130,19 +130,18 @@ scheduler.start()
 
 
 # Cette fonction est pour la route A4 et A5
-@app.route('/api/nombre_amende_etablissement/du=<date_debut>&au=<date_fin>',
-           methods=["GET"])
-def recherche_contrevenants_interval(date_debut, date_fin):
+@app.route('/api/nombre_amende_etablissement/interval', methods=["GET"])
+def recherche_contrevenants_interval():
     liste_champs_interval = initial_champ_interval()
     liste_validation_interval = initial_champ_interval_validation()
     liste_champs_interval = remplissage_champs_interval(liste_champs_interval,
-                                                        date_debut, date_fin)
+                                                        request.args["du"],
+                                                        request.args["au"])
     liste_validation_interval = validation_champs_interval(
         liste_champs_interval, liste_validation_interval)
     liste_validation_interval = situation_erreur_interval(
         liste_validation_interval)
 
-    ensemble_trouve = []
     if not liste_validation_interval['situation_erreur']:
         conn_db = get_db()
         ensemble_trouve = conn_db.nombre_contravention_interval(
