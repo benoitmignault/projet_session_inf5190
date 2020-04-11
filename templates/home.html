@@ -4,8 +4,14 @@
     Montréal</h1>
 <div class="container">
     <p class="desktop" id="hautPageDesktop"></p>
-    <h2>Section pour rechercher le nombre et la liste des amendes d'un
-        établissement</h2>
+    <h2>Section pour déposer une plainte envers un établissement</h2>
+    <div class='zone_admin'>
+        <div class="admin">
+            <a class="bouton seul" href="/api/nouvelle_plainte">Créer
+                une plainte</a>
+        </div>
+    </div>
+    <h2>Section pour rechercher des établissements rapidement</h2>
     <div class='zone_recherche_resto'>
         <form id="recherche_par_interval">
             <p>Il vous est mit à votre disposition deux moyens de
@@ -67,10 +73,10 @@
         <div id="result_interval"></div>
         <!-- Section pour le retour Ajax A6 -->
         <p>Résultat 2 - Toutes l'information sur les amendes d'un
-                établissement sélectionnémendes</p>
+            établissement sélectionnémendes</p>
         <div id="result_interval_etablissement"></div>
     </div>
-    
+
     <h2>Section pour rechercher une liste des établissements fautifs</h2>
     <div class='zone_recherche_resto'>
         {% set champ = '' %}

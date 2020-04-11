@@ -3,11 +3,14 @@ from apscheduler.triggers.combining import OrTrigger
 from apscheduler.triggers.cron import CronTrigger
 from flask import Flask, Response, jsonify, redirect, render_template, request, \
     session, url_for
+from flask_json_schema import JsonSchema
+from flask_json_schema import JsonValidationError
 
 from modules.fonction import *
+from validateur_json_schema import nouvelle_plainte_etablissement
 
 app = Flask(__name__, static_url_path='', static_folder='static')
-
+schema = JsonSchema(app)
 # Déclaration de la secret key pour me permettre utiliser
 # les variables de sessions
 app.secret_key = "(*&*&322387he738220)(*(*22347657"
@@ -19,6 +22,12 @@ def not_found(e):
     titre = "Page inexistante - 404"
     return render_template("erreur_404.html", titre=titre,
                            erreur_404=erreur_404)
+
+
+@app.errorhandler(JsonValidationError)
+def validation_error(e):
+    errors = [validation_error.message for validation_error in e.errors]
+    return jsonify({'error': e.message, 'errors': errors}), 400
 
 
 @app.teardown_appcontext
@@ -86,7 +95,6 @@ def recherche_restaurant():
     if liste_validation['situation_erreur']:
         liste_champs['messages'] = message_erreur_recherche(liste_validation)
         session['erreur_recherche'] = True
-        # print(liste_validation['situation_erreur'])
         session['liste_champs'] = liste_champs
         session['titre'] = "Problème avec la recherche !"
         session['liste_validation'] = liste_validation
@@ -121,9 +129,7 @@ scheduler.add_job(mise_jour_bd, trigger)
 scheduler.start()
 
 
-# Modification des tache A5 et A6
-
-
+# Cette fonction est pour la route A4 et A5
 @app.route('/api/nombre_amende_etablissement/du=<date_debut>&au=<date_fin>',
            methods=["GET"])
 def recherche_contrevenants_interval(date_debut, date_fin):
@@ -142,7 +148,6 @@ def recherche_contrevenants_interval(date_debut, date_fin):
         ensemble_trouve = conn_db.nombre_contravention_interval(
             liste_champs_interval['date_debut'],
             liste_champs_interval['date_fin'])
-        print(ensemble_trouve)
         return jsonify(ensemble_trouve)
 
     else:
@@ -196,6 +201,34 @@ def recherche_contrevenants_csv():
     csv_information = construction_csv(ensemble_trouve)
 
     return Response(csv_information, mimetype='text/csv')
+
+
+# Cette fonction est pour la tache D1
+@app.route('/api/nouvelle_plainte', methods=["GET", "POST"])
+@schema.validate(nouvelle_plainte_etablissement)
+def creation_plainte():
+    if request.method == "POST":
+        print(request.get_json())
+        liste_champs_plainte = initial_champ_nouvelle_plainte()
+        liste_champs_plainte = remplissage_champ_nouvelle_plainte(
+            request, liste_champs_plainte)
+        conn_db = get_db()
+        liste_champs_plainte['id_plainte'] = conn_db.inserer_nouvelle_plainte(
+            liste_champs_plainte['etablissement'],
+            liste_champs_plainte['no_civique'],
+            liste_champs_plainte['nom_rue'],
+            liste_champs_plainte['ville'],
+            liste_champs_plainte['date_visite'],
+            liste_champs_plainte['prenom_plaignant'],
+            liste_champs_plainte['nom_plaignant'],
+            liste_champs_plainte['description'])
+
+        return jsonify({"Voici le numéro de la plainte ouverte":
+                            liste_champs_plainte['id_plainte']}), 201
+
+    elif request.method == "GET":
+        titre = "Nouvelle plainte"
+        return render_template("formulaire_plainte.html", titre=titre)
 
 
 def main():
