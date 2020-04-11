@@ -437,8 +437,8 @@ function appel_ajax_interval_etablissement(){
             }
         }
     };
-    var param = `etablissement=${champ_liste_resto.value}`;
-    ajax.open("GET", "/api/liste_amendes_etablissement/"+param, true);
+    var nom_encode = champ_liste_resto.value;
+    ajax.open("GET", "/api/liste_amendes_etablissement/etablissement?choix=" + encodeURIComponent(nom_encode), true);
     ajax.send();
 }
 

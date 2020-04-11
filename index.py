@@ -158,13 +158,12 @@ def recherche_contrevenants_interval(date_debut, date_fin):
 
 
 # Cette fonction était pour la tache A6
-@app.route('/api/liste_amendes_etablissement/etablissement=<nom>',
-           methods=["GET"])
-def recherche_liste_contravention_par_etablissement(nom):
-    print(nom)
-    if nom != "":
+@app.route('/api/liste_amendes_etablissement/etablissement', methods=["GET"])
+def recherche_liste_contravention_par_etablissement():
+    if request.args["choix"] != "":
         conn_db = get_db()
-        ensemble_trouve = conn_db.liste_contravention_etablissement(nom)
+        ensemble_trouve = conn_db.liste_contravention_etablissement(
+            request.args["choix"])
 
         return jsonify(ensemble_trouve)
 
