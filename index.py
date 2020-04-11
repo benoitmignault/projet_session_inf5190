@@ -161,6 +161,7 @@ def recherche_contrevenants_interval(date_debut, date_fin):
 @app.route('/api/liste_amendes_etablissement/etablissement=<nom>',
            methods=["GET"])
 def recherche_liste_contravention_par_etablissement(nom):
+    print(nom)
     if nom != "":
         conn_db = get_db()
         ensemble_trouve = conn_db.liste_contravention_etablissement(nom)
@@ -208,7 +209,6 @@ def recherche_contrevenants_csv():
 @schema.validate(nouvelle_plainte_etablissement)
 def creation_plainte():
     if request.method == "POST":
-        print(request.get_json())
         liste_champs_plainte = initial_champ_nouvelle_plainte()
         liste_champs_plainte = remplissage_champ_nouvelle_plainte(
             request, liste_champs_plainte)
@@ -232,6 +232,16 @@ def creation_plainte():
 
 
 # Cette fonction est pour la tache D2
+@app.route('/api/plainte/<id_plainte>', methods=["DELETE"])
+def delete_person(id_plainte):
+    conn_db = get_db()
+    no_plainte = conn_db.verification_existance_plainte(id_plainte)
+
+    if no_plainte is None:
+        return "", 404
+    else:
+        conn_db.suppression_plainte_existante(no_plainte)
+        return {"La plainte a bien été supprimée": no_plainte}, 200
 
 
 def main():
