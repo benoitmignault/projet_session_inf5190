@@ -141,15 +141,34 @@ class Database:
                     "prenom_plaignant, nom_plaignant, description) " \
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
         connection.execute(insert_bd,
-                                (etablissement, no_civique, nom_rue,
-                                 ville, date_visite, prenom_plaignant,
-                                 nom_plaignant, description))
+                           (etablissement, no_civique, nom_rue,
+                            ville, date_visite, prenom_plaignant,
+                            nom_plaignant, description))
         connection.commit()
         cursor = connection.cursor()
         cursor.execute("select max(id_plainte) from departement_plaintes")
         result = cursor.fetchall()
 
         return result[0][0]
+
+    def verification_existance_plainte(self, id_plainte):
+        cursor = self.get_connection().cursor()
+        select = "SELECT id_plainte "
+        fromm = "FROM departement_plaintes "
+        where = "WHERE id_plainte = ? "
+        sql = select + fromm + where
+        cursor.execute(sql, (id_plainte,))
+        result = cursor.fetchall()
+        if len(result) is 0:
+            return None
+        else:
+            return result[0][0]
+
+    def suppression_plainte_existante(self, no_plainte):
+        connection = self.get_connection()
+        sql = "DELETE from departement_plaintes where id_plainte = ?"
+        connection.execute(sql, (no_plainte,))
+        connection.commit()
 
 
 def remplissage_condition_sql(liste_champs):

@@ -99,6 +99,10 @@ h2 {
     align-items: center;
 }
 
+.container > .zone_admin{
+    background-color: initial;
+}
+
 .container > .zone_recherche_resto{
     margin-bottom: 15px;
 }
@@ -209,6 +213,9 @@ Fin de l'ajout du recentrage de attribut legend
 
 .err_400{
     width: 10%;
+    margin: auto;
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 .container h2 span{

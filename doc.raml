@@ -46,37 +46,38 @@ baseUri: http://127.0.0.1:5000/
                     }
                   ]
 
-    get:
-      description: Extraire l'information des établissements avec l'interval des dates
-      queryParameters:
-        du:
-          type: string
-          description: Début pour le début de l'interval
-          example: 2015-09-30
-          required: true
-        au:
-          type: string
-          description: Fin pour le début de l'interval
-          example: 2015-10-05
-          required: true
-      responses:
-          200:
-            body:
-              application/json:
-                example: |
-                  [
-                    {
-                      "Adresse": "4219 Rue Notre-Dame Ouest ",
-                      "Catégorie": "Restaurant",
-                      "Date d'infraction": "2015-09-30",
-                      "Date de jugement": "2017-03-16",
-                      "Description": "Le lieu ou le véhicule doit être exempt de contaminants, de polluants, de toute espèce d'animaux y compris les insectes et les rongeurs ou de leurs excréments.",
-                      "Montant de l'amende": 750,
-                      "Propriétaire": "9313-2603 QUEBEC INC.  (Fermé)",
-                      "Ville": "Montréal H4C 1R4",
-                      "Établissement": "NOUVEAU RESTO MAK MAK"
-                    }
-                  ]
+    /interval:
+      get:
+        description: Extraire l'information des établissements avec l'interval des dates
+        queryParameters:
+          du:
+            type: string
+            description: Début pour le début de l'interval
+            example: 2015-09-30
+            required: true
+          au:
+            type: string
+            description: Fin pour le début de l'interval
+            example: 2015-10-05
+            required: true
+        responses:
+            200:
+              body:
+                application/json:
+                  example: |
+                    [
+                      {
+                        "Adresse": "4219 Rue Notre-Dame Ouest ",
+                        "Catégorie": "Restaurant",
+                        "Date d'infraction": "2015-09-30",
+                        "Date de jugement": "2017-03-16",
+                        "Description": "Le lieu ou le véhicule doit être exempt de contaminants, de polluants, de toute espèce d'animaux y compris les insectes et les rongeurs ou de leurs excréments.",
+                        "Montant de l'amende": 750,
+                        "Propriétaire": "9313-2603 QUEBEC INC.  (Fermé)",
+                        "Ville": "Montréal H4C 1R4",
+                        "Établissement": "NOUVEAU RESTO MAK MAK"
+                      }
+                    ]
 
   /nouvelle_plainte:
     post:
@@ -132,3 +133,13 @@ baseUri: http://127.0.0.1:5000/
                       "voici le numero de la plainte": 13
                     }
                   ]
+  /plainte:
+    /{id_plainte}:
+      delete:
+        description: Suppression d'une plainte ayant été déposée.
+        responses:
+          200:
+            description: La plainte a bien été enlevé du système.
+          404:
+            description: La plainte n'existe pas dans notre système.
+
