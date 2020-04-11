@@ -133,3 +133,13 @@ baseUri: http://127.0.0.1:5000/
                       "voici le numero de la plainte": 13
                     }
                   ]
+  /plainte:
+    /{id_plainte}:
+      delete:
+        description: Suppression d'une plainte ayant été déposée.
+        responses:
+          200:
+            description: La plainte a bien été enlevé du système.
+          404:
+            description: La plainte n'existe pas dans notre système.
+
