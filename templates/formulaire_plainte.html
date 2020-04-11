@@ -28,7 +28,7 @@
                         <div>
                             <input id="no_civique" name="no_civique" value=""
                                    title="Charactères numériques seulement"
-                                   type="number">
+                                   type="number" maxlength="5">
                         </div>
                     </div>
                     <div class="information">
@@ -87,9 +87,10 @@
                 <div class="information">
                     <label for="description">Description du problème :</label>
                     <div>
-                        <textarea rows="4" cols="50" id="description"
-                                  name="description">
-                        </textarea>
+                        <input id="description" name="description"
+                               title="Charactères alphanumériques, les espaces,
+                                   l'apostrophe et le tiret sont permis"
+                               type="text" value="">
                     </div>
                 </div>
                 <div class="troisBTN">
@@ -100,7 +101,8 @@
             </div>
             <ul class="aucun" id="message_erreur_plainte"></ul>
         </form>
-        <!-- Section pour le retour Ajax A5 -->
+        <p>Résultat - Par rapport à la création de la plainte</p>
+        <!-- Section pour le retour Ajax D1 -->
         <div id="result_plainte"></div>
     </div>
     <div class='zone_admin'>

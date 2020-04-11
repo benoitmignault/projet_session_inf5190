@@ -19,7 +19,9 @@ const message_erreur_recher = document.querySelector('#message_erreur_recher');
 
 // Variable pour l'ajout d'une demande de plainte
 const form_nouvelle_plainte = document.querySelector('#nouvelle_plainte');
+const btn_reset_plainte = document.querySelector('#btn_reset_plainte');
 const message_erreur_plainte = document.querySelector('#message_erreur_plainte');
+const result_plainte = document.querySelector('#result_plainte');
 const champ_etablissement = document.querySelector('#etablissement');
 const champ_no_civique = document.querySelector('#no_civique');
 const champ_nom_rue_plainte = document.querySelector('#nom_rue');
@@ -31,12 +33,27 @@ const champ_nom_plaignant = document.querySelector('#nom_plaignant');
 const champ_description = document.querySelector('#description');
 
 const pattern_date = new RegExp("^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$");
+const pattern_code = new RegExp("^[A-Z][0-9][A-Z][ ]{1}[0-9][A-Z][0-9]$");
+const pattern_proprio = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,98}[a-z0-9A-Z.)]$");
+const pattern_resto = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,63}[a-z0-9A-Z.)]$");
+const pattern_ville = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,31}[a-z0-9A-Z.)]$");
+const pattern_rue = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z]{1,33}[a-z0-9A-Z]$");
 
-function initial_champ_ajax_validation(){
+function initial_plainte_validation(){
+    var liste_validation = {"champ_resto_vide": false, "champ_numero_vide": false,
+        "champ_numero_inv": false, "champ_rue_vide": false, "champ_ville_vide": false,
+        "champ_code_vide": false, "champ_code_inv": false, "champ_date_vide": false,
+        "champ_date_inv": false, "champ_prenom_vide": false, "champ_nom_vide": false,
+        "champ_description_vide": false, "champ_resto_inv": false, "champ_rue_inv": false,
+        "champ_ville_inv": false, "requete_ajax_avec_erreur": false};
+
+    return liste_validation;
+}
+
+function initial_recherche_validation(){
     var liste_validation = {"champ_debut_inv": false, "aucun_choix": false,
-                        "champ_fin_inv": false, "champ_debut_vide": false,
-                        "champ_fin_vide": false, "champ_liste_resto_vide": false,
-                        "les_deux_choix": false, "champs_date_vides": false};
+        "champ_fin_inv": false, "champ_debut_vide": false, "champ_fin_vide": false,
+        "champ_liste_resto_vide": false, "les_deux_choix": false, "champs_date_vides": false};
 
     return liste_validation;
 }
@@ -65,6 +82,24 @@ function reset_recherche_interval(){
     });
 }
 
+function reset_demande_plainte(){
+    $(btn_reset_plainte).click(function() {
+        champ_etablissement.defaultValue = "";
+        champ_no_civique.defaultValue = "";
+        champ_nom_rue_plainte.defaultValue = "";
+        champ_nom_ville.defaultValue = "";
+        champ_code_postal.defaultValue = "";
+        champ_date_visite.defaultValue = "";
+        champ_prenom_plaignant.defaultValue = "";
+        champ_nom_plaignant.defaultValue = "";
+        champ_description.defaultValue = "";
+        result_plainte.innerHTML = "";
+        effacer_messages_erreurs(message_erreur_plainte);
+        initialiser_tous_champs("input[type=text]");
+        initialiser_tous_champs("#nouvelle_plainte");
+    });
+}
+
 function initialiser_tous_champs(type_champs){
     var tous_champs = document.querySelectorAll(type_champs);
     tous_champs.forEach(function(un_champ){
@@ -85,26 +120,21 @@ function effacer_messages_erreurs(message){
 }
 
 function validation_champs_recherches(){
-    var regex_resto = "^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,98}[a-z0-9A-Z.)]$";
-    var regex_proprio = "^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,63}[a-z0-9A-Z.)]$";
-    var regex_rue = "^[a-z1-9A-Z][a-z0-9- 'A-Z]{1,33}[a-z0-9A-Z]$"
-
     $(champ_nom_resto).change(function () {
-        validation_regex(champ_nom_resto, regex_resto);
+        validation_regex(champ_nom_resto, pattern_resto);
     });
 
     $(champ_nom_proprio).change(function () {
-        validation_regex(champ_nom_proprio, regex_proprio);
+        validation_regex(champ_nom_proprio, pattern_proprio);
     });
 
     $(champ_nom_rue).change(function () {
-        validation_regex(champ_nom_rue, regex_rue);
+        validation_regex(champ_nom_rue, pattern_rue);
     });
 }
 
-function validation_regex(champ, type_regex){
-    var re = new RegExp(type_regex);
-    if (!(re.test(champ.value))) {
+function validation_regex(champ, pattern_regex){
+    if (!(pattern_regex.test(champ.value))) {
         alert("Veuillez respecter les charactères permis et la longueur permise !");
         champ.value = "";
     }
@@ -114,10 +144,10 @@ function recherche_rapide(){
     $(form_interval).submit(function (e) {
         e.preventDefault();
         message_erreur_interval.innerHTML = ""; // On remet la section des messages vide
-        var liste_validation = initial_champ_ajax_validation();
+        var liste_validation = initial_recherche_validation();
         liste_validation = verification_interval(liste_validation);
         liste_validation = verification_choix_etablissement(liste_validation);
-        message_erreur_ajax(liste_validation);
+        message_erreur_recherche(liste_validation);
         ajustement_style_champs(liste_validation);
         if (!liste_validation['champs_date_vides'] && liste_validation['champ_liste_resto_vide']){
             result_interval.innerHTML = "";
@@ -143,11 +173,16 @@ function demande_plainte(){
     $(form_nouvelle_plainte).submit(function (e) {
         e.preventDefault();
         message_erreur_plainte.innerHTML = ""; // On remet la section des messages vide
-        appel_ajax_nouvelle_plainte();
-
+        var liste_validation = initial_plainte_validation();
+        liste_validation = verification_nouvelle_plainte(liste_validation);
+        message_erreur_nouvelle_plainte(liste_validation);
+        liste_validation = verification_tous_champs_valide(liste_validation);
+        if (!liste_validation['requete_ajax_avec_erreur']){
+            appel_ajax_nouvelle_plainte();
+        }
     });
-
 }
+
 function verification_interval(liste_validation){
     if (champ_date_debut.value == "") {
         liste_validation['champ_debut_vide'] = true;
@@ -184,7 +219,79 @@ function verification_choix_etablissement(liste_validation){
     return liste_validation;
 }
 
-function message_erreur_ajax(liste_validation){
+function verification_nouvelle_plainte(liste_validation){
+    if (champ_etablissement.value == "") {
+        liste_validation['champ_resto_vide'] = true;
+    } else if (!(pattern_resto.test(champ_etablissement.value))) {
+        liste_validation['champ_resto_inv'] = true;
+    }
+
+    if (champ_no_civique.value == "") {
+        liste_validation['champ_numero_vide'] = true;
+    } else if(isNaN(champ_no_civique.value)){
+	    liste_validation['champ_numero_inv'] = true;
+    }
+
+    if (champ_nom_rue_plainte.value == "") {
+        liste_validation['champ_rue_vide'] = true;
+    } else if(!(pattern_rue.test(champ_nom_rue_plainte.value))){
+	    liste_validation['champ_rue_inv'] = true;
+    }
+
+    if (champ_nom_ville.value == "") {
+        liste_validation['champ_ville_vide'] = true;
+    } else if(!(pattern_rue.test())){
+	    liste_validation['champ_ville_inv'] = true;
+    }
+
+    if (champ_code_postal.value == "") {
+        liste_validation['champ_code_vide'] = true;
+    } else if(!(pattern_code.test(champ_code_postal.value.toUpperCase()))){
+	    liste_validation['champ_code_inv'] = true;
+    }
+
+    if (champ_date_visite.value == "") {
+        liste_validation['champ_date_vide'] = true;
+    } else if(!(pattern_date.test(champ_date_visite.value))){
+	    liste_validation['champ_date_inv'] = true;
+    }
+
+    if (champ_prenom_plaignant.value == "") {
+        liste_validation['champ_prenom_vide'] = true;
+    }
+
+    if (champ_nom_plaignant.value == "") {
+        liste_validation['champ_nom_vide'] = true;
+    }
+
+    if (champ_description.value == "") {
+        liste_validation['champ_description_vide'] = true;
+    }
+
+    // Une manière simple d'afficher un message générale, s'il y a des champs vides
+    // https://stackoverflow.com/questions/16211871/how-to-check-if-all-inputs-are-not-empty-with-jquery
+    $('input').each(function() {
+        if (!$(this).val()){
+            alert('Attention ! Il y a encore des champs vides !');
+            return false;
+        }
+    });
+
+    return liste_validation;
+}
+
+function verification_tous_champs_valide(liste_validation){
+    for (var key in liste_validation) {
+        if (liste_validation[key]){
+            liste_validation['requete_ajax_avec_erreur'] = true;
+            break;
+        }
+    }
+
+    return liste_validation;
+}
+
+function message_erreur_recherche(liste_validation){
     if (liste_validation['aucun_choix'] || liste_validation['les_deux_choix']){
         if (liste_validation['aucun_choix']){
             message_erreur_interval.innerHTML += "<li>Veuiller choisir au moins une des deux options !</li>";
@@ -207,6 +314,50 @@ function message_erreur_ajax(liste_validation){
         if (liste_validation['champ_liste_resto_vide'] && !liste_validation['champ_debut_vide'] && liste_validation['champ_fin_vide']){
             message_erreur_interval.innerHTML += "<li>Le champ «Date fin» ne peut être vide !</li>";
         }
+    }
+}
+
+function message_erreur_nouvelle_plainte(liste_validation){
+    if (liste_validation['champ_resto_inv']) {
+        message_erreur_plainte.innerHTML += "<li>Veuillez respecter les charactères permis et la longueur permise !</li>";
+        modification_erreur(champ_etablissement);
+    } else {
+        modification_correct(champ_etablissement);
+    }
+
+    if (liste_validation['champ_numero_inv']) {
+        message_erreur_plainte.innerHTML += "<li>Veuillez saisir une donnée numérique !</li>";
+        modification_erreur(champ_no_civique);
+    } else {
+        modification_correct(champ_no_civique);
+    }
+
+    if (liste_validation['champ_rue_inv']) {
+        message_erreur_plainte.innerHTML += "<li>Veuillez respecter les charactères permis et la longueur permise !</li>";
+        modification_erreur(champ_nom_rue_plainte);
+    } else {
+        modification_correct(champ_nom_rue_plainte);
+    }
+
+    if (liste_validation['champ_ville_inv']) {
+        message_erreur_plainte.innerHTML += "<li>Veuillez respecter les charactères permis et la longueur permise !</li>";
+        modification_erreur(champ_nom_ville);
+    } else {
+        modification_correct(champ_nom_ville);
+    }
+
+    if (liste_validation['champ_code_inv']) {
+        message_erreur_plainte.innerHTML += "<li>Veuillez respecter le format H1H 1H1 !</li>";
+        modification_erreur(champ_code_postal);
+    } else {
+        modification_correct(champ_code_postal);
+    }
+
+    if (liste_validation['champ_date_inv']) {
+        message_erreur_plainte.innerHTML += "<li>La date du dépôt de la plainte doit être au format ISO 8601 !</li>";
+        modification_erreur(champ_date_visite);
+    } else {
+        modification_correct(champ_date_visite);
     }
 }
 
@@ -292,30 +443,43 @@ function appel_ajax_interval_etablissement(){
 }
 
 function appel_ajax_nouvelle_plainte(){
-    console.log("je suis dans la fct ajax");
     var ajax = new XMLHttpRequest();
+    ajax.onreadystatechange = function() {
+        if (ajax.readyState === XMLHttpRequest.DONE) {
+            if (ajax.status === 201) {
+                var liste = JSON.parse(ajax.responseText);
+                result_plainte.innerHTML = creation_bloc_html_plainte(liste);
+            } else {
+                appel_ajax_plainte_succes_mais_erreur();
+                message_erreur_plainte.innerHTML += "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
+            }
+        }
+    };
     var data = {
-            "etablissement": "AILE BUFFALO BILL",
-            "no_civique": 4084,
-            "nom_rue": "Rue Saint-Denis",
-            "ville": "Montréal H2W 2M5",
-            "date_visite": "2018-05-28",
-            "prenom_plaignant": "Benoît",
-            "nom_plaignant": "Mignault",
-            "description": "Nous avons remarqué la présence de petits animaux dans la cuisine"
+            "etablissement": champ_etablissement.value,
+            "no_civique": parseInt(champ_no_civique.value),
+            "nom_rue": champ_nom_rue_plainte.value,
+            "ville": champ_nom_ville.value + " " + champ_code_postal.value,
+            "date_visite": champ_date_visite.value,
+            "prenom_plaignant": champ_prenom_plaignant.value,
+            "nom_plaignant": champ_nom_plaignant.value,
+            "description": champ_description.value
         };
     var data_json = JSON.stringify(data);
-    console.log(data_json);
     ajax.open("POST", "/api/nouvelle_plainte", true);
     ajax.setRequestHeader("Content-Type", "application/json");
     ajax.send(data_json);
 }
 
-
 function appel_ajax_interval_succes_mais_erreur(){
     result_interval.innerHTML = "";
     result_interval_etablissement.innerHTML = "";
     form_interval.style.border = "2px solid red";
+}
+
+function appel_ajax_plainte_succes_mais_erreur(){
+    result_plainte.innerHTML = "";
+    form_nouvelle_plainte.style.border = "2px solid red";
 }
 
 // J'ai découvert comment faire des string avec des variables
@@ -339,11 +503,11 @@ function creation_bloc_html_interval(liste){
 
 // Utilisation de ce principe pour itérer
 // https://zellwk.com/blog/looping-through-js-objects/
-function creation_bloc_html_etablissement(liste){
+function creation_bloc_html_etablissement(listes){
     var result_liste = "";
-    for(var i = 0; i < liste.length; i++) {
+    for(var i = 0; i < listes.length; i++) {
         result_liste += "<table class=\"tabeau_resto\"><tbody>";
-        const une_amande = Object.entries(liste[i]);
+        const une_amande = Object.entries(listes[i]);
         for (const [cle, valeur] of une_amande) {
             result_liste += "<tr>";
             result_liste += `<td class='cle'>${cle} :</td>`;
@@ -360,10 +524,25 @@ function creation_bloc_html_etablissement(liste){
     return result_liste;
 }
 
+function creation_bloc_html_plainte(listes){
+    var result_liste = "";
+    result_liste += "<table class=\"tabeau_resto\"><tbody>";
+    for (var key in listes) {
+        result_liste += "<tr>";
+        result_liste += `<td class='plainte_cle'>${key} :</td>`;
+        result_liste += `<td class='plainte_valeur'>${listes[key]}</td>`;
+        result_liste += "<tr>";
+    }
+    result_liste += "</tbody></table>";
+
+    return result_liste;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     validation_champs_recherches();
     recherche_rapide();
     demande_plainte();
     reset_recherche();
     reset_recherche_interval();
+    reset_demande_plainte();
 });

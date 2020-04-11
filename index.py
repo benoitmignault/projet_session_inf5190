@@ -223,8 +223,8 @@ def creation_plainte():
             liste_champs_plainte['nom_plaignant'],
             liste_champs_plainte['description'])
 
-        return jsonify({"voici le numero de la plainte": liste_champs_plainte
-            ['id_plainte']}), 201
+        return jsonify({"Voici le numéro de la plainte ouverte":
+                            liste_champs_plainte['id_plainte']}), 201
 
     elif request.method == "GET":
         titre = "Nouvelle plainte"

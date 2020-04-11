@@ -84,6 +84,7 @@ h2 {
 
 .container > .zone_recherche_resto > #result_interval_etablissement,
 .container > .zone_recherche_resto > #result_interval,
+.container > .zone_recherche_resto > #result_plainte,
 .container > .zone_admin,
 .container > .zone_recherche_resto,
 .container > .erreur_404{
@@ -124,7 +125,7 @@ h2 {
     margin-bottom: 15px;
 }
 
-
+.container > .zone_recherche_resto > #result_plainte,
 .container > .zone_recherche_resto > #result_interval_etablissement,
 .container > .zone_recherche_resto > #result_interval{
     padding: 0px;
@@ -176,7 +177,6 @@ Fin de l'ajout du recentrage de attribut legend
 
 .container > .zone_recherche_resto > form > div > fieldset > div > div > input[type=number],
 .container > .zone_recherche_resto > form > div > div > div > input[type=text],
-.container > .zone_recherche_resto > form > div > div > div > textarea,
 .container > .zone_recherche_resto > form > div > fieldset > div > div > input[type=text],
 .container > .zone_recherche_resto > form > div > fieldset > div > div > select{
     border-radius: 10px;
@@ -187,8 +187,9 @@ Fin de l'ajout du recentrage de attribut legend
     margin-right: 10px;
     width: 50%;
 }
-.container > .zone_recherche_resto > form > div > div > div > textarea{
-    text-align: left;
+
+.container > .zone_recherche_resto > form > div > div > div > #description{
+    width: 100%;
 }
 
 .container > .zone_recherche_resto > form > div > fieldset > div > div > select{
@@ -203,6 +204,7 @@ Fin de l'ajout du recentrage de attribut legend
     font-weight: bold;
     color:red;
     margin: 0;
+    margin-top: 15px;
 }
 
 .err_400{
@@ -231,6 +233,7 @@ Fin de l'ajout du recentrage de attribut legend
     font-weight: bold;
 }
 
+.container > .zone_recherche_resto > #result_plainte > .tabeau_resto,
 .container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto,
 .container > .zone_recherche_resto > #result_interval > .tabeau_resto,
 .container > .zone_recherche_resto > #recherche_par_interval,
@@ -243,6 +246,7 @@ Fin de l'ajout du recentrage de attribut legend
     padding: 10px;
 }
 
+.container > .zone_recherche_resto > #result_plainte > .tabeau_resto,
 .container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto{
     margin-bottom: 15px;
 }
@@ -286,6 +290,7 @@ Fin de l'ajout du recentrage de attribut legend
     width: 20%;
 }
 
+.container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_cle,
 .container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .cle,
 .container > .zone_recherche_resto > .tabeau_resto .cle{
     font-weight: bold;
@@ -293,12 +298,22 @@ Fin de l'ajout du recentrage de attribut legend
     width: 30%;
 }
 
+.container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_valeur,
 .container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .valeur,
 .container > .zone_recherche_resto > .tabeau_resto .valeur{
     text-align: justify;
     width: 70%;
 }
 
+.container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_cle{
+    width: 70%;
+    color: #006400;
+}
+
+.container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_valeur{
+    width: 30%;
+    color: #006400;
+}
 
 .container > .zone_recherche_resto > form > div {
     display: flex;
