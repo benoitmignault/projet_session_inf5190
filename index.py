@@ -231,6 +231,9 @@ def creation_plainte():
         return render_template("formulaire_plainte.html", titre=titre)
 
 
+# Cette fonction est pour la tache D2
+
+
 def main():
     importation_donnees()
 
