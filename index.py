@@ -125,7 +125,7 @@ def recherche_restaurant_trouve():
 
 # Tache A3
 scheduler = BackgroundScheduler(daemon=True)
-trigger = OrTrigger([CronTrigger(day_of_week='*', hour=1, minute=23)])
+trigger = OrTrigger([CronTrigger(day_of_week='*', hour=9, minute=17)])
 
 scheduler.add_job(mise_jour_bd, trigger)
 scheduler.start()
@@ -233,7 +233,7 @@ def creation_plainte():
 
 # Cette fonction est pour la tache D2
 @app.route('/api/plainte/<id_plainte>', methods=["DELETE"])
-def delete_person(id_plainte):
+def suppression_plainte(id_plainte):
     conn_db = get_db()
     no_plainte = conn_db.verification_existance_plainte(id_plainte)
 

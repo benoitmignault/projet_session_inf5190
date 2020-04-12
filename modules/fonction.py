@@ -53,31 +53,33 @@ def initialisation_connexion_hors_flask():
 
 def mise_jour_bd():
     print("Mise à jour !!!")
-    liste_champs_xml = initial_champ_importation_xml()
-    liste_contrevenants = recuperation_information_url()
     connection = initialisation_connexion_hors_flask()
-    liste_envoi = {}
-    indice = 0
+    liste_contrevenants = recuperation_information_url()
+
+    liste_envoi = []
     for un_contrevenant in liste_contrevenants:
+        liste_champs_xml = initial_champ_importation_xml()
         liste_champs_xml = remplissage_champs_importation_xml(liste_champs_xml,
                                                               un_contrevenant)
         ensemble_existant = connection.verifier_contrevenant_existe(
-            liste_champs_xml[0], liste_champs_xml[1], liste_champs_xml[2],
-            liste_champs_xml[3], liste_champs_xml[4], liste_champs_xml[5],
-            liste_champs_xml[6], liste_champs_xml[7], liste_champs_xml[8],
-            liste_champs_xml[9])
+            liste_champs_xml["proprietaire"], liste_champs_xml["categorie"],
+            liste_champs_xml["etablissement"], liste_champs_xml["no_civ"],
+            liste_champs_xml["nom_rue"], liste_champs_xml["ville"],
+            liste_champs_xml["description"],
+            liste_champs_xml["date_infraction"],
+            liste_champs_xml["date_jugement"], liste_champs_xml["montant"])
         if len(ensemble_existant) == 0:
             """
             connection.insertion_contrevenant(
-                liste_champs_xml[0], liste_champs_xml[1], liste_champs_xml[2],
-                liste_champs_xml[3], liste_champs_xml[4], liste_champs_xml[5],
-                liste_champs_xml[6], liste_champs_xml[7], liste_champs_xml[8],
-                liste_champs_xml[9])
+                liste_champs_xml["proprietaire"], liste_champs_xml["categorie"],
+                liste_champs_xml["etablissement"], liste_champs_xml["no_civ"],
+                liste_champs_xml["nom_rue"], liste_champs_xml["ville"],
+                liste_champs_xml["description"],
+                liste_champs_xml["date_infraction"],
+                liste_champs_xml["date_jugement"], liste_champs_xml["montant"])
             """
-            liste_envoi[indice] = liste_champs_xml
-            indice += 1
+            liste_envoi.append(liste_champs_xml)
 
-    print(liste_envoi)
     creation_courriel(liste_envoi)
     connection.disconnect()
 
@@ -97,16 +99,15 @@ def initial_champ_nouvelle_plainte():
 
 
 def initial_champ_importation_xml():
-    """
     liste_champs_xml = {"proprietaire": "", "categorie": "",
                         "etablissement": "", "no_civ": "", "nom_rue": "",
                         "ville": "", "description": "", "date_infraction": "",
                         "date_jugement": "", "montant": 0}
 
-    return liste_champs_xml
-    """
-    liste_champs_xml = {0: "", 1: "", 2: "", 3: "", 4: "",
-                        5: "", 6: "", 7: "", 8: "", 9: 0}
+    # liste_champs_xml
+
+    # liste_champs_xml = {0: "", 1: "", 2: "", 3: "", 4: "",
+    #                    5: "", 6: "", 7: "", 8: "", 9: 0}
 
     return liste_champs_xml
 
@@ -142,25 +143,25 @@ def construction_xml(ensemble_trouve):
 
 
 def remplissage_champs_importation_xml(liste_champs_xml, contrevenant):
-    liste_champs_xml[0] = contrevenant.find('proprietaire').text
-    liste_champs_xml[1] = contrevenant.find('categorie').text
-    liste_champs_xml[2] = contrevenant.find('etablissement').text
+    liste_champs_xml["proprietaire"] = contrevenant.find('proprietaire').text
+    liste_champs_xml["categorie"] = contrevenant.find('categorie').text
+    liste_champs_xml["etablissement"] = contrevenant.find('etablissement').text
     adresse = contrevenant.find('adresse').text
     # Pour faire optimiser la recherche avec le nom de la rue, je met le
     # numéro civique dans une variable à part
-    liste_champs_xml[3] = adresse.split(' ', 1)[0]
+    liste_champs_xml["no_civ"] = adresse.split(' ', 1)[0]
     adresse = adresse.split(' ', 1)[1]
     # Ceci est en raison des données de la ville qui contient un espace après
     # apostrophe ce qui ne sera pas utile lors de recherche d'un nom de rue
-    liste_champs_xml[4] = adresse.replace("' ", "'")
-    liste_champs_xml[5] = contrevenant.find('ville').text
-    liste_champs_xml[6] = contrevenant.find('description').text
-    liste_champs_xml[7] = convertisseur_date(
+    liste_champs_xml["nom_rue"] = adresse.replace("' ", "'")
+    liste_champs_xml["ville"] = contrevenant.find('ville').text
+    liste_champs_xml["description"] = contrevenant.find('description').text
+    liste_champs_xml["date_infraction"] = convertisseur_date(
         contrevenant.find('date_infraction').text)
-    liste_champs_xml[8] = convertisseur_date(
+    liste_champs_xml["date_jugement"] = convertisseur_date(
         contrevenant.find('date_jugement').text)
     montant_en_transformation = contrevenant.find('montant').text.split()
-    liste_champs_xml[9] = int(montant_en_transformation[0])
+    liste_champs_xml["montant"] = int(montant_en_transformation[0])
 
     return liste_champs_xml
 
@@ -199,16 +200,13 @@ def importation_donnees():
     for un_contrevenant in liste_contrevenants:
         liste_champs_xml = remplissage_champs_importation_xml(liste_champs_xml,
                                                               un_contrevenant)
-        connection.insertion_contrevenant(liste_champs_xml[0],
-                                          liste_champs_xml[1],
-                                          liste_champs_xml[2],
-                                          liste_champs_xml[3],
-                                          liste_champs_xml[4],
-                                          liste_champs_xml[5],
-                                          liste_champs_xml[6],
-                                          liste_champs_xml[7],
-                                          liste_champs_xml[8],
-                                          liste_champs_xml[9])
+        connection.insertion_contrevenant(
+            liste_champs_xml["proprietaire"], liste_champs_xml["categorie"],
+            liste_champs_xml["etablissement"], liste_champs_xml["no_civ"],
+            liste_champs_xml["nom_rue"], liste_champs_xml["ville"],
+            liste_champs_xml["description"],
+            liste_champs_xml["date_infraction"],
+            liste_champs_xml["date_jugement"], liste_champs_xml["montant"])
 
     connection.disconnect()
 
@@ -341,16 +339,16 @@ def creation_html_courriel(liste_envoi):
         </tr>
         </thead><tbody>    
     """
-    for cle, valeur in liste_envoi.items():
+    for un_etablissement in liste_envoi:
         msg_corps += "<tr>"
-        for cle2, valeur2 in valeur.items():
+        for cle, valeur in un_etablissement.items():
             msg_corps += "<td style=\"border: 1px solid black; padding: 5px; "
-            if cle2 == 9:
-                msg_corps += "text-align: center\">" + str(valeur2) + " $</td>"
-            elif cle2 == 6:
-                msg_corps += "text-align: justify\">" + valeur2 + "</td>"
+            if cle == "montant":
+                msg_corps += "text-align: center\">" + str(valeur) + " $</td>"
+            elif cle == "description":
+                msg_corps += "text-align: justify\">" + valeur + "</td>"
             else:
-                msg_corps += "text-align: center\">" + valeur2 + "</td>"
+                msg_corps += "text-align: center\">" + valeur + "</td>"
 
         msg_corps += "</tr>"
 
