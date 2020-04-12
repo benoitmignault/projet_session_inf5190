@@ -23,7 +23,8 @@ sudo apt-get install sqlite3
   * Jsonify
   * Apscheduler
   * YAML 
-  * Email
+  * Email (Pour utiliser Gmail pour la gestion des courriels)
+  * Tweepy (Pour utiliser Tweeter)
   * RAML qui nécessitera aussi l'installation de NPM
   * Flask Json Schema
   * Flask Json Schema Validateur 
@@ -47,6 +48,17 @@ pip3 install email-to
     * Uqam123((SUPER)))
   * Les informations du courriel et password sont dans le fichier fonction.py comme constante  
 
+  * Pour offrir un système d'envoi de tweets, nous avons besoin d'un package pour gérer le tout
+```bash
+pip3 install tweepy  
+```
+  * Dans le cadre du travail, nous avons créer un compte TWEETER pour l'envoi automatique de tweets.
+    Les informations pour se connecter au compte sont les mêmes que pour le compte GMAIL.    
+    * API_KEY = "nIOLstoH2fvZllC6Vo8QpcpKP"
+    * API_SECRET = "PoX7IFqCuKKMBjoYD4diGag3XgkWF4JthQ5ZsItt17TWtl3bIW"
+    * ACCESS_TOKEN = "1243952698556383232-Qv98BnYtkFj8mje95QXox6yvLSUUTl"
+    * ACCESS_TOKEN_SECRET = "8nclhl82lk4P52CLYTIQz94vHwlod3djHRzOcdNMq4iQ8"
+        
   * Pour offrir une documentation  claire des services REST, on va utiliser RAML
     mais on doit installer NPM avant. 
     
