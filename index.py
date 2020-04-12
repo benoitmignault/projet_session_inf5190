@@ -7,7 +7,7 @@ from flask_json_schema import JsonSchema
 from flask_json_schema import JsonValidationError
 
 from modules.fonction import *
-from validateur_json_schema import nouvelle_plainte_etablissement
+from validateur_plainte_json_schema import nouvelle_plainte_etablissement
 
 app = Flask(__name__, static_url_path='', static_folder='static')
 schema = JsonSchema(app)
