@@ -123,12 +123,12 @@ def recherche_restaurant_trouve():
                            nb_restaurant_trouve=nb_restaurant_trouve)
 
 
-# Tache A3
-scheduler = BackgroundScheduler(daemon=True)
-trigger = OrTrigger([CronTrigger(day_of_week='*', hour=9, minute=17)])
-
-scheduler.add_job(mise_jour_bd, trigger)
-scheduler.start()
+# Cette fonction est pour la route A3
+def mise_jour_contrevenants():
+    scheduler = BackgroundScheduler(daemon=True)
+    trigger = OrTrigger([CronTrigger(day_of_week='*', hour=9, minute=29)])
+    scheduler.add_job(mise_jour_bd, trigger)
+    scheduler.start()
 
 
 # Cette fonction est pour la route A4 et A5
@@ -262,10 +262,9 @@ def creation_profil():
         return jsonify({"Création du nouveau profil": "Succès !"}), 201
 
 
-def main():
-    importation_donnees()
-
+# La fonction sera exécuté à chaque jour à minuit, automatiquement
+mise_jour_contrevenants()
 
 # Cette fonction était pour la tache A1
 if __name__ == "__main__":
-    main()
+    importation_donnees()
