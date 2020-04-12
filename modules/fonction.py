@@ -5,11 +5,13 @@ import xml.etree.ElementTree as ET
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from io import BytesIO, StringIO
+from datetime import datetime
 
 import hashlib
 import uuid
 
 import requests
+import tweepy
 from flask import g
 
 import yaml
@@ -33,6 +35,22 @@ SOURCE_ADRESSE = "b.mignault.uqam.qc.ca@gmail.com"
 
 MOT_DE_PASSE = "Uqam123((SUPER)))"
 
+# Ces API seront pour la tache B2
+API_KEY = "nIOLstoH2fvZllC6Vo8QpcpKP"
+API_SECRET = "PoX7IFqCuKKMBjoYD4diGag3XgkWF4JthQ5ZsItt17TWtl3bIW"
+# Ces Access seront pour la tache B2
+ACCESS_TOKEN = "1243952698556383232-Qv98BnYtkFj8mje95QXox6yvLSUUTl"
+ACCESS_TOKEN_SECRET = "8nclhl82lk4P52CLYTIQz94vHwlod3djHRzOcdNMq4iQ8"
+
+
+def connexion_twitter():
+    try:
+        conn_auth = tweepy.OAuthHandler(API_KEY, API_SECRET)
+        conn_auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+        return conn_auth
+    except Exception as e:
+        return None
+
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -54,7 +72,9 @@ def mise_jour_bd():
     connection = initialisation_connexion_hors_flask()
     liste_contrevenants = recuperation_information_url()
 
-    liste_envoi = []
+    liste_envoi = []  # Sera utiliser pour l'envoi de courriel
+    liste_nom_contrevenant = []  # Sera utiliser pour la section Twitter
+
     for un_contrevenant in liste_contrevenants:
         liste_champs_xml = initial_champ_importation_xml()
         liste_champs_xml = remplissage_champs_importation_xml(liste_champs_xml,
@@ -77,9 +97,11 @@ def mise_jour_bd():
                 liste_champs_xml["date_jugement"], liste_champs_xml["montant"])
             """
             liste_envoi.append(liste_champs_xml)
+            liste_nom_contrevenant.append(liste_champs_xml["proprietaire"])
 
     creation_courriel(liste_envoi)
-    # Ajout de la branche Recuperation_Manuelle_B2
+    conn_auth = connexion_twitter()
+    creation_tweet(conn_auth, liste_nom_contrevenant)
     connection.disconnect()
 
 
@@ -367,6 +389,15 @@ def recuperation_courriel_yaml():
             string_courriel = liste_courriel
 
     return string_courriel
+
+
+def creation_tweet(conn_auth, liste):
+    date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    api = tweepy.API(conn_auth)
+    message = "\n\nVoici le nouveau contrevenant prise en " \
+              "défault par la ville de Montréal !\n\n"
+    for un_contrevenant in liste:
+        api.update_status(date + message + un_contrevenant)
 
 
 def nombre_critiere_recherche(liste_champs):
