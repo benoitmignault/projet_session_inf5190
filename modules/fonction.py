@@ -1,6 +1,9 @@
 import csv
 import re  # pour la gestion des patterns pour les différents champs input
+import smtplib
 import xml.etree.ElementTree as ET
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from io import BytesIO, StringIO
 
 import hashlib
@@ -8,6 +11,8 @@ import uuid
 
 import requests
 from flask import g
+
+import yaml
 
 from .database import Database  # Importer le fichier database.py
 
@@ -23,6 +28,10 @@ PATTERN_NOM_RESTO = "^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,98}" \
 PATTERN_NOM_RUE = "^[a-z1-9A-Z][a-z0-9- 'A-Z]{1,33}[a-z0-9A-Z]$"
 
 PATTERN_DATE = "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$"
+
+SOURCE_ADRESSE = "b.mignault.uqam.qc.ca@gmail.com"
+
+MOT_DE_PASSE = "Uqam123((SUPER)))"
 
 
 def get_db():
@@ -43,38 +52,35 @@ def initialisation_connexion_hors_flask():
 
 
 def mise_jour_bd():
-    liste_champs_xml = initial_champ_importation_xml()
-    liste_contrevenants = recuperation_information_url()
+    print("Mise à jour !!!")
     connection = initialisation_connexion_hors_flask()
+    liste_contrevenants = recuperation_information_url()
 
+    liste_envoi = []
     for un_contrevenant in liste_contrevenants:
-
+        liste_champs_xml = initial_champ_importation_xml()
         liste_champs_xml = remplissage_champs_importation_xml(liste_champs_xml,
                                                               un_contrevenant)
         ensemble_existant = connection.verifier_contrevenant_existe(
-            liste_champs_xml['proprietaire'],
-            liste_champs_xml['categorie'],
-            liste_champs_xml['etablissement'],
-            liste_champs_xml['no_civ'],
-            liste_champs_xml['nom_rue'],
-            liste_champs_xml['ville'],
-            liste_champs_xml['description'],
-            liste_champs_xml['date_infraction'],
-            liste_champs_xml['date_jugement'],
-            liste_champs_xml['montant'])
+            liste_champs_xml["proprietaire"], liste_champs_xml["categorie"],
+            liste_champs_xml["etablissement"], liste_champs_xml["no_civ"],
+            liste_champs_xml["nom_rue"], liste_champs_xml["ville"],
+            liste_champs_xml["description"],
+            liste_champs_xml["date_infraction"],
+            liste_champs_xml["date_jugement"], liste_champs_xml["montant"])
         if len(ensemble_existant) == 0:
+            """
             connection.insertion_contrevenant(
-                liste_champs_xml['proprietaire'],
-                liste_champs_xml['categorie'],
-                liste_champs_xml['etablissement'],
-                liste_champs_xml['no_civ'],
-                liste_champs_xml['nom_rue'],
-                liste_champs_xml['ville'],
-                liste_champs_xml['description'],
-                liste_champs_xml['date_infraction'],
-                liste_champs_xml['date_jugement'],
-                liste_champs_xml['montant'])
+                liste_champs_xml["proprietaire"], liste_champs_xml["categorie"],
+                liste_champs_xml["etablissement"], liste_champs_xml["no_civ"],
+                liste_champs_xml["nom_rue"], liste_champs_xml["ville"],
+                liste_champs_xml["description"],
+                liste_champs_xml["date_infraction"],
+                liste_champs_xml["date_jugement"], liste_champs_xml["montant"])
+            """
+            liste_envoi.append(liste_champs_xml)
 
+    creation_courriel(liste_envoi)
     connection.disconnect()
 
 
@@ -98,6 +104,11 @@ def initial_champ_importation_xml():
                         "ville": "", "description": "", "date_infraction": "",
                         "date_jugement": "", "montant": 0}
 
+    # liste_champs_xml
+
+    # liste_champs_xml = {0: "", 1: "", 2: "", 3: "", 4: "",
+    #                    5: "", 6: "", 7: "", 8: "", 9: 0}
+
     return liste_champs_xml
 
 
@@ -109,7 +120,6 @@ def initial_champ_nouveau_profil():
     return liste_champs
 
 
-# Fonction pour récupérer les informations venant de URL
 def recuperation_information_url():
     resultat = requests.get(URL)
     resultat.encoding = 'utf-8'
@@ -133,26 +143,25 @@ def construction_xml(ensemble_trouve):
 
 
 def remplissage_champs_importation_xml(liste_champs_xml, contrevenant):
-    liste_champs_xml['proprietaire'] = contrevenant.find('proprietaire').text
-    liste_champs_xml['categorie'] = contrevenant.find('categorie').text
-    liste_champs_xml['etablissement'] = contrevenant.find(
-        'etablissement').text
+    liste_champs_xml["proprietaire"] = contrevenant.find('proprietaire').text
+    liste_champs_xml["categorie"] = contrevenant.find('categorie').text
+    liste_champs_xml["etablissement"] = contrevenant.find('etablissement').text
     adresse = contrevenant.find('adresse').text
     # Pour faire optimiser la recherche avec le nom de la rue, je met le
     # numéro civique dans une variable à part
-    liste_champs_xml['no_civ'] = adresse.split(' ', 1)[0]
+    liste_champs_xml["no_civ"] = adresse.split(' ', 1)[0]
     adresse = adresse.split(' ', 1)[1]
     # Ceci est en raison des données de la ville qui contient un espace après
     # apostrophe ce qui ne sera pas utile lors de recherche d'un nom de rue
-    liste_champs_xml['nom_rue'] = adresse.replace("' ", "'")
-    liste_champs_xml['ville'] = contrevenant.find('ville').text
-    liste_champs_xml['description'] = contrevenant.find('description').text
-    liste_champs_xml['date_infraction'] = convertisseur_date(
+    liste_champs_xml["nom_rue"] = adresse.replace("' ", "'")
+    liste_champs_xml["ville"] = contrevenant.find('ville').text
+    liste_champs_xml["description"] = contrevenant.find('description').text
+    liste_champs_xml["date_infraction"] = convertisseur_date(
         contrevenant.find('date_infraction').text)
-    liste_champs_xml['date_jugement'] = convertisseur_date(
+    liste_champs_xml["date_jugement"] = convertisseur_date(
         contrevenant.find('date_jugement').text)
     montant_en_transformation = contrevenant.find('montant').text.split()
-    liste_champs_xml['montant'] = int(montant_en_transformation[0])
+    liste_champs_xml["montant"] = int(montant_en_transformation[0])
 
     return liste_champs_xml
 
@@ -191,16 +200,13 @@ def importation_donnees():
     for un_contrevenant in liste_contrevenants:
         liste_champs_xml = remplissage_champs_importation_xml(liste_champs_xml,
                                                               un_contrevenant)
-        connection.insertion_contrevenant(liste_champs_xml['proprietaire'],
-                                          liste_champs_xml['categorie'],
-                                          liste_champs_xml['etablissement'],
-                                          liste_champs_xml['no_civ'],
-                                          liste_champs_xml['nom_rue'],
-                                          liste_champs_xml['ville'],
-                                          liste_champs_xml['description'],
-                                          liste_champs_xml['date_infraction'],
-                                          liste_champs_xml['date_jugement'],
-                                          liste_champs_xml['montant'])
+        connection.insertion_contrevenant(
+            liste_champs_xml["proprietaire"], liste_champs_xml["categorie"],
+            liste_champs_xml["etablissement"], liste_champs_xml["no_civ"],
+            liste_champs_xml["nom_rue"], liste_champs_xml["ville"],
+            liste_champs_xml["description"],
+            liste_champs_xml["date_infraction"],
+            liste_champs_xml["date_jugement"], liste_champs_xml["montant"])
 
     connection.disconnect()
 
@@ -293,6 +299,80 @@ def remplissage_champ_nouvelle_profil(request, liste_champs):
         liste_champs['liste_etablissement'].append(un_etablissement)
 
     return liste_champs
+
+
+# Création de la nouvelle branche Recuperation_Manuelle_B1
+def creation_courriel(liste_envoi):
+    string_courriel = recuperation_courriel_yaml()
+
+    message = MIMEMultipart("alternative")
+    message["Subject"] = "Voici les nouveaux contrevenants depuis " \
+                         "la derniere mise a jour !"
+    message["From"] = SOURCE_ADRESSE
+    message["To"] = string_courriel
+    msg_corps = creation_html_courriel(liste_envoi)
+    message.attach(MIMEText(msg_corps, "html"))
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.ehlo()
+    server.starttls()
+    server.login(SOURCE_ADRESSE, MOT_DE_PASSE)
+    message = message.as_string().encode('utf-8')
+    server.sendmail(SOURCE_ADRESSE, string_courriel, message)
+    server.quit()
+
+
+def creation_html_courriel(liste_envoi):
+    msg_corps = """<html><head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="utf-8">
+        </head><body>
+        <h2>Bonjour,</h2>
+        <p>Voici la liste des nouveaux contrevenants depuis notre derniere 
+        mise a jour pour la ville de Montreal</p>
+        <table style="border-collapse: collapse; border: 2px solid black; 
+        width: 100%"><thead>
+        <tr>
+        <th>Propriétaire</th><th>Catégorie</th><th>Établissement</th> 
+        <th>No Civique</th><th>Rue</th><th>Ville & Code Postal</th>
+        <th>Description</th><th>Date de l'infraction</th>
+        <th>Date du jugement</th><th>Montant</th>
+        </tr>
+        </thead><tbody>    
+    """
+    for un_etablissement in liste_envoi:
+        msg_corps += "<tr>"
+        for cle, valeur in un_etablissement.items():
+            msg_corps += "<td style=\"border: 1px solid black; padding: 5px; "
+            if cle == "montant":
+                msg_corps += "text-align: center\">" + str(valeur) + " $</td>"
+            elif cle == "description":
+                msg_corps += "text-align: justify\">" + valeur + "</td>"
+            else:
+                msg_corps += "text-align: center\">" + valeur + "</td>"
+
+        msg_corps += "</tr>"
+
+    msg_corps += "</tbody></table>"
+    msg_corps += "<p>Bonne journee</p>"
+    msg_corps += "</body></html>"
+
+    return msg_corps
+
+
+def recuperation_courriel_yaml():
+    string_courriel = ""
+    racine_liste = []
+    # Le fichier doit se trouver à la racine du projet
+    with open(r'adresse_destination.yaml') as file:
+        adresse_list = yaml.full_load(file)
+        for item, doc in adresse_list.items():
+            racine_liste.append(doc)
+
+    for une_sous_liste in racine_liste:
+        for liste_courriel in une_sous_liste:
+            string_courriel = liste_courriel
+
+    return string_courriel
 
 
 def nombre_critiere_recherche(liste_champs):

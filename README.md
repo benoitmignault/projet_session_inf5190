@@ -23,6 +23,7 @@ sudo apt-get install sqlite3
   * Jsonify
   * Apscheduler
   * YAML 
+  * Email
   * RAML qui nécessitera aussi l'installation de NPM
   * Flask Json Schema
   * Flask Json Schema Validateur 
@@ -36,6 +37,16 @@ pip3 install jsonify
 pip3 install APScheduler
 pip3 install pyyaml
 ```
+
+  * Pour offrir un système d'envoi de courriel, nous avons besoin d'un package pour gérer le tout
+```bash
+pip3 install email-to  
+```
+  * Dans le cadre du travail, nous avons créer un compte GMAIL uniquement pour la gestion des courriel
+    * b.mignault.uqam.qc.ca@gmail.com
+    * Uqam123((SUPER)))
+  * Les informations du courriel et password sont dans le fichier fonction.py comme constante  
+
   * Pour offrir une documentation  claire des services REST, on va utiliser RAML
     mais on doit installer NPM avant. 
     
