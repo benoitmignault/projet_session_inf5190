@@ -121,12 +121,12 @@ def construction_xml(ensemble_trouve):
     return xml_information.getvalue()
 
 
-def remplissage_champs_importation_xml(liste_champs_xml, un_contrevenant):
-    liste_champs_xml['proprietaire'] = un_contrevenant.find('proprietaire').text
-    liste_champs_xml['categorie'] = un_contrevenant.find('categorie').text
-    liste_champs_xml['etablissement'] = un_contrevenant.find(
+def remplissage_champs_importation_xml(liste_champs_xml, contrevenant):
+    liste_champs_xml['proprietaire'] = contrevenant.find('proprietaire').text
+    liste_champs_xml['categorie'] = contrevenant.find('categorie').text
+    liste_champs_xml['etablissement'] = contrevenant.find(
         'etablissement').text
-    adresse = un_contrevenant.find('adresse').text
+    adresse = contrevenant.find('adresse').text
     # Pour faire optimiser la recherche avec le nom de la rue, je met le
     # numéro civique dans une variable à part
     liste_champs_xml['no_civ'] = adresse.split(' ', 1)[0]
@@ -134,13 +134,13 @@ def remplissage_champs_importation_xml(liste_champs_xml, un_contrevenant):
     # Ceci est en raison des données de la ville qui contient un espace après
     # apostrophe ce qui ne sera pas utile lors de recherche d'un nom de rue
     liste_champs_xml['nom_rue'] = adresse.replace("' ", "'")
-    liste_champs_xml['ville'] = un_contrevenant.find('ville').text
-    liste_champs_xml['description'] = un_contrevenant.find('description').text
+    liste_champs_xml['ville'] = contrevenant.find('ville').text
+    liste_champs_xml['description'] = contrevenant.find('description').text
     liste_champs_xml['date_infraction'] = convertisseur_date(
-        un_contrevenant.find('date_infraction').text)
+        contrevenant.find('date_infraction').text)
     liste_champs_xml['date_jugement'] = convertisseur_date(
-        un_contrevenant.find('date_jugement').text)
-    montant_en_transformation = un_contrevenant.find('montant').text.split()
+        contrevenant.find('date_jugement').text)
+    montant_en_transformation = contrevenant.find('montant').text.split()
     liste_champs_xml['montant'] = int(montant_en_transformation[0])
 
     return liste_champs_xml
@@ -384,8 +384,9 @@ def situation_erreur(liste_validation):
                 cle != "champ_rue_vide"):
             if valeur:
                 liste_validation['situation_erreur'] = True
-                # Il n'est pas nécessaire de vérifier si il y a une autre erreur
-                # de validation à true.
+                # Il n'est pas nécessaire de vérifier
+                # si il y a une autre erreur
+
                 break
 
     return liste_validation
@@ -410,7 +411,8 @@ def message_erreur_recherche(liste_validation):
 
     else:
         messages = sous_message_erreur_proprietaire(messages, liste_validation)
-        messages = sous_message_erreur_etablissement(messages, liste_validation)
+        messages = sous_message_erreur_etablissement(messages,
+                                                     liste_validation)
         messages = sous_message_erreur_nom_rue(messages, liste_validation)
 
     return messages
@@ -418,7 +420,8 @@ def message_erreur_recherche(liste_validation):
 
 def sous_message_erreur_proprietaire(messages, liste_validation):
     if liste_validation['champ_proprietaire_inv']:
-        messages.append("Attention ! Le nom du propriétaire doit être valide !")
+        messages.append("Attention ! Le nom du propriétaire doit être "
+                        "valide !")
 
     if liste_validation['longueur_proprietaire_inv']:
         messages.append("Attention ! Le nom du propriétaire doit être entre "

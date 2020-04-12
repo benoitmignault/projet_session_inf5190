@@ -58,6 +58,13 @@ pip3 install elementpath
 pip3 install responses
 ```
 
+  * Il y a un dernier module utile à installer est celui pour valider 
+    notre style de codage par rapport à la norme PEP 8.
+```bash
+pip install pycodestyle
+pip install --upgrade pycodestyle
+```
+
 ## License
 
 * Travail présenté par Benoît Mignault étudiant de l'UQAM 

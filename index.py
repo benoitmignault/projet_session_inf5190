@@ -1,8 +1,8 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.combining import OrTrigger
 from apscheduler.triggers.cron import CronTrigger
-from flask import Flask, Response, jsonify, redirect, render_template, request,\
-    session, url_for
+from flask import Flask, Response, jsonify, redirect
+from flask import render_template, request, session, url_for
 from flask_json_schema import JsonSchema
 from flask_json_schema import JsonValidationError
 
@@ -222,7 +222,7 @@ def creation_plainte():
             liste_champs_plainte['description'])
 
         return jsonify({"Voici le numéro de la plainte ouverte":
-                            liste_champs_plainte['id_plainte']}), 201
+                        liste_champs_plainte['id_plainte']}), 201
 
     elif request.method == "GET":
         titre = "Nouvelle plainte"

@@ -78,8 +78,8 @@ class Database:
 
     def liste_contrevenant_interval(self, date_debut, date_fin):
         cursor = self.get_connection().cursor()
-        select = "select proprietaire, categorie, etablissement, no_civique, " \
-                 "nom_rue, ville, description, date_infraction," \
+        select = "select proprietaire, categorie, etablissement, " \
+                 "no_civique, nom_rue, ville, description, date_infraction, " \
                  "date_jugement, montant_amende, id_resto "
         fromm = "from mauvais_restaurants "
         where = "where date_infraction BETWEEN ? AND ? "
@@ -128,7 +128,8 @@ class Database:
         sql = select + fromm + where + order
         cursor.execute(sql, (nom,))
         result = cursor.fetchall()
-        ensemble_trouve = recuperation_liste_contravention_etablissement(result)
+        ensemble_trouve = recuperation_liste_contravention_etablissement(
+            result)
 
         return ensemble_trouve
 
@@ -137,8 +138,9 @@ class Database:
                                  nom_plaignant, description):
         connection = self.get_connection()
         insert_bd = "INSERT INTO departement_plaintes " \
-                    "(etablissement, no_civique, nom_rue, ville, date_visite," \
-                    "prenom_plaignant, nom_plaignant, description) " \
+                    "(etablissement, no_civique, nom_rue, ville, " \
+                    "date_visite, prenom_plaignant, nom_plaignant, " \
+                    "description) " \
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
         connection.execute(insert_bd,
                            (etablissement, no_civique, nom_rue,
@@ -315,15 +317,15 @@ def recuperation_resultat_liste(result):
 def recuperation_liste_contravention_etablissement(result):
     ensemble_trouve = []
     if result is not None:
-        for une_contravention in result:
-            sous_ensemble = {'Catégorie': une_contravention[0],
-                             'Adresse': une_contravention[1] + " " +
-                                        une_contravention[2],
-                             'Ville': une_contravention[3],
-                             'Description': une_contravention[4],
-                             "Date d'infraction": une_contravention[5],
-                             'Date de jugement': une_contravention[6],
-                             "Montant de l'amende": une_contravention[7]}
+        for contravention in result:
+            sous_ensemble = {'Catégorie': contravention[0],
+                             'Adresse':
+                                 contravention[1] + " " + contravention[2],
+                             'Ville': contravention[3],
+                             'Description': contravention[4],
+                             "Date d'infraction": contravention[5],
+                             'Date de jugement': contravention[6],
+                             "Montant de l'amende": contravention[7]}
             ensemble_trouve.append(sous_ensemble)
 
     return ensemble_trouve
