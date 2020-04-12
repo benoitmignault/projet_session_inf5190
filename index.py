@@ -1,7 +1,7 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.combining import OrTrigger
 from apscheduler.triggers.cron import CronTrigger
-from flask import Flask, Response, jsonify, redirect, render_template, request, \
+from flask import Flask, Response, jsonify, redirect, render_template, request,\
     session, url_for
 from flask_json_schema import JsonSchema
 from flask_json_schema import JsonValidationError
