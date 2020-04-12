@@ -8,6 +8,7 @@ from flask_json_schema import JsonValidationError
 
 from modules.fonction import *
 from validateur_plainte_json_schema import nouvelle_plainte_etablissement
+from validateur_profil_json_schema import nouveau_profil
 
 app = Flask(__name__, static_url_path='', static_folder='static')
 schema = JsonSchema(app)
@@ -25,9 +26,10 @@ def not_found(e):
 
 
 @app.errorhandler(JsonValidationError)
-def validation_error(e):
-    errors = [validation_error.message for validation_error in e.errors]
-    return jsonify({'error': e.message, 'errors': errors}), 400
+def validation_error(erreur):
+    errors = [validation.message for validation in erreur.errors]
+    return jsonify({"Le champ en problème": erreur.message,
+                    "Le message d'erreur": errors}), 400
 
 
 @app.teardown_appcontext
@@ -222,7 +224,7 @@ def creation_plainte():
             liste_champs_plainte['description'])
 
         return jsonify({"Voici le numéro de la plainte ouverte":
-                        liste_champs_plainte['id_plainte']}), 201
+                            liste_champs_plainte['id_plainte']}), 201
 
     elif request.method == "GET":
         titre = "Nouvelle plainte"
@@ -243,6 +245,16 @@ def delete_person(id_plainte):
 
 
 # Cette fonction est pour la tache E1
+@app.route('/api/nouveau_profil', methods=["GET", "POST"])
+@schema.validate(nouveau_profil)
+def creation_profil():
+    if request.method == "POST":
+        liste_champs_profil = initial_champ_nouveau_profil()
+        liste_champs_profil = remplissage_champ_nouvelle_profil(
+            request, liste_champs_profil)
+        conn_db = get_db()
+        print(liste_champs_profil)
+        return "", 201
 
 
 def main():
