@@ -42,8 +42,6 @@ def get_db():
     return g._database
 
 
-# Fonction pour création la connexion qui sera utilisé dans un contexte hors
-# d'une route utilisée avec Flask
 def initialisation_connexion_hors_flask():
     connection = Database()
     connection.get_connection()
@@ -81,6 +79,7 @@ def mise_jour_bd():
             liste_envoi.append(liste_champs_xml)
 
     creation_courriel(liste_envoi)
+    # Ajout de la branche Recuperation_Manuelle_B2
     connection.disconnect()
 
 
@@ -103,11 +102,6 @@ def initial_champ_importation_xml():
                         "etablissement": "", "no_civ": "", "nom_rue": "",
                         "ville": "", "description": "", "date_infraction": "",
                         "date_jugement": "", "montant": 0}
-
-    # liste_champs_xml
-
-    # liste_champs_xml = {0: "", 1: "", 2: "", 3: "", 4: "",
-    #                    5: "", 6: "", 7: "", 8: "", 9: 0}
 
     return liste_champs_xml
 
