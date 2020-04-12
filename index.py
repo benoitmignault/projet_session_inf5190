@@ -242,6 +242,9 @@ def delete_person(id_plainte):
         return {"La plainte a bien été supprimée": no_plainte}, 200
 
 
+# Cette fonction est pour la tache E1
+
+
 def main():
     importation_donnees()
 
