@@ -295,6 +295,8 @@ def remplissage_champ_nouvelle_profil(request, liste_champs):
     return liste_champs
 
 
+# Création de la nouvelle branche Recuperation_Manuelle_B1
+
 def nombre_critiere_recherche(liste_champs):
     nombre = 0
 
