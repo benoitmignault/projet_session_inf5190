@@ -87,6 +87,15 @@ pip3 install responses
 pip install pycodestyle
 pip install --upgrade pycodestyle
 ```
+## Le site internet est muni de plusieurs routes.
+    Nous avons fourni plusieurs service REST qui offre plusieurs fonctionnalités 
+    à l'utilisateur et ainsi à des processus automatisé qui voudront intéragir 
+    avec le site.
+    
+    La documentation pour l'utilisation de ces services RESt sont disponible à l'adresse
+   
+   [Lien pour la documentation](http://127.0.0.1:5000/doc)
+
 
 ## License
 
