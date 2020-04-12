@@ -172,6 +172,31 @@ class Database:
         connection.execute(sql, (no_plainte,))
         connection.commit()
 
+    def inserer_nouveau_profil(self, nom, prenom, courriel, password, salt,
+                               liste_etablissement):
+        connection = self.get_connection()
+        insert_bd = "INSERT INTO profil_utilisateur " \
+                    "(nom, prenom, courriel, password, salt) " \
+                    "VALUES (?, ?, ?, ?, ?)"
+        connection.execute(insert_bd, (nom, prenom, courriel, password, salt))
+        connection.commit()
+        # Maintenant, on va récupérer le id_personne.
+        # Ce dernier, il sera utilser pour associer chaque établissement
+        # à la personne lors de la création du profil
+        cursor = connection.cursor()
+        cursor.execute("select max(id_personne) from profil_utilisateur")
+        result = cursor.fetchall()
+        self.inserer_etablissement_surveiller_par_profil(result[0][0],
+                                                         liste_etablissement)
+
+    def inserer_etablissement_surveiller_par_profil(self, id_personne, liste):
+        connection = self.get_connection()
+        for un_etablissement in liste:
+            insert_bd = "INSERT INTO etablissement_surveiller " \
+                        "(id_personne, etablissement) VALUES (?, ?)"
+            connection.execute(insert_bd, (id_personne, un_etablissement))
+            connection.commit()
+
 
 def remplissage_condition_sql(liste_champs):
     # La préparation des critères en vue d'utiliser l'opérateur like aura

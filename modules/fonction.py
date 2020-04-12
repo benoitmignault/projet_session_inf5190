@@ -3,6 +3,9 @@ import re  # pour la gestion des patterns pour les différents champs input
 import xml.etree.ElementTree as ET
 from io import BytesIO, StringIO
 
+import hashlib
+import uuid
+
 import requests
 from flask import g
 
@@ -96,6 +99,14 @@ def initial_champ_importation_xml():
                         "date_jugement": "", "montant": 0}
 
     return liste_champs_xml
+
+
+def initial_champ_nouveau_profil():
+    liste_champs = {"nom": "", "prenom": "", "courriel": "", "password": "",
+                    "liste_etablissement": [], "salt": "", "id_personne": 0,
+                    "id_photo": 0}
+
+    return liste_champs
 
 
 # Fonction pour récupérer les informations venant de URL
@@ -263,6 +274,23 @@ def remplissage_champ_nouvelle_plainte(request, liste_champs):
     liste_champs['prenom_plaignant'] = data['prenom_plaignant']
     liste_champs['nom_plaignant'] = data['nom_plaignant']
     liste_champs['description'] = data['description']
+
+    return liste_champs
+
+
+def remplissage_champ_nouvelle_profil(request, liste_champs):
+    data = request.get_json()
+    liste_champs['nom'] = data['nom']
+    liste_champs['prenom'] = data['prenom']
+    liste_champs['courriel'] = data['courriel']
+    liste_champs['password'] = data['password']
+    salt = uuid.uuid4().hex
+    liste_champs['salt'] = salt
+    liste_champs['password'] = hashlib.sha512(
+        str(liste_champs['password'] + salt).encode("utf-8")).hexdigest()
+
+    for un_etablissement in data['liste_etablissement']:
+        liste_champs['liste_etablissement'].append(un_etablissement)
 
     return liste_champs
 
