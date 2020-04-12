@@ -224,7 +224,7 @@ def creation_plainte():
             liste_champs_plainte['description'])
 
         return jsonify({"Voici le numéro de la plainte ouverte":
-                            liste_champs_plainte['id_plainte']}), 201
+                        liste_champs_plainte['id_plainte']}), 201
 
     elif request.method == "GET":
         titre = "Nouvelle plainte"
@@ -253,8 +253,13 @@ def creation_profil():
         liste_champs_profil = remplissage_champ_nouvelle_profil(
             request, liste_champs_profil)
         conn_db = get_db()
-        print(liste_champs_profil)
-        return "", 201
+        conn_db.inserer_nouveau_profil(
+            liste_champs_profil['nom'], liste_champs_profil['prenom'],
+            liste_champs_profil['courriel'], liste_champs_profil['password'],
+            liste_champs_profil['salt'],
+            liste_champs_profil['liste_etablissement'])
+
+        return jsonify({"Création du nouveau profil": "Succès !"}), 201
 
 
 def main():

@@ -103,7 +103,8 @@ def initial_champ_importation_xml():
 
 def initial_champ_nouveau_profil():
     liste_champs = {"nom": "", "prenom": "", "courriel": "", "password": "",
-                    "liste_etablissement": [], "salt": ""}
+                    "liste_etablissement": [], "salt": "", "id_personne": 0,
+                    "id_photo": 0}
 
     return liste_champs
 
