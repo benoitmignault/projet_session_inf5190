@@ -262,6 +262,9 @@ def creation_profil():
         return jsonify({"Création du nouveau profil": "Succès !"}), 201
 
 
+# Cette fonction est pour la tache E2
+
+
 # La fonction sera exécuté à chaque jour à minuit, automatiquement
 mise_jour_contrevenants()
 
