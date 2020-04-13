@@ -172,6 +172,19 @@ class Database:
         connection.execute(sql, (no_plainte,))
         connection.commit()
 
+    def verification_profil_existant(self, courriel):
+        cursor = self.get_connection().cursor()
+        select = "SELECT courriel "
+        fromm = "FROM profil_utilisateur "
+        where = "WHERE courriel = ? "
+        sql = select + fromm + where
+        cursor.execute(sql, (courriel,))
+        result = cursor.fetchall()
+        if len(result) is 0:
+            return None
+        else:
+            return result[0][0]
+
     def inserer_nouveau_profil(self, nom, prenom, courriel, password, salt,
                                liste_etablissement):
         connection = self.get_connection()

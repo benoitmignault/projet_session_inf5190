@@ -224,7 +224,7 @@ def creation_plainte():
             liste_champs_plainte['description'])
 
         return jsonify({"Voici le numéro de la plainte ouverte":
-                        liste_champs_plainte['id_plainte']}), 201
+                            liste_champs_plainte['id_plainte']}), 201
 
     elif request.method == "GET":
         titre = "Nouvelle plainte"
@@ -249,17 +249,27 @@ def suppression_plainte(id_plainte):
 @schema.validate(nouveau_profil)
 def creation_profil():
     if request.method == "POST":
+        conn_db = get_db()
         liste_champs_profil = initial_champ_nouveau_profil()
         liste_champs_profil = remplissage_champ_nouvelle_profil(
             request, liste_champs_profil)
-        conn_db = get_db()
-        conn_db.inserer_nouveau_profil(
-            liste_champs_profil['nom'], liste_champs_profil['prenom'],
-            liste_champs_profil['courriel'], liste_champs_profil['password'],
-            liste_champs_profil['salt'],
-            liste_champs_profil['liste_etablissement'])
 
-        return jsonify({"Création du nouveau profil": "Succès !"}), 201
+        courriel = conn_db.verification_profil_existant(
+            liste_champs_profil['courriel'])
+
+        if courriel is None:
+            conn_db.inserer_nouveau_profil(
+                liste_champs_profil['nom'], liste_champs_profil['prenom'],
+                liste_champs_profil['courriel'],
+                liste_champs_profil['password'],
+                liste_champs_profil['salt'],
+                liste_champs_profil['liste_etablissement'])
+
+            return jsonify({"Création du nouveau profil": "Succès !"}), 201
+
+        else:
+            return jsonify({"Impossible de créer le profil":
+                            "Courriel est déjà présent !"}), 404
 
 
 # Cette fonction est pour la tache E2
