@@ -248,7 +248,14 @@ def suppression_plainte(id_plainte):
 @app.route('/api/nouveau_profil', methods=["GET", "POST"])
 @schema.validate(nouveau_profil)
 def creation_profil():
-    if request.method == "POST":
+    if request.method == "GET":
+        conn_db = get_db()
+        liste_etablissement = conn_db.liste_tous_restaurants()
+        titre = "Création d'un profil"
+        return render_template('creation_profil.html', titre=titre,
+                               liste_etablissement=liste_etablissement)
+
+    elif request.method == "POST":
         conn_db = get_db()
         liste_champs_profil = initial_champ_nouveau_profil()
         liste_champs_profil = remplissage_champ_nouvelle_profil(
@@ -269,7 +276,7 @@ def creation_profil():
 
         else:
             return jsonify({"Impossible de créer le profil":
-                            "Courriel est déjà présent !"}), 404
+                                "Courriel est déjà présent !"}), 404
 
 
 # Cette fonction est pour la tache E2

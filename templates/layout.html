@@ -6,7 +6,7 @@
     <meta content="width=device-width, initial-scale=1" name="viewport">
     <meta content="Centre Information sur les restaurants fautfis de Montréal"
           name="description">
-    
+
     <!-- Ici , on va déterminer quelle icône sera afficher dans l'onglet de la page du site web -->
     {% if not erreur_400 and not erreur_404 %}
     <!-- «Réutilisation permise» -->
@@ -22,21 +22,28 @@
     <!-- Fichier 404-notfound.jpg est une propriété du site https://www.flickr.com/photos/guspim/2280690094/ sous licence libre -->
     <link href="/img/icone404.jpg" rel="shortcut icon">
     {% endif %}
-    
-    <!-- Mon design de mes différents pages web -->
-    <link href="/css/restaurant.css" rel="stylesheet" type="text/css">
-    <link href="/css/responsive.css" rel="stylesheet" type="text/css">
-    
+
     {% if titre %}
     <title>Restaurant - {{ titre }}</title>
+    {% if titre == "Création d'un profil" %}
+    <!-- Licence :
+    Select2 is licensed under the Apache Software Foundation License Version 2.0
+    and GPL Version 2.0. Coded by Igor Vaynberg. -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css"
+          rel="stylesheet">
+    {% endif %}
     {% else %}
     <title>Restaurant - CMS</title>
     {% endif %}
+    <!-- Mon design de mes différents pages web -->
+    <link href="/css/restaurant.css" rel="stylesheet" type="text/css">
+    <link href="/css/responsive.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-    {% block content %}{% endblock %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
-    <script src="/js/restaurant.js"></script>
+{% block content %}{% endblock %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+<script src="/js/restaurant.js"></script>
 </body>
 </html>

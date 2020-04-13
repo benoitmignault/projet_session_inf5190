@@ -548,4 +548,7 @@ document.addEventListener('DOMContentLoaded', function () {
     reset_recherche();
     reset_recherche_interval();
     reset_demande_plainte();
+    $('.js-example-basic-multiple').select2({
+        placeholder: 'Sélectionner un ou plusieurs établissements'
+    });
 });
