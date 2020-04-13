@@ -96,9 +96,11 @@ def mise_jour_bd():
             liste_envoi.append(liste_champs_xml)
             liste_nom_contrevenant.append(liste_champs_xml["proprietaire"])
 
-    creation_courriel(liste_envoi)
-    conn_auth = connexion_twitter()
-    creation_tweet(conn_auth, liste_nom_contrevenant)
+    if len(liste_envoi) > 0:
+        creation_courriel(liste_envoi)
+        conn_auth = connexion_twitter()
+        creation_tweet(conn_auth, liste_nom_contrevenant)
+        
     connection.disconnect()
 
 
