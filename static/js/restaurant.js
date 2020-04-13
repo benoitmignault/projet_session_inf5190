@@ -541,6 +541,11 @@ function creation_bloc_html_plainte(listes){
     return result_liste;
 }
 
+function creation_select2(){
+    $('.js-example-basic-multiple').select2({
+        placeholder: 'Sélectionner un ou plusieurs établissements'
+    });
+}
 document.addEventListener('DOMContentLoaded', function () {
     validation_champs_recherches();
     recherche_rapide();
@@ -548,7 +553,5 @@ document.addEventListener('DOMContentLoaded', function () {
     reset_recherche();
     reset_recherche_interval();
     reset_demande_plainte();
-    $('.js-example-basic-multiple').select2({
-        placeholder: 'Sélectionner un ou plusieurs établissements'
-    });
+    creation_select2();
 });
