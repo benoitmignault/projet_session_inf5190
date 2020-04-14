@@ -279,6 +279,36 @@ def creation_profil():
                             "Courriel est déjà présent !"}), 404
 
 
+# Cette fonction est pour la tache E2
+@app.route('/connexion', methods=["GET", "POST"])
+def connexion_profil():
+    # Dans le get, on devra vérifier si le user est connecté
+    if request.method == "GET":
+        titre = "Page de Connexion !"
+        return render_template("login.html", titre=titre)
+
+    elif request.method == "POST":
+        liste_champs_connexion = initial_champ_connexion()
+        liste_validation_connexion = initial_champ_connexion_validation()
+        liste_champs_connexion = remplissage_champ_connexion(
+            request, liste_champs_connexion)
+        conn_db = get_db()
+        # Validation que les données sont valide
+        liste_validation_connexion = validation_champ_connexion(
+            liste_champs_connexion, liste_validation_connexion)
+
+        utilisateur = conn_db.recuperation_info_connexion(
+            liste_champs_connexion['courriel'])
+        if utilisateur is None:
+            liste_validation_connexion['champ_courriel_non_trouve'] = True
+
+        else:
+            liste_champs_connexion = remplissage_post_verification_conn(
+                liste_champs_connexion, utilisateur)
+
+
+
+
 # La fonction sera exécuté à chaque jour à minuit, automatiquement
 mise_jour_contrevenants()
 

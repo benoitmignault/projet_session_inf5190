@@ -210,6 +210,19 @@ class Database:
             connection.execute(insert_bd, (id_personne, un_etablissement))
             connection.commit()
 
+    def recuperation_info_connexion(self, courriel):
+        cursor = self.get_connection().cursor()
+        select = "SELECT salt, hash "
+        fromm = "FROM profil_utilisateur "
+        where = "WHERE courriel = ? "
+        sql = select + fromm + where
+        cursor.execute(sql, (courriel,))
+        result = cursor.fetchone()
+        if result is None:
+            return None
+        else:
+            return result[0], result[1]
+
 
 def remplissage_condition_sql(liste_champs):
     # La préparation des critères en vue d'utiliser l'opérateur like aura
