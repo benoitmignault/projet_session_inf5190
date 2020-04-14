@@ -276,10 +276,7 @@ def creation_profil():
 
         else:
             return jsonify({"Impossible de créer le profil":
-                                "Courriel est déjà présent !"}), 404
-
-
-# Cette fonction est pour la tache E2
+                            "Courriel est déjà présent !"}), 404
 
 
 # La fonction sera exécuté à chaque jour à minuit, automatiquement

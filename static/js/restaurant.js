@@ -134,10 +134,6 @@ function reset_nouveau_profil(){
         champ_password.defaultValue = "";
         champ_password_conf.defaultValue = "";
 
-        // Baseball123(((
-        // select2-selection__rendered <--- UL
-        // select2-selection__choice <--- LI
-
         $('.select2-selection__rendered .select2-selection__choice').each(function () {
             $(this).remove(); // Remove li one by one
         });
@@ -255,9 +251,7 @@ function demande_nouveau_profil(){
         liste_validation = verification_tous_champs_valide(liste_validation);
 
         if (!liste_validation['requete_ajax_avec_erreur']){
-            // Créer l'appel Ajax
-            console.log("ca marche");
-            var liste_etablissements = document.querySelector('.select2-selection__choice');
+            appel_ajax_nouveau_profil();
         }
     });
 }
@@ -643,7 +637,7 @@ function appel_ajax_nouvelle_plainte(){
         if (ajax.readyState === XMLHttpRequest.DONE) {
             if (ajax.status === 201) {
                 var liste = JSON.parse(ajax.responseText);
-                result_plainte.innerHTML = creation_bloc_html_plainte(liste);
+                result_plainte.innerHTML = creation_bloc_html(liste);
             } else {
                 appel_ajax_plainte_succes_mais_erreur();
                 message_erreur_plainte.innerHTML += "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
@@ -664,6 +658,42 @@ function appel_ajax_nouvelle_plainte(){
     ajax.open("POST", "/api/nouvelle_plainte", true);
     ajax.setRequestHeader("Content-Type", "application/json");
     ajax.send(data_json);
+}
+
+function appel_ajax_nouveau_profil(){
+    var ajax = new XMLHttpRequest();
+    ajax.onreadystatechange = function() {
+        if (ajax.readyState === XMLHttpRequest.DONE) {
+            if (ajax.status === 201) {
+                var liste = JSON.parse(ajax.responseText);
+                result_profil.innerHTML = creation_bloc_html(liste);
+            } else {
+                appel_ajax_profil_succes_mais_erreur();
+                message_erreur_profil.innerHTML += "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
+            }
+        }
+    };
+    var data = {
+            "nom": champ_nom.value,
+            "prenom": champ_prenom.value,
+            "courriel": champ_courriel.value,
+            "password": champ_password.value,
+            "liste_etablissement": []
+    };
+    var liste_etablissements = document.querySelectorAll('.select2-selection__choice');
+    liste_etablissements.forEach(function(un_etablissement){
+        data["liste_etablissement"].push(un_etablissement.title.trim());
+    });
+
+    var data_json = JSON.stringify(data);
+    ajax.open("POST", "/api/nouveau_profil", true);
+    ajax.setRequestHeader("Content-Type", "application/json");
+    ajax.send(data_json);
+}
+
+function appel_ajax_profil_succes_mais_erreur(){
+    result_profil.innerHTML = "";
+    form_nouveau_profil.style.border = "2px solid red";
 }
 
 function appel_ajax_interval_succes_mais_erreur(){
@@ -719,7 +749,7 @@ function creation_bloc_html_etablissement(listes){
     return result_liste;
 }
 
-function creation_bloc_html_plainte(listes){
+function creation_bloc_html(listes){
     var result_liste = "";
     result_liste += "<table class=\"tabeau_resto\"><tbody>";
     for (var key in listes) {

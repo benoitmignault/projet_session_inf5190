@@ -82,6 +82,7 @@ h2 {
     margin: 0px;
 }
 
+.container > .zone_recherche_resto > #result_profil,
 .container > .zone_recherche_resto > #result_interval_etablissement,
 .container > .zone_recherche_resto > #result_interval,
 .container > .zone_recherche_resto > #result_plainte,
@@ -129,6 +130,7 @@ h2 {
     margin-bottom: 15px;
 }
 
+.container > .zone_recherche_resto > #result_profil,
 .container > .zone_recherche_resto > #result_plainte,
 .container > .zone_recherche_resto > #result_interval_etablissement,
 .container > .zone_recherche_resto > #result_interval{
@@ -242,6 +244,7 @@ Fin de l'ajout du recentrage de attribut legend
     font-weight: bold;
 }
 
+.container > .zone_recherche_resto > #result_profil > .tabeau_resto,
 .container > .zone_recherche_resto > #result_plainte > .tabeau_resto,
 .container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto,
 .container > .zone_recherche_resto > #result_interval > .tabeau_resto,
@@ -256,6 +259,7 @@ Fin de l'ajout du recentrage de attribut legend
     padding: 10px;
 }
 
+.container > .zone_recherche_resto > #result_profil > .tabeau_resto,
 .container > .zone_recherche_resto > #result_plainte > .tabeau_resto,
 .container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto{
     margin-bottom: 15px;
@@ -300,6 +304,7 @@ Fin de l'ajout du recentrage de attribut legend
     width: 20%;
 }
 
+.container > .zone_recherche_resto > #result_profil > .tabeau_resto .plainte_cle,
 .container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_cle,
 .container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .cle,
 .container > .zone_recherche_resto > .tabeau_resto .cle{
@@ -308,6 +313,7 @@ Fin de l'ajout du recentrage de attribut legend
     width: 30%;
 }
 
+.container > .zone_recherche_resto > #result_profil > .tabeau_resto .plainte_valeur,
 .container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_valeur,
 .container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .valeur,
 .container > .zone_recherche_resto > .tabeau_resto .valeur{
@@ -315,11 +321,13 @@ Fin de l'ajout du recentrage de attribut legend
     width: 70%;
 }
 
+.container > .zone_recherche_resto > #result_profil > .tabeau_resto .plainte_cle,
 .container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_cle{
     width: 70%;
     color: #006400;
 }
 
+.container > .zone_recherche_resto > #result_profil > .tabeau_resto .plainte_valeur,
 .container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_valeur{
     width: 30%;
     color: #006400;
@@ -442,6 +450,7 @@ Fin de l'ajout du recentrage de attribut legend
 /* CSS modifié du fichier select2.min.css fourni via
     https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/
 */
+
 .container > .zone_recherche_resto > #nouveau_profil > .modif > .information > div > span > .selection > .select2-selection--multiple{
     border-radius: 10px;
 }
