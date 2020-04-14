@@ -306,30 +306,24 @@ Fin de l'ajout du recentrage de attribut legend
 
 .container > .zone_recherche_resto > #result_profil > .tabeau_resto .plainte_cle,
 .container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_cle,
-.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .cle,
-.container > .zone_recherche_resto > .tabeau_resto .cle{
+.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .cle{
     font-weight: bold;
     text-align: right;
-    width: 30%;
+}
+.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .cle{
+    width: 25%;
 }
 
-.container > .zone_recherche_resto > #result_profil > .tabeau_resto .plainte_valeur,
-.container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_valeur,
-.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .valeur,
-.container > .zone_recherche_resto > .tabeau_resto .valeur{
+.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .valeur{
     text-align: justify;
-    width: 70%;
+    width: 75%;
 }
 
 .container > .zone_recherche_resto > #result_profil > .tabeau_resto .plainte_cle,
-.container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_cle{
-    width: 70%;
-    color: #006400;
-}
-
 .container > .zone_recherche_resto > #result_profil > .tabeau_resto .plainte_valeur,
+.container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_cle,
 .container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_valeur{
-    width: 30%;
+    width: 50%;
     color: #006400;
 }
 

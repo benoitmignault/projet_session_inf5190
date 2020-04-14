@@ -139,7 +139,6 @@ function reset_nouveau_profil(){
         });
         // Champ où est affiché la liste sans être la liste
         var champ_liste_etablissement = document.querySelector('.select2-search__field');
-        var boite_champ_liste_etablissement = document.querySelector('.select2-selection--multiple');
         var section_afficher_liste = document.querySelector('.select2-search--inline');
         // Remise aux valeurs initiales du champ
         champ_liste_etablissement.placeholder = "Choix d'(es) établissement(s)";
@@ -151,7 +150,6 @@ function reset_nouveau_profil(){
         initialiser_tous_champs("input[type=email]");
         initialiser_tous_champs("input[type=text]");
         initialiser_tous_champs("#nouveau_profil");
-        initialiser_tous_champs(".select2-selection--multiple");
     });
 }
 
@@ -251,6 +249,8 @@ function demande_nouveau_profil(){
         liste_validation = verification_tous_champs_valide(liste_validation);
 
         if (!liste_validation['requete_ajax_avec_erreur']){
+            // Il se pourrait que la requête précédente était invalide
+            initialiser_tous_champs("#nouveau_profil");
             appel_ajax_nouveau_profil();
         }
     });
@@ -667,9 +667,13 @@ function appel_ajax_nouveau_profil(){
             if (ajax.status === 201) {
                 var liste = JSON.parse(ajax.responseText);
                 result_profil.innerHTML = creation_bloc_html(liste);
-            } else {
+            } else{
                 appel_ajax_profil_succes_mais_erreur();
-                message_erreur_profil.innerHTML += "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
+                if (ajax.status === 404)  {
+                    result_profil.innerHTML = "<p class=\"aucun\">Impossible de créer le profil, car le Courriel est déjà présent !</p>";
+                } else {
+                    message_erreur_profil.innerHTML += "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
+                }
             }
         }
     };
