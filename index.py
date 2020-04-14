@@ -293,9 +293,6 @@ def connexion_profil():
         liste_champs_connexion = remplissage_champ_connexion(
             request, liste_champs_connexion)
         conn_db = get_db()
-        # Validation que les données sont valide
-        liste_validation_connexion = validation_champ_connexion(
-            liste_champs_connexion, liste_validation_connexion)
 
         utilisateur = conn_db.recuperation_info_connexion(
             liste_champs_connexion['courriel'])
@@ -305,6 +302,10 @@ def connexion_profil():
         else:
             liste_champs_connexion = remplissage_post_verification_conn(
                 liste_champs_connexion, utilisateur)
+
+        # Validation que les données sont valide
+        liste_validation_connexion = validation_champ_connexion(
+            liste_champs_connexion, liste_validation_connexion)
 
 
 

@@ -143,7 +143,7 @@ def initial_champ_nouveau_profil():
 
 def initial_champ_connexion():
     liste_champs = {"courriel": "", "password": "", "salt": "", "hash": "",
-                    "password_hasher": ""}
+                    "password_hasher": "", "id_session": ""}
 
     return liste_champs
 
@@ -457,25 +457,13 @@ def nombre_critiere_recherche(liste_champs):
     return nombre
 
 
-"""
- liste_validation = {"situation_erreur": False,
-                    "champ_courriel_vide": False,
-                    "champ_password_vide": False,
-                    "champ_courriel_inv": False,
-                    "champ_password_inv": False,
-                    "champ_courriel_non_trouve": False,
-                    "champ_password_non_trouve": False,
-                    "longueur_courriel_inv": False,
-                    "longueur_password_inv": False}
-"""
-
-
 def validation_champ_connexion(liste_champs, liste_validation):
-    liste_validation = sous_validation_courriel_connexion(liste_champs,
-                                                          liste_validation)
+    if not liste_validation['champ_courriel_non_trouve']:
+        liste_validation = sous_validation_courriel_connexion(liste_champs,
+                                                              liste_validation)
 
-    liste_validation = sous_validation_password_connexion(liste_champs,
-                                                          liste_validation)
+        liste_validation = sous_validation_password_connexion(liste_champs,
+                                                              liste_validation)
 
     return liste_validation
 
@@ -506,6 +494,9 @@ def sous_validation_password_connexion(liste_champs, liste_validation):
 
         if not (8 < len(liste_champs['password']) < 20):
             liste_validation['longueur_password_inv'] = True
+
+        if not liste_champs['password_hasher'] == liste_champs['hash']:
+            liste_validation['champ_password_non_trouve'] = True
 
     return liste_validation
 
