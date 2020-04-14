@@ -32,12 +32,27 @@ const champ_prenom_plaignant = document.querySelector('#prenom_plaignant');
 const champ_nom_plaignant = document.querySelector('#nom_plaignant');
 const champ_description = document.querySelector('#description');
 
+// Variable pour la création du profil
+const form_nouveau_profil = document.querySelector('#nouveau_profil');
+const btn_reset_profil = document.querySelector('#btn_reset_profil');
+const message_erreur_profil = document.querySelector('#message_erreur_profil');
+const result_profil = document.querySelector('#result_profil');
+const champ_prenom = document.querySelector('#prenom');
+const champ_nom = document.querySelector('#nom');
+const champ_courriel = document.querySelector('#courriel');
+const champ_password = document.querySelector('#password');
+const champ_password_conf = document.querySelector('#password_conf');
+// Les variables de la liste des établissements seront crée au besoin
+
 const pattern_date = new RegExp("^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$");
 const pattern_code = new RegExp("^[A-Z][0-9][A-Z][ ]{1}[0-9][A-Z][0-9]$");
 const pattern_proprio = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,98}[a-z0-9A-Z.)]$");
 const pattern_resto = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,63}[a-z0-9A-Z.)]$");
 const pattern_ville = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,31}[a-z0-9A-Z.)]$");
 const pattern_rue = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z]{1,33}[a-z0-9A-Z]$");
+const pattern_courriel = new RegExp("^([a-zA-Z0-9_\\.\\-\\+])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+$");
+const pattern_prenom_nom = new RegExp("^[A-Z][a-z-A-Z]{1,48}[a-z]$");
+const pattern_password = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*()?&])[A-Za-z\\d@()$!%*?&]{8,20}$");
 
 function initial_plainte_validation(){
     var liste_validation = {"champ_resto_vide": false, "champ_numero_vide": false,
@@ -46,6 +61,17 @@ function initial_plainte_validation(){
         "champ_date_inv": false, "champ_prenom_vide": false, "champ_nom_vide": false,
         "champ_description_vide": false, "champ_resto_inv": false, "champ_rue_inv": false,
         "champ_ville_inv": false, "requete_ajax_avec_erreur": false};
+
+    return liste_validation;
+}
+
+function initial_profil_validation(){
+    var liste_validation = {"champ_prenom_vide": false, "champ_nom_vide": false,
+        "champ_prenom_inv": false, "champ_nom_inv": false, "champ_courriel_vide": false,
+        "champ_password_vide": false, "champ_password_conf_vide": false,
+        "champ_courriel_inv": false, "champ_password_inv": false, "champ_password_conf_inv": false,
+        "champ_passwords_non_egal": false, "requete_ajax_avec_erreur": false,
+        "champ_liste_resto_profil_vide": false};
 
     return liste_validation;
 }
@@ -100,14 +126,50 @@ function reset_demande_plainte(){
     });
 }
 
+function reset_nouveau_profil(){
+    $(btn_reset_profil).click(function() {
+        champ_prenom.defaultValue = "";
+        champ_nom.defaultValue = "";
+        champ_courriel.defaultValue = "";
+        champ_password.defaultValue = "";
+        champ_password_conf.defaultValue = "";
+
+        // Baseball123(((
+        // select2-selection__rendered <--- UL
+        // select2-selection__choice <--- LI
+
+        $('.select2-selection__rendered .select2-selection__choice').each(function () {
+            $(this).remove(); // Remove li one by one
+        });
+        // Champ où est affiché la liste sans être la liste
+        var champ_liste_etablissement = document.querySelector('.select2-search__field');
+        var boite_champ_liste_etablissement = document.querySelector('.select2-selection--multiple');
+        var section_afficher_liste = document.querySelector('.select2-search--inline');
+        // Remise aux valeurs initiales du champ
+        champ_liste_etablissement.placeholder = "Choix d'(es) établissement(s)";
+        section_afficher_liste.style.width = "100%";
+        champ_liste_etablissement.style.width = "100%";
+        result_profil.innerHTML = "";
+        effacer_messages_erreurs(message_erreur_profil);
+        initialiser_tous_champs("input[type=password]");
+        initialiser_tous_champs("input[type=email]");
+        initialiser_tous_champs("input[type=text]");
+        initialiser_tous_champs("#nouveau_profil");
+        initialiser_tous_champs(".select2-selection--multiple");
+    });
+}
+
 function initialiser_tous_champs(type_champs){
     var tous_champs = document.querySelectorAll(type_champs);
     tous_champs.forEach(function(un_champ){
-        if (type_champs == "input[type=text]" || type_champs == "#liste_resto"){
-            un_champ.style.background = "white";
-            un_champ.style.border = "1px solid #ccc";
-        } else if (type_champs == "#recherche_par_interval" || type_champs == "#recherche"){
+        if (type_champs == "#nouveau_profil" ||
+            type_champs == "#nouvelle_plainte" ||
+            type_champs == "#recherche_par_interval" ||
+            type_champs == "#recherche"){
             un_champ.style.border = "2px solid black";
+        } else {
+            un_champ.style.backgroundColor = "white";
+            un_champ.style.border = "1px solid #ccc";
         }
     });
 }
@@ -172,13 +234,30 @@ function recherche_rapide(){
 function demande_plainte(){
     $(form_nouvelle_plainte).submit(function (e) {
         e.preventDefault();
-        message_erreur_plainte.innerHTML = ""; // On remet la section des messages vide
+        message_erreur_plainte.innerHTML = "";
         var liste_validation = initial_plainte_validation();
         liste_validation = verification_nouvelle_plainte(liste_validation);
         message_erreur_nouvelle_plainte(liste_validation);
         liste_validation = verification_tous_champs_valide(liste_validation);
         if (!liste_validation['requete_ajax_avec_erreur']){
             appel_ajax_nouvelle_plainte();
+        }
+    });
+}
+
+function demande_nouveau_profil(){
+    $(form_nouveau_profil).submit(function (e) {
+        e.preventDefault();
+        message_erreur_profil.innerHTML = "";
+        var liste_validation = initial_profil_validation();
+        liste_validation = verification_nouveau_profil(liste_validation);
+        message_erreur_nouveau_profil(liste_validation);
+        liste_validation = verification_tous_champs_valide(liste_validation);
+
+        if (!liste_validation['requete_ajax_avec_erreur']){
+            // Créer l'appel Ajax
+            console.log("ca marche");
+            var liste_etablissements = document.querySelector('.select2-selection__choice');
         }
     });
 }
@@ -220,39 +299,41 @@ function verification_choix_etablissement(liste_validation){
 }
 
 function verification_nouvelle_plainte(liste_validation){
+    verification_champs_vides();
+
     if (champ_etablissement.value == "") {
         liste_validation['champ_resto_vide'] = true;
-    } else if (!(pattern_resto.test(champ_etablissement.value))) {
-        liste_validation['champ_resto_inv'] = true;
+    } else if (!(pattern_resto.test(champ_etablissement.value))){
+	    liste_validation['champ_resto_inv'] = true;
     }
 
     if (champ_no_civique.value == "") {
         liste_validation['champ_numero_vide'] = true;
-    } else if(isNaN(champ_no_civique.value)){
-	    liste_validation['champ_numero_inv'] = true;
-    }
+    } else if (isNaN(champ_no_civique.value)){
+	        liste_validation['champ_numero_inv'] = true;
+	}
 
     if (champ_nom_rue_plainte.value == "") {
         liste_validation['champ_rue_vide'] = true;
-    } else if(!(pattern_rue.test(champ_nom_rue_plainte.value))){
+    } else if (!(pattern_rue.test(champ_nom_rue_plainte.value))){
 	    liste_validation['champ_rue_inv'] = true;
     }
 
     if (champ_nom_ville.value == "") {
         liste_validation['champ_ville_vide'] = true;
-    } else if(!(pattern_rue.test())){
+    } else if (!(pattern_rue.test())){
 	    liste_validation['champ_ville_inv'] = true;
     }
 
     if (champ_code_postal.value == "") {
         liste_validation['champ_code_vide'] = true;
-    } else if(!(pattern_code.test(champ_code_postal.value.toUpperCase()))){
+    } else if (!(pattern_code.test(champ_code_postal.value.toUpperCase()))){
 	    liste_validation['champ_code_inv'] = true;
     }
 
     if (champ_date_visite.value == "") {
         liste_validation['champ_date_vide'] = true;
-    } else if(!(pattern_date.test(champ_date_visite.value))){
+    } else if (!(pattern_date.test(champ_date_visite.value))){
 	    liste_validation['champ_date_inv'] = true;
     }
 
@@ -268,16 +349,71 @@ function verification_nouvelle_plainte(liste_validation){
         liste_validation['champ_description_vide'] = true;
     }
 
+    return liste_validation;
+}
+
+function verification_nouveau_profil(liste_validation){
+    if (champ_prenom.value == "") {
+        liste_validation['champ_prenom_vide'] = true;
+    } else if(!(pattern_prenom_nom.test(champ_prenom.value))){
+	    liste_validation['champ_prenom_inv'] = true;
+    }
+
+    if (champ_nom.value == "") {
+        liste_validation['champ_nom_vide'] = true;
+    } else if(!(pattern_prenom_nom.test(champ_nom.value))){
+	    liste_validation['champ_nom_inv'] = true;
+    }
+
+    if (champ_courriel.value == "") {
+        liste_validation['champ_courriel_vide'] = true;
+    } else if(!(pattern_courriel.test(champ_courriel.value))){
+	    liste_validation['champ_courriel_inv'] = true;
+    }
+
+    if (champ_password.value == "") {
+        liste_validation['champ_password_vide'] = true;
+    } else if(!(pattern_password.test(champ_password.value))){
+	    liste_validation['champ_password_inv'] = true;
+    }
+
+    if (champ_password_conf.value == "") {
+        liste_validation['champ_password_conf_vide'] = true;
+    } else if(!(pattern_password.test(champ_password_conf.value))){
+	    liste_validation['champ_password_conf_inv'] = true;
+    }
+
+    if (!liste_validation['champ_password_vide'] && !liste_validation['champ_password_conf_vide']){
+        if (champ_password.value.localeCompare(champ_password_conf.value) != 0){
+            liste_validation['champ_passwords_non_egal'] = true;
+        }
+    }
+
+    // En fonction de la manière que fonctionne Select2 de Jquery,
+    // je dois compter le nombre de li dans le ul de la classe selection__rendered
+    // 1 équivaut au LI de base
+    if ($('.select2-selection__rendered li').length == 1){
+        liste_validation['champ_liste_resto_profil_vide'] = true;
+    }
+
+    verification_champs_vides();
+
+    return liste_validation;
+}
+
+function verification_champs_vides(){
     // Une manière simple d'afficher un message générale, s'il y a des champs vides
     // https://stackoverflow.com/questions/16211871/how-to-check-if-all-inputs-are-not-empty-with-jquery
     $('input').each(function() {
         if (!$(this).val()){
-            alert('Attention ! Il y a encore des champs vides !');
-            return false;
+            if (this.hasAttribute('placeholder') && this.placeholder !== "Choix d'(es) établissement(s)"){
+                return true;
+            } else {
+                alert('Attention ! Il y a encore des champs vides !');
+                return false;
+            }
         }
     });
-
-    return liste_validation;
 }
 
 function verification_tous_champs_valide(liste_validation){
@@ -361,6 +497,62 @@ function message_erreur_nouvelle_plainte(liste_validation){
     }
 }
 
+function message_erreur_nouveau_profil(liste_validation){
+    if (liste_validation['champ_prenom_inv']) {
+        message_erreur_profil.innerHTML += "<li>Veuillez saisir un prenom valide allant jusqu'à 50 charactères !</li>";
+        modification_erreur(champ_prenom);
+    } else {
+        modification_correct(champ_prenom);
+    }
+
+    if (liste_validation['champ_nom_inv']) {
+        message_erreur_profil.innerHTML += "<li>Veuillez saisir un nom valide allant jusqu'à 50 charactères !</li>";
+        modification_erreur(champ_nom);
+    } else {
+        modification_correct(champ_nom);
+    }
+
+    if (liste_validation['champ_courriel_inv']) {
+        message_erreur_profil.innerHTML += "<li>Veuillez saisir un courriel qui respect «exemple@domaine.com» !</li>";
+        modification_erreur(champ_courriel);
+    } else {
+        modification_correct(champ_courriel);
+    }
+
+    if (liste_validation['champ_password_inv']) {
+        message_erreur_profil.innerHTML += "<li>Veuillez saisir un mot de passe valide allant de 8 et 20 charactères !</li>";
+    }
+
+    if (liste_validation['champ_password_conf_inv']) {
+        message_erreur_profil.innerHTML += "<li>Veuillez saisir la confirmation du mot de passe valide allant de 8 et 20 charactères !</li>";
+    }
+
+    if (liste_validation['champ_passwords_non_egal']){
+        message_erreur_profil.innerHTML += "<li>Veuillez saisir un mot de passe et sa confirmatinon identique !</li>";
+    }
+
+    if (liste_validation['champ_password_inv'] && liste_validation['champ_passwords_non_egal']){
+        modification_erreur(champ_password);
+    } else {
+        modification_correct(champ_password);
+    }
+
+    if (liste_validation['champ_password_conf_inv'] && liste_validation['champ_passwords_non_egal']){
+        modification_erreur(champ_password_conf);
+    } else {
+        modification_correct(champ_password_conf);
+    }
+
+    if (liste_validation['champ_liste_resto_profil_vide']){
+        message_erreur_profil.innerHTML += "<li>Veuillez sélectionner au moins un établissement parmis la liste !";
+        var type_champ = document.querySelector(".select2-selection--multiple");
+        type_champ.style.border = "2px solid red";
+        type_champ.style.backgroundColor = "#FCDEDE";
+    } else {
+        initialiser_tous_champs(".select2-selection--multiple");
+    }
+}
+
 function ajustement_style_champs(liste_validation){
     if (liste_validation['champ_debut_inv'] || (liste_validation['champ_debut_vide'] && liste_validation['champ_liste_resto_vide'])){
         modification_erreur(champ_date_debut);
@@ -392,12 +584,12 @@ function ajustement_style_champs(liste_validation){
 
 function modification_erreur(champ){
     champ.style.border = "2px solid red";
-    champ.style.background = "#FCDEDE";
+    champ.style.backgroundColor = "#FCDEDE";
 }
 
 function modification_correct(champ){
     champ.style.border = "1px solid #ccc";
-    champ.style.background = "white";
+    champ.style.backgroundColor = "white";
 }
 
 function appel_ajax_interval(){
@@ -543,15 +735,18 @@ function creation_bloc_html_plainte(listes){
 
 function creation_select2(){
     $('.js-example-basic-multiple').select2({
-        placeholder: 'Sélectionner un ou plusieurs établissements'
+        placeholder: "Choix d'(es) établissement(s)"
     });
 }
+
 document.addEventListener('DOMContentLoaded', function () {
     validation_champs_recherches();
     recherche_rapide();
     demande_plainte();
+    demande_nouveau_profil();
     reset_recherche();
     reset_recherche_interval();
     reset_demande_plainte();
+    reset_nouveau_profil();
     creation_select2();
 });

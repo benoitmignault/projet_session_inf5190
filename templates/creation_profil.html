@@ -7,15 +7,16 @@
         <form method="post" action="/api/nouveau_profil"
               id="nouveau_profil">
             <ul>
-                <li>Veuillez remplir tous les champs, sauf le dernier qui est optionnel.</li>
+                <li>Veuillez remplir tous les champs, sauf le dernier qui est
+                    optionnel.
+                </li>
             </ul>
             <div class="modif">
                 <div class="information">
                     <label for="prenom">Prénom :</label>
                     <div>
                         <input id="prenom" name="prenom" type="text"
-                               title="Charactères alphabétique, les espaces,
-                               l'apostrophe et le tiret sont permis"
+                               title="Charactères alphabétique, les espaces et le tiret sont permis"
                                maxlength="50" value="">
                     </div>
                 </div>
@@ -47,8 +48,7 @@
                         <label for="password">Mot de passe :</label>
                         <div>
                             <input id="password" name="password"
-                                   title="Charactères alphanumériques, les espaces,
-                               l'apostrophe et le tiret sont permis"
+                                   title=""
                                    type="password" maxlength="20"
                                    value="" minlength="8">
                         </div>
@@ -58,8 +58,7 @@
                             :</label>
                         <div>
                             <input id="password_conf" name="password_conf"
-                                   title="Charactères alphanumériques, les espaces,
-                               l'apostrophe et le tiret sont permis"
+                                   title=""
                                    type="password"
                                    maxlength="20"
                                    value="" minlength="8">
@@ -74,7 +73,7 @@
                         <select class="js-example-basic-multiple"
                                 id="liste_resto_profil" multiple="multiple"
                                 name="liste_resto_profil[]"
-                                title="Saisir un établissement en particulier">
+                                title="Saisir un/des établissement(s) en particulier">
                             {% for un_etablissement in liste_etablissement %}
                             <option value="{{un_etablissement}}">
                                 {{un_etablissement}}
@@ -84,14 +83,17 @@
                     </div>
                 </div>
                 <div class="troisBTN">
-                    <input class="bouton" type='submit' value="Créer son profil...">
+                    <input class="bouton" type='submit'
+                           value="Créer son profil...">
                     <input class="bouton" id="btn_reset_profil" type='reset'
                            value="Effacer...">
                 </div>
             </div>
             <ul class="aucun" id="message_erreur_profil"></ul>
         </form>
-
+        <p>Résultat - Par rapport à la création du profil</p>
+        <!-- Section pour le retour Ajax D1 -->
+        <div id="result_profil"></div>
     </div>
     <div class='zone_admin'>
         <div class="admin">
