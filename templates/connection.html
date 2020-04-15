@@ -3,24 +3,47 @@
 <h1>Bienvenue sur la page pour se connecter à son profil</h1>
 <div class="container">
     <div class='zone_recherche_resto'>
-        <form method="post" action="/connexion" id="connexion_profil">
+        {% set champ = '' %}
+        {% if erreur %}
+        {% set champ = 'erreur' %}
+        {% endif %}
+        <form method="post" class="{{champ}}" action="/connection"
+              id="connexion_profil">
             <div class="modif">
-                <div class="information">
+                {% set champ = '' %}
+                {% if erreur %}
+                {% if liste_validation['champ_courriel_vide'] or
+                liste_validation['champ_courriel_inv'] or
+                liste_validation['champ_courriel_non_trouve'] or
+                liste_validation['longueur_courriel_inv'] %}
+                {% set champ = 'erreur' %}
+                {% endif %}
+                {% endif %}
+                <div class="information {{champ}}">
                     <label for="courriel_conn">Courriel :</label>
                     <div>
                         <input id="courriel_conn" name="courriel_conn"
                                title="Le format doit respecter les standards de
                                l'industrie sur la nomenclature des courriels"
                                type="email" placeholder="exemple@domaine.com"
-                               value="">
+                               value="{{courriel}}">
                     </div>
                 </div>
-                <div class="information">
+                {% set champ = '' %}
+                {% if erreur %}
+                {% if liste_validation['champ_password_vide'] or
+                liste_validation['champ_password_inv'] or
+                liste_validation['champ_password_non_trouve'] or
+                liste_validation['longueur_password_inv'] %}
+                {% set champ = 'erreur' %}
+                {% endif %}
+                {% endif %}
+                <div class="information {{champ}}">
                     <label for="password_conn">Mot de passe :</label>
                     <div>
                         <input id="password_conn" name="password_conn" title=""
                                type="password" maxlength="20"
-                               value="" minlength="8">
+                               value="{{password}}" minlength="8">
                     </div>
                 </div>
                 <div class="troisBTN">
@@ -31,12 +54,18 @@
                 </div>
             </div>
         </form>
-        <ul class="aucun" id="message_erreur_connexion"></ul>
+        <ul class="aucun" id="message_erreur_connexion">
+            {% if erreur %}
+            {% for message in messages %}
+            <li>{{message}}</li>
+            {% endfor %}
+            {% endif %}
+        </ul>
     </div>
     <h2>Section pour créer un profil</h2>
     <div class='zone_admin'>
         <div class="admin">
-            <a class="bouton" href="/api/nouveau_profil">Se Connecter</a>
+            <a class="bouton" href="/api/nouveau_profil">Créer son profil</a>
         </div>
     </div>
     <h2>Section pour revenir à la page d'accueil</h2>

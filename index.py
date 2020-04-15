@@ -270,7 +270,7 @@ def creation_profil():
             conn_db.inserer_nouveau_profil(
                 liste_champs_profil['nom'], liste_champs_profil['prenom'],
                 liste_champs_profil['courriel'],
-                liste_champs_profil['password'],
+                liste_champs_profil['password_hasher'],
                 liste_champs_profil['salt'],
                 liste_champs_profil['liste_etablissement'])
 
@@ -282,21 +282,20 @@ def creation_profil():
 
 
 # Cette fonction est pour la tache E2
-@app.route('/connexion', methods=["GET", "POST"])
+@app.route('/connection', methods=["GET", "POST"])
 def connexion_profil():
     # Dans le get, on devra vérifier si le user est connecté
     if request.method == "GET":
         titre = "Page de Connexion !"
-        return render_template("connexion.html", titre=titre, messages=[],
-                               erreur=False)
+        return render_template("connection.html", courriel="", password="",
+                               titre=titre, messages=[], erreur=False)
 
     elif request.method == "POST":
         liste_champs_connexion = initial_champ_connexion()
         liste_validation_connexion = initial_champ_connexion_validation()
         liste_champs_connexion = remplissage_champ_connexion(
-            request, liste_champs_connexion)
+            request.form, liste_champs_connexion)
         conn_db = get_db()
-
         utilisateur = conn_db.recuperation_info_connexion(
             liste_champs_connexion['courriel'])
         if utilisateur is None:
@@ -310,7 +309,10 @@ def connexion_profil():
             liste_champs_connexion, liste_validation_connexion)
         liste_validation_connexion = situation_erreur_interval(
             liste_validation_connexion)
-        # verification si jai une situation erreur
+
+        print(liste_champs_connexion)
+        print(liste_validation_connexion)
+
         if not liste_validation_connexion['situation_erreur']:
             id_session = uuid.uuid4().hex
             conn_db.creation_session_active(id_session,
@@ -325,8 +327,12 @@ def connexion_profil():
             liste_champs_connexion['messages'] = message_erreur_connexion(
                 liste_validation_connexion)
             titre = "Erreur de la Connexion !"
-            return render_template("connexion.html", titre=titre, erreur=True,
-                                   messages=liste_champs_connexion['messages'])
+
+            return render_template("connection.html", titre=titre, erreur=True,
+                                   messages=liste_champs_connexion['messages'],
+                                   liste_validation=liste_validation_connexion,
+                                   courriel=liste_champs_connexion['courriel'],
+                                   password=liste_champs_connexion['password'])
 
 
 # À vérifier plutard !!!
@@ -355,11 +361,15 @@ def authentification_requise_deconnexion(f):
 @app.route('/connection/profil', methods=["GET"])
 # @authentification_requise_connexion
 def profil_connecter():
-    pass
+    id_session = session["id"]
+    courriel = session["courriel"]
+    titre = "Vous êtes maintenant connecté !"
+    return render_template("utilisateur_connecter.html", titre=titre)
+
 
 
 # À vérifier plutard !!!
-@app.route('/logout')
+@app.route('/deconnection')
 @authentification_requise_deconnexion
 def logout():
     id_session = session["id"]

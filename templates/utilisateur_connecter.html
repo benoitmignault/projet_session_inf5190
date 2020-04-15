@@ -1,10 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+{% extends "layout.html" %}
+{% block content %}
+<h1>Bienvenue dans votre profil !</h1>
+<div class="container">
+    <h2>Section pour revenir à la page d'accueil</h2>
+    <div class='zone_admin'>
+        <div class="admin">
+            <a class="bouton" href="/deconnection">Page D'accueil</a>
+        </div>
+    </div>
+</div>
+{% endblock content %}

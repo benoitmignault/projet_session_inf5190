@@ -1,5 +1,5 @@
 import csv
-import re  # pour la gestion des patterns pour les différents champs input
+import re
 import smtplib
 import xml.etree.ElementTree as ET
 from email.mime.multipart import MIMEMultipart
@@ -459,10 +459,10 @@ def nombre_critiere_recherche(liste_champs):
 
 
 def validation_champ_connexion(liste_champs, liste_validation):
-    if not liste_validation['champ_courriel_non_trouve']:
+    if (not liste_validation['champ_courriel_vide'] and not
+            liste_validation['champ_password_vide']):
         liste_validation = sous_validation_courriel_connexion(liste_champs,
                                                               liste_validation)
-
         liste_validation = sous_validation_password_connexion(liste_champs,
                                                               liste_validation)
 
@@ -478,7 +478,7 @@ def sous_validation_courriel_connexion(liste_champs, liste_validation):
         if match_courriel(liste_champs['courriel']) is None:
             liste_validation['champ_courriel_inv'] = True
 
-        if not (len(liste_champs['courriel']) > 50):
+        if len(liste_champs['courriel']) > 50:
             liste_validation['longueur_courriel_inv'] = True
 
     return liste_validation
@@ -493,7 +493,7 @@ def sous_validation_password_connexion(liste_champs, liste_validation):
         if match_password(liste_champs['password']) is None:
             liste_validation['champ_password_inv'] = True
 
-        if not (8 < len(liste_champs['password']) < 20):
+        if not (7 < len(liste_champs['password']) < 21):
             liste_validation['longueur_password_inv'] = True
 
         if not liste_champs['password_hasher'] == liste_champs['hash']:
@@ -689,7 +689,6 @@ def sous_message_erreur_courriel(messages, liste_validation):
     if liste_validation['champ_courriel_vide']:
         messages.append("Au moment de vous connectez, vous n'avez rien saisie "
                         "dans le champ «Courriel» !")
-
     else:
         if liste_validation['champ_courriel_inv']:
             messages.append("Au moment de vous connectez, votre «Courriel» "
@@ -713,8 +712,8 @@ def sous_message_erreur_password(messages, liste_validation):
 
     else:
         if liste_validation['champ_password_inv']:
-            messages.append(
-                "Au moment de vous connectez, votre «Courriel» était invalide")
+            messages.append("Au moment de vous connectez, votre mot de passe "
+                            "saisie était invalide !")
 
         if liste_validation['longueur_password_inv']:
             messages.append("Attention la longueur permise pour le mot de passe"
@@ -723,7 +722,7 @@ def sous_message_erreur_password(messages, liste_validation):
         if liste_validation['champ_password_non_trouve'] and not \
                 liste_validation['champ_courriel_non_trouve']:
             messages.append("Au moment de vous connectez, votre mot de passe "
-                            "saisie était invalide avec votre courriel !")
+                            "n'était pas le bon avec votre courriel !")
             messages.append("Vous devez vous créer un nouveau profil, comme la "
                             "mécanique de réinitialisation de mot de passe "
                             "n'est pas en place pour l'instant...")
