@@ -223,6 +223,19 @@ class Database:
         else:
             return result[0], result[1]
 
+    def creation_session_active(self, id_session, courriel):
+        insert_bd = "INSERT INTO session_profil (id_session, courriel) " \
+                    "VALUES (?, ?)"
+        connection = self.get_connection()
+        connection.execute(insert_bd, (id_session, courriel))
+        connection.commit()
+
+    def detruire_session_active(self, id_session):
+        sql = "DELETE from session_profil where id_session = ?"
+        connection = self.get_connection()
+        connection.execute(sql, (id_session,))
+        connection.commit()
+
 
 def remplissage_condition_sql(liste_champs):
     # La préparation des critères en vue d'utiliser l'opérateur like aura

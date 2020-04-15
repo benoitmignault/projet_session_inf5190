@@ -1,3 +1,5 @@
+from functools import wraps
+
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.combining import OrTrigger
 from apscheduler.triggers.cron import CronTrigger
@@ -276,7 +278,7 @@ def creation_profil():
 
         else:
             return jsonify({"Impossible de créer le profil":
-                            "Courriel est déjà présent !"}), 404
+                                "Courriel est déjà présent !"}), 404
 
 
 # Cette fonction est pour la tache E2
@@ -285,7 +287,8 @@ def connexion_profil():
     # Dans le get, on devra vérifier si le user est connecté
     if request.method == "GET":
         titre = "Page de Connexion !"
-        return render_template("login.html", titre=titre)
+        return render_template("login.html", titre=titre, messages=[],
+                               erreur=False)
 
     elif request.method == "POST":
         liste_champs_connexion = initial_champ_connexion()
@@ -303,11 +306,77 @@ def connexion_profil():
             liste_champs_connexion = remplissage_post_verification_conn(
                 liste_champs_connexion, utilisateur)
 
-        # Validation que les données sont valide
         liste_validation_connexion = validation_champ_connexion(
             liste_champs_connexion, liste_validation_connexion)
+        liste_validation_connexion = situation_erreur_interval(
+            liste_validation_connexion)
+        # verification si jai une situation erreur
+        if not liste_validation_connexion['situation_erreur']:
+            id_session = uuid.uuid4().hex
+            conn_db.creation_session_active(id_session,
+                                            liste_champs_connexion['courriel'])
+            session["id"] = id_session
+            session["courriel"] = liste_champs_connexion['courriel']
+
+            return redirect(url_for('.profil_connecter'))
+
+        # si vrai que cest faux, on se connection avec un id de session avant
+        else:
+            liste_champs_connexion['messages'] = message_erreur_connexion(
+                liste_validation_connexion)
+            titre = "Erreur de la Connexion !"
+            return render_template("login.html", titre=titre, erreur=True,
+                                   messages=liste_champs_connexion['messages'])
 
 
+# À vérifier plutard !!!
+def authentification_requise_connexion(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not is_authenticated(session):
+            return send_unauthorized()
+        return f(*args, **kwargs)
+
+    return decorated
+
+
+# À vérifier plutard !!!
+def authentification_requise_deconnexion(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not is_authenticated(session):
+            return send_unauthorized()
+        return f(*args, **kwargs)
+
+    return decorated
+
+
+# Cette fonction est pour la tache E2 et l'authentification avec succès
+@app.route('/connection/profil', methods=["GET"])
+# @authentification_requise_connexion
+def profil_connecter():
+    pass
+
+
+# À vérifier plutard !!!
+@app.route('/logout')
+@authentification_requise_deconnexion
+def logout():
+    id_session = session["id"]
+    session.pop('id', None)
+    conn_db = get_db()
+    conn_db.detruire_session_active(id_session)
+    return redirect("/")
+
+
+def is_authenticated(session):
+    return "id" in session
+
+
+def send_unauthorized():
+    return Response('Could not verify your access level for that URL.\n'
+                    'You have to login with proper credentials', 401,
+                    {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 
 # La fonction sera exécuté à chaque jour à minuit, automatiquement

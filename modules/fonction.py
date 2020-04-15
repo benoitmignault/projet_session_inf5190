@@ -143,7 +143,7 @@ def initial_champ_nouveau_profil():
 
 def initial_champ_connexion():
     liste_champs = {"courriel": "", "password": "", "salt": "", "hash": "",
-                    "password_hasher": "", "id_session": ""}
+                    "password_hasher": "", "messages": []}
 
     return liste_champs
 
@@ -314,6 +314,7 @@ def remplissage_champ_connexion(request, liste_champs):
 def remplissage_post_verification_conn(liste_champs, utilisateur):
     liste_champs['salt'] = utilisateur[0]
     liste_champs['hash'] = utilisateur[1]
+
     liste_champs['password_hasher'] = hashlib.sha512(
         str(liste_champs['password'] + liste_champs['salt']).encode(
             "utf-8")).hexdigest()
@@ -667,5 +668,64 @@ def sous_message_erreur_nom_rue(messages, liste_validation):
     if liste_validation['longueur_rue_inv']:
         messages.append("Attention ! Le nom de la rue doit être entre "
                         "3 et 35 caractères !")
+
+    return messages
+
+
+def message_erreur_connexion(liste_validation):
+    messages = []
+    if (liste_validation['champ_courriel_vide'] and
+            liste_validation['champ_password_vide']):
+        messages.append("Attention les tous les champs sont vides !")
+
+    else:
+        messages = sous_message_erreur_courriel(messages, liste_validation)
+        messages = sous_message_erreur_password(messages, liste_validation)
+
+    return messages
+
+
+def sous_message_erreur_courriel(messages, liste_validation):
+    if liste_validation['champ_courriel_vide']:
+        messages.append("Au moment de vous connectez, vous n'avez rien saisie "
+                        "dans le champ «Courriel» !")
+
+    else:
+        if liste_validation['champ_courriel_inv']:
+            messages.append("Au moment de vous connectez, votre «Courriel» "
+                            "était invalide")
+
+        if liste_validation['champ_courriel_non_trouve']:
+            messages.append("Au moment de vous connectez, votre «Courriel» "
+                            "n'existait pas !")
+
+        if liste_validation['longueur_courriel_inv']:
+            messages.append("Attention la longueur permise pour le courriel "
+                            "est de 50 charactères !")
+
+    return messages
+
+
+def sous_message_erreur_password(messages, liste_validation):
+    if liste_validation['champ_password_vide']:
+        messages.append("Au moment de vous connectez, vous n'avez rien saisie "
+                        "dans le champ «mot de passe» !")
+
+    else:
+        if liste_validation['champ_password_inv']:
+            messages.append(
+                "Au moment de vous connectez, votre «Courriel» était invalide")
+
+        if liste_validation['longueur_password_inv']:
+            messages.append("Attention la longueur permise pour le mot de passe"
+                            "se trouve entre 8 et 20 charactères !")
+
+        if liste_validation['champ_password_non_trouve'] and not \
+                liste_validation['champ_courriel_non_trouve']:
+            messages.append("Au moment de vous connectez, votre mot de passe "
+                            "saisie était invalide avec votre courriel !")
+            messages.append("Vous devez vous créer un nouveau profil, comme la "
+                            "mécanique de réinitialisation de mot de passe "
+                            "n'est pas en place pour l'instant...")
 
     return messages
