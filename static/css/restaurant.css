@@ -255,7 +255,7 @@ Fin de l'ajout du recentrage de attribut legend
 .container > .zone_recherche_resto > #recherche_par_interval,
 .container > .zone_recherche_resto > #nouvelle_plainte,
 .container > .zone_recherche_resto > #nouveau_profil,
-.container > .zone_recherche_resto > #connexion_profil,
+.container > .zone_recherche_resto > #connection_profil,
 .container > .zone_recherche_resto > #recherche,
 .container > .zone_recherche_resto > .tabeau_resto{
     width: 100%;
@@ -384,13 +384,15 @@ Fin de l'ajout du recentrage de attribut legend
     cursor: pointer;
 }
 
+.container > .zone_recherche_resto > form > .modif > .erreur > div > input[type=email],
+.container > .zone_recherche_resto > form > .modif > .erreur > div > input[type=password],
 .container > .zone_recherche_resto > form > .modif > .erreur > div > input[type=text]{
     border-color: red;
     background-color: #FCDEDE;
     border: 2px solid red;
 }
 
-.container > .zone_recherche_resto > #recherche.erreur{
+.container > .zone_recherche_resto > .erreur{
     border-color: red;
 }
 

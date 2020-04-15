@@ -8,7 +8,7 @@
         {% set champ = 'erreur' %}
         {% endif %}
         <form method="post" class="{{champ}}" action="/connection"
-              id="connexion_profil">
+              id="connection_profil">
             <div class="modif">
                 {% set champ = '' %}
                 {% if erreur %}
@@ -49,12 +49,12 @@
                 <div class="troisBTN">
                     <input class="bouton" type='submit'
                            value="Se Connecter...">
-                    <input class="bouton" id="btn_reset_connexion" type='reset'
+                    <input class="bouton" id="btn_reset_connection" type='reset'
                            value="Effacer...">
                 </div>
             </div>
         </form>
-        <ul class="aucun" id="message_erreur_connexion">
+        <ul class="aucun" id="message_erreur_connection">
             {% if erreur %}
             {% for message in messages %}
             <li>{{message}}</li>

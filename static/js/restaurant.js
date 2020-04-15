@@ -44,6 +44,13 @@ const champ_password = document.querySelector('#password');
 const champ_password_conf = document.querySelector('#password_conf');
 // Les variables de la liste des établissements seront crée au besoin
 
+// Variable pour la connection au profil
+const form_connection_profil = document.querySelector('#connection_profil');
+const btn_reset_connection = document.querySelector('#btn_reset_connection');
+const message_erreur_connection = document.querySelector('#message_erreur_connection');
+const champ_courriel_connection = document.querySelector('#courriel_conn');
+const champ_password_connection = document.querySelector('#password_conn');
+
 const pattern_date = new RegExp("^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$");
 const pattern_code = new RegExp("^[A-Z][0-9][A-Z][ ]{1}[0-9][A-Z][0-9]$");
 const pattern_proprio = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,98}[a-z0-9A-Z.)]$");
@@ -153,10 +160,22 @@ function reset_nouveau_profil(){
     });
 }
 
+function reset_demande_connection(){
+    $(btn_reset_connection).click(function() {
+        champ_courriel_connection.defaultValue = "";
+        champ_password_connection.defaultValue = "";
+        effacer_messages_erreurs(message_erreur_connection);
+        initialiser_tous_champs("input[type=password]");
+        initialiser_tous_champs("input[type=email]");
+        initialiser_tous_champs("#connection_profil");
+    });
+}
+
 function initialiser_tous_champs(type_champs){
     var tous_champs = document.querySelectorAll(type_champs);
     tous_champs.forEach(function(un_champ){
         if (type_champs == "#nouveau_profil" ||
+            type_champs == "#connection_profil" ||
             type_champs == "#nouvelle_plainte" ||
             type_champs == "#recherche_par_interval" ||
             type_champs == "#recherche"){
@@ -173,6 +192,16 @@ function effacer_messages_erreurs(message){
     if (message){
         message.innerHTML = "";
     }
+}
+
+function validation_champs_connection(){
+    $(champ_courriel_connection).change(function () {
+        validation_regex(champ_courriel_connection, pattern_courriel);
+    });
+
+    $(champ_password_connection).change(function () {
+        validation_regex(champ_password_connection, pattern_password);
+    });
 }
 
 function validation_champs_recherches(){
@@ -252,6 +281,17 @@ function demande_nouveau_profil(){
             // Il se pourrait que la requête précédente était invalide
             initialiser_tous_champs("#nouveau_profil");
             appel_ajax_nouveau_profil();
+        }
+    });
+}
+
+function demande_connection_profil(){
+    $(form_connection_profil).submit(function (e) {
+        if (champ_courriel_connection.value == "" || champ_password_connection.value == ""){
+            e.preventDefault();
+            alert("Veuiller saisir des informations dans les champs vides !");
+        } else {
+            $(this).unbind(e);
         }
     });
 }
@@ -775,12 +815,15 @@ function creation_select2(){
 
 document.addEventListener('DOMContentLoaded', function () {
     validation_champs_recherches();
+    validation_champs_connection();
     recherche_rapide();
     demande_plainte();
     demande_nouveau_profil();
+    demande_connection_profil();
     reset_recherche();
     reset_recherche_interval();
     reset_demande_plainte();
     reset_nouveau_profil();
+    reset_demande_connection();
     creation_select2();
 });
