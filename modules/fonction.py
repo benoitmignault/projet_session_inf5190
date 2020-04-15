@@ -305,8 +305,8 @@ def initial_champ_interval_validation():
 
 
 def remplissage_champ_connexion(request, liste_champs):
-    liste_champs['courriel'] = request['courriel']
-    liste_champs['password'] = request['password']
+    liste_champs['courriel'] = request['courriel_conn']
+    liste_champs['password'] = request['password_conn']
 
     return liste_champs
 

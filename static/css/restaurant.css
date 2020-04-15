@@ -181,6 +181,8 @@ Fin de l'ajout du recentrage de attribut legend
     margin-left: 30px;
 }
 
+.container > .zone_recherche_resto > form > div > div > div > input[type=email],
+.container > .zone_recherche_resto > form > div > div > div > input[type=password],
 .container > .zone_recherche_resto > form > div > fieldset > div > div > input[type=email],
 .container > .zone_recherche_resto > form > div > fieldset > div > div > input[type=password],
 .container > .zone_recherche_resto > form > div > fieldset > div > div > input[type=number],
@@ -251,6 +253,7 @@ Fin de l'ajout du recentrage de attribut legend
 .container > .zone_recherche_resto > #recherche_par_interval,
 .container > .zone_recherche_resto > #nouvelle_plainte,
 .container > .zone_recherche_resto > #nouveau_profil,
+.container > .zone_recherche_resto > #connexion_profil,
 .container > .zone_recherche_resto > #recherche,
 .container > .zone_recherche_resto > .tabeau_resto{
     width: 100%;

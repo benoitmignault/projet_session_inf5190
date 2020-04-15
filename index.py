@@ -287,7 +287,7 @@ def connexion_profil():
     # Dans le get, on devra vérifier si le user est connecté
     if request.method == "GET":
         titre = "Page de Connexion !"
-        return render_template("login.html", titre=titre, messages=[],
+        return render_template("connexion.html", titre=titre, messages=[],
                                erreur=False)
 
     elif request.method == "POST":
@@ -325,7 +325,7 @@ def connexion_profil():
             liste_champs_connexion['messages'] = message_erreur_connexion(
                 liste_validation_connexion)
             titre = "Erreur de la Connexion !"
-            return render_template("login.html", titre=titre, erreur=True,
+            return render_template("connexion.html", titre=titre, erreur=True,
                                    messages=liste_champs_connexion['messages'])
 
 

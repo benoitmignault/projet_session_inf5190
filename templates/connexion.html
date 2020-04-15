@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Bienvenue sur la page pour se connecter à son profil</h1>
+<div class="container">
+    <div class='zone_recherche_resto'>
+        <form method="post" action="/connexion" id="connexion_profil">
+            <div class="modif">
+                <div class="information">
+                    <label for="courriel_conn">Courriel :</label>
+                    <div>
+                        <input id="courriel_conn" name="courriel_conn"
+                               title="Le format doit respecter les standards de
+                               l'industrie sur la nomenclature des courriels"
+                               type="email" placeholder="exemple@domaine.com"
+                               value="">
+                    </div>
+                </div>
+                <div class="information">
+                    <label for="password_conn">Mot de passe :</label>
+                    <div>
+                        <input id="password_conn" name="password_conn" title=""
+                               type="password" maxlength="20"
+                               value="" minlength="8">
+                    </div>
+                </div>
+                <div class="troisBTN">
+                    <input class="bouton" type='submit'
+                           value="Se Connecter...">
+                    <input class="bouton" id="btn_reset_connexion" type='reset'
+                           value="Effacer...">
+                </div>
+            </div>
+        </form>
+        <ul class="aucun" id="message_erreur_connexion"></ul>
+    </div>
+    <h2>Section pour créer un profil</h2>
+    <div class='zone_admin'>
+        <div class="admin">
+            <a class="bouton" href="/api/nouveau_profil">Se Connecter</a>
+        </div>
+    </div>
+    <h2>Section pour revenir à la page d'accueil</h2>
+    <div class='zone_admin'>
+        <div class="admin">
+            <a class="bouton" href="/">Page D'accueil</a>
+        </div>
+    </div>
+</div>
+{% endblock content %}
