@@ -247,38 +247,40 @@ def suppression_plainte(id_plainte):
 
 
 # Cette fonction est pour la tache E1
-@app.route('/api/nouveau_profil', methods=["GET", "POST"])
+@app.route('/api/nouveau_profil', methods=["POST"])
 @schema.validate(nouveau_profil)
+def api_creation_profil():
+    conn_db = get_db()
+    liste_champs_profil = initial_champ_nouveau_profil()
+    liste_champs_profil = remplissage_champ_nouveau_profil(
+        request, liste_champs_profil)
+
+    courriel = conn_db.verification_profil_existant(
+        liste_champs_profil['courriel'])
+
+    if courriel is None:
+        conn_db.inserer_nouveau_profil(
+            liste_champs_profil['nom'], liste_champs_profil['prenom'],
+            liste_champs_profil['courriel'],
+            liste_champs_profil['password_hasher'],
+            liste_champs_profil['salt'],
+            liste_champs_profil['liste_etablissement'])
+
+        return jsonify({"Création du nouveau profil": "Succès !"}), 201
+
+    else:
+        return jsonify({"Impossible de créer le profil":
+                        "Courriel est déjà présent !"}), 404
+
+
+# Cette fonction est pour la tache E2
+@app.route('/nouveau_profil', methods=["GET"])
 def creation_profil():
-    if request.method == "GET":
-        conn_db = get_db()
-        liste_etablissement = conn_db.liste_tous_restaurants()
-        titre = "Création d'un profil"
-        return render_template('creation_profil.html', titre=titre,
-                               liste_etablissement=liste_etablissement)
-
-    elif request.method == "POST":
-        conn_db = get_db()
-        liste_champs_profil = initial_champ_nouveau_profil()
-        liste_champs_profil = remplissage_champ_nouveau_profil(
-            request, liste_champs_profil)
-
-        courriel = conn_db.verification_profil_existant(
-            liste_champs_profil['courriel'])
-
-        if courriel is None:
-            conn_db.inserer_nouveau_profil(
-                liste_champs_profil['nom'], liste_champs_profil['prenom'],
-                liste_champs_profil['courriel'],
-                liste_champs_profil['password_hasher'],
-                liste_champs_profil['salt'],
-                liste_champs_profil['liste_etablissement'])
-
-            return jsonify({"Création du nouveau profil": "Succès !"}), 201
-
-        else:
-            return jsonify({"Impossible de créer le profil":
-                            "Courriel est déjà présent !"}), 404
+    conn_db = get_db()
+    liste_etablissement = conn_db.liste_tous_restaurants()
+    titre = "Création d'un profil"
+    return render_template('creation_profil.html', titre=titre,
+                           liste_etablissement=liste_etablissement)
 
 
 # Cette fonction est pour la tache E2
@@ -365,7 +367,6 @@ def profil_connecter():
     courriel = session["courriel"]
     titre = "Vous êtes maintenant connecté !"
     return render_template("utilisateur_connecter.html", titre=titre)
-
 
 
 # À vérifier plutard !!!
