@@ -136,7 +136,7 @@ def initial_champ_importation_xml():
 def initial_champ_nouveau_profil():
     liste_champs = {"nom": "", "prenom": "", "courriel": "", "password": "",
                     "liste_etablissement": [], "salt": "", "id_personne": 0,
-                    "id_photo": 0}
+                    "id_photo": 0, "password_hasher": ""}
 
     return liste_champs
 
@@ -344,7 +344,7 @@ def remplissage_champ_nouvelle_plainte(request, liste_champs):
     return liste_champs
 
 
-def remplissage_champ_nouvelle_profil(request, liste_champs):
+def remplissage_champ_nouveau_profil(request, liste_champs):
     data = request.get_json()
     liste_champs['nom'] = data['nom']
     liste_champs['prenom'] = data['prenom']
@@ -352,7 +352,7 @@ def remplissage_champ_nouvelle_profil(request, liste_champs):
     liste_champs['password'] = data['password']
     salt = uuid.uuid4().hex
     liste_champs['salt'] = salt
-    liste_champs['password'] = hashlib.sha512(
+    liste_champs['password_hasher'] = hashlib.sha512(
         str(liste_champs['password'] + salt).encode("utf-8")).hexdigest()
 
     for un_etablissement in data['liste_etablissement']:

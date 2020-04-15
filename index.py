@@ -260,7 +260,7 @@ def creation_profil():
     elif request.method == "POST":
         conn_db = get_db()
         liste_champs_profil = initial_champ_nouveau_profil()
-        liste_champs_profil = remplissage_champ_nouvelle_profil(
+        liste_champs_profil = remplissage_champ_nouveau_profil(
             request, liste_champs_profil)
 
         courriel = conn_db.verification_profil_existant(
@@ -278,7 +278,7 @@ def creation_profil():
 
         else:
             return jsonify({"Impossible de créer le profil":
-                                "Courriel est déjà présent !"}), 404
+                            "Courriel est déjà présent !"}), 404
 
 
 # Cette fonction est pour la tache E2

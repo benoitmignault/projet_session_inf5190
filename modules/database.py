@@ -185,13 +185,14 @@ class Database:
         else:
             return result[0][0]
 
-    def inserer_nouveau_profil(self, nom, prenom, courriel, password, salt,
-                               liste_etablissement):
+    def inserer_nouveau_profil(self, nom, prenom, courriel, password_hasher,
+                               salt, liste_etablissement):
         connection = self.get_connection()
         insert_bd = "INSERT INTO profil_utilisateur " \
-                    "(nom, prenom, courriel, password, salt) " \
+                    "(nom, prenom, courriel, password_hasher, salt) " \
                     "VALUES (?, ?, ?, ?, ?)"
-        connection.execute(insert_bd, (nom, prenom, courriel, password, salt))
+        connection.execute(insert_bd,
+                           (nom, prenom, courriel, password_hasher, salt))
         connection.commit()
         # Maintenant, on va récupérer le id_personne.
         # Ce dernier, il sera utilser pour associer chaque établissement
@@ -212,7 +213,7 @@ class Database:
 
     def recuperation_info_connexion(self, courriel):
         cursor = self.get_connection().cursor()
-        select = "SELECT salt, hash "
+        select = "SELECT salt, password_hasher "
         fromm = "FROM profil_utilisateur "
         where = "WHERE courriel = ? "
         sql = select + fromm + where
