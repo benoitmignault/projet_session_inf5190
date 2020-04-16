@@ -109,6 +109,13 @@ def mise_jour_bd():
     connection.disconnect()
 
 
+def initial_champ_connecter():
+    liste_champs = {"id_personne": "", "id_photo": "", "prenom": "", "nom": "",
+                    "courriel": "", "liste_etablissement": []}
+
+    return liste_champs
+
+
 def initial_champ_interval():
     liste_champs = {"date_debut": "", "date_fin": ""}
 
@@ -306,6 +313,19 @@ def initial_champ_interval_validation():
 def remplissage_champ_connexion(request, liste_champs):
     liste_champs['courriel'] = request['courriel_conn']
     liste_champs['password'] = request['password_conn']
+
+    return liste_champs
+
+
+def remplissage_champ_connecter(liste_champs, info_profil, info_etablissement):
+    liste_champs['prenom'] = info_profil[0]
+    liste_champs['nom'] = info_profil[1]
+    liste_champs['id_photo'] = info_profil[2]
+    liste_champs['id_personne'] = info_profil[3]
+    liste_champs['courriel'] = info_profil[4]
+
+    for etablissement in info_etablissement:
+        liste_champs['liste_etablissement'].append(etablissement)
 
     return liste_champs
 

@@ -225,7 +225,7 @@ def api_creation_plainte():
         liste_champs_plainte['description'])
 
     return jsonify({"Voici le numéro de la plainte ouverte":
-                    liste_champs_plainte['id_plainte']}), 201
+                        liste_champs_plainte['id_plainte']}), 201
 
 
 # Cette fonction est pour la tache D1 de l'interface web
@@ -288,7 +288,6 @@ def creation_profil():
 # Cette fonction est pour la tache E2
 @app.route('/connection', methods=["GET", "POST"])
 def connexion_profil():
-    # Dans le get, on devra vérifier si le user est connecté
     if request.method == "GET":
         titre = "Page de Connexion !"
         return render_template("connection.html", courriel="", password="",
@@ -314,19 +313,13 @@ def connexion_profil():
         liste_validation_connexion = situation_erreur_interval(
             liste_validation_connexion)
 
-        print(liste_champs_connexion)
-        print(liste_validation_connexion)
-
         if not liste_validation_connexion['situation_erreur']:
             id_session = uuid.uuid4().hex
             conn_db.creation_session_active(id_session,
                                             liste_champs_connexion['courriel'])
             session["id"] = id_session
-            session["courriel"] = liste_champs_connexion['courriel']
-
             return redirect(url_for('.profil_connecter'))
 
-        # si vrai que cest faux, on se connection avec un id de session avant
         else:
             liste_champs_connexion['messages'] = message_erreur_connexion(
                 liste_validation_connexion)
@@ -339,42 +332,47 @@ def connexion_profil():
                                    password=liste_champs_connexion['password'])
 
 
-# À vérifier plutard !!!
-def authentification_requise_connexion(f):
+def authentification_requise(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if not is_authenticated(session):
-            return send_unauthorized()
-        return f(*args, **kwargs)
-
-    return decorated
-
-
-# À vérifier plutard !!!
-def authentification_requise_deconnexion(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        if not is_authenticated(session):
-            return send_unauthorized()
+            return personne_non_autorisee()
         return f(*args, **kwargs)
 
     return decorated
 
 
 # Cette fonction est pour la tache E2 et l'authentification avec succès
-@app.route('/connection/profil', methods=["GET"])
-# @authentification_requise_connexion
+@app.route('/connection/profil', methods=["GET", "POST"])
+@authentification_requise
 def profil_connecter():
-    id_session = session["id"]
-    courriel = session["courriel"]
-    titre = "Vous êtes maintenant connecté !"
-    return render_template("utilisateur_connecter.html", titre=titre)
+    # Validation que le id de session est toujours valide dans a BD
+    # Car nous détruisons les sessions à chaque jours à 00:15
+    conn_db = get_db()
+    courriel = conn_db.recuperation_session_active(session["id"])
+    if courriel is None:
+        session.pop('id', None)
+        personne_non_autorisee()
+
+    elif request.method == "GET":
+        liste_champs_connecter = initial_champ_connecter()
+        info_profil = conn_db.recuperation_profil(courriel)
+        info_etablissement = conn_db.recuperation_profil_etablissement(
+            info_profil[4])
+        liste_champs_connecter = remplissage_champ_connecter(
+            liste_champs_connecter, info_profil, info_etablissement)
+
+        titre = "Vous êtes maintenant connecté !"
+        return render_template("utilisateur_connecter.html", titre=titre,
+                               liste_champs_connecter=liste_champs_connecter)
+
+    elif request.method == "POST":
+        pass
 
 
-# À vérifier plutard !!!
 @app.route('/deconnection')
-@authentification_requise_deconnexion
-def logout():
+@authentification_requise
+def deconnection_profil():
     id_session = session["id"]
     session.pop('id', None)
     conn_db = get_db()
@@ -386,9 +384,10 @@ def is_authenticated(session):
     return "id" in session
 
 
-def send_unauthorized():
-    return Response('Could not verify your access level for that URL.\n'
-                    'You have to login with proper credentials', 401,
+def personne_non_autorisee():
+    return Response('Vous tentez d''accéder à une page web sécurité !\n'
+                    'Veuillez vous authentifiez avec ce lien :\n'
+                    'http://127.0.0.1:5000/connection', 401,
                     {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 

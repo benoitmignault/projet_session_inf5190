@@ -237,6 +237,45 @@ class Database:
         connection.execute(sql, (id_session,))
         connection.commit()
 
+    def recuperation_session_active(self, id_session):
+        cursor = self.get_connection().cursor()
+        select = "SELECT courriel "
+        fromm = "FROM session_profil "
+        where = "WHERE id_session = ? "
+        sql = select + fromm + where
+        cursor.execute(sql, (id_session,))
+        result = cursor.fetchone()
+        if result is None:
+            return None
+        else:
+            return result[0]
+
+    def recuperation_profil(self, courriel):
+        cursor = self.get_connection().cursor()
+        select = "SELECT prenom, nom, id_photo, id_personne, courriel "
+        fromm = "FROM profil_utilisateur "
+        where = "WHERE courriel = ? "
+        sql = select + fromm + where
+        cursor.execute(sql, (courriel,))
+        result = cursor.fetchone()
+        if result is None:
+            return None
+        else:
+            return result[0], result[1], result[2], result[3], result[4]
+
+    def recuperation_profil_etablissement(self, id_personne):
+        cursor = self.get_connection().cursor()
+        select = "SELECT etablissement "
+        fromm = "FROM etablissement_surveiller "
+        where = "WHERE id_personne = ? "
+        order = "ORDER BY etablissement "
+        sql = select + fromm + where + order
+        cursor.execute(sql, (id_personne,))
+        result = cursor.fetchall()
+        ensemble_trouve = recuperation_resultat_liste(result)
+
+        return ensemble_trouve
+
 
 def remplissage_condition_sql(liste_champs):
     # La préparation des critères en vue d'utiliser l'opérateur like aura
@@ -367,7 +406,7 @@ def recuperation_resultat_regrouper(result):
     return ensemble_trouve
 
 
-# Cette fonction sera utiliser pour la tache A6
+# Cette fonction sera utiliser pour la tache A6, E2
 def recuperation_resultat_liste(result):
     ensemble_trouve = []
 
