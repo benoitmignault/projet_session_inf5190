@@ -20,11 +20,11 @@ app.secret_key = "(*&*&322387he738220)(*(*22347657"
 
 
 @app.errorhandler(404)
-def not_found(e):
+def not_found_404(e):
     erreur_404 = True
-    titre = "Page inexistante - 404"
+    titre = "Page inexistante"
     return render_template("erreur_404.html", titre=titre,
-                           erreur_404=erreur_404)
+                           erreur_404=erreur_404), 404
 
 
 @app.errorhandler(JsonValidationError)
@@ -385,10 +385,10 @@ def is_authenticated(session):
 
 
 def personne_non_autorisee():
-    return Response('Vous tentez d''accéder à une page web sécurité !\n'
-                    'Veuillez vous authentifiez avec ce lien :\n'
-                    'http://127.0.0.1:5000/connection', 401,
-                    {'WWW-Authenticate': 'Basic realm="Login Required"'})
+    return Response("Vous tentez d''accéder à une page web sécurité !<br>"
+                    "Veuillez vous authentifiez avec ce lien :<br> "
+                    "<a href=\"/connection\">Se Connecter</a>'"
+                    , 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 
 # La fonction sera exécuté à chaque jour à minuit, automatiquement
