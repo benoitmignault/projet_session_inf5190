@@ -1,11 +1,81 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Bienvenue dans votre profil !</h1>
+<h1>Bienvenue dans votre profil &rarr; <span class='userDisplay'>{{liste_infos['prenom']}} {{liste_infos['nom']}}</span>
+    &larr;</h1>
 <div class="container">
+    <h2>Section pour gérer votre photo de profil</h2>
+    <div class='zone_recherche_resto'>
+
+    </div>
+    <!-- Utilisation nouvelle d'un bouton X : https://fr.pngtree.com/element/down?id=Mjc3NDkzMA==&type=1 -->
+    <h2>Section pour gérer vos établissements à surveiller</h2>
+    <div class='zone_recherche_resto'>
+        <fieldset>
+            <legend class="legendCenter">Voici votre liste actuel</legend>
+            <table class="tableau_profil">
+                <thead>
+                <tr>
+                    <th>Nom de l'établissement</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for un_etablissement in etablissement %}
+                <tr>
+                    <td>{{un_etablissement["nom"]}}</td>
+                    <td class="supp">
+                        <form method="post"
+                              action="/connecter/retirer_etablissement">
+                            <input class="bouton_supp" type="submit" value="">
+                            <input type="hidden" name="id_surveillance"
+                                   value="{{un_etablissement['id_surveillance']}}">
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </fieldset>
+        <fieldset>
+            <legend class="legendCenter">Voici la liste des établissements
+                disponible
+            </legend>
+            <form method="post" action="/connecter/ajouter_etablissement"
+                  id="ajout_etablissement">
+                <div class="modif">
+                    <div class="information">
+                        <label for="ajout_resto_profil">Liste des établissements
+                            :</label>
+                        <div>
+                            <!-- https://select2.org/getting-started/basic-usage -->
+                            <select class="js-example-basic-multiple"
+                                    id="ajout_resto_profil" multiple="multiple"
+                                    name="ajout_resto_profil[]"
+                                    title="Saisir un/des établissement(s) en particulier">
+                                {% for un_etablissement in etablissement_dispo %}
+                                <option value="{{un_etablissement}}">
+                                    {{un_etablissement}}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="troisBTN">
+                        <input class="bouton" type='submit' value="Ajouter...">
+                        <input class="bouton" id="btn_reset_etablissement"
+                               type='reset'
+                               value="Effacer...">
+                    </div>
+                </div>
+                <ul class="aucun" id="message_erreur_etablissement"></ul>
+            </form>
+        </fieldset>
+    </div>
+
     <h2>Section pour revenir à la page d'accueil</h2>
     <div class='zone_admin'>
         <div class="admin">
-            <a class="bouton" href="/deconnection">Page D'accueil</a>
+            <a class="bouton" href="/deconnection">Déconnexion</a>
         </div>
     </div>
 </div>

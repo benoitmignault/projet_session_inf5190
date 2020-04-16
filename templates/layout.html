@@ -22,16 +22,13 @@
     <!-- Fichier 404-notfound.jpg est une propriété du site https://www.flickr.com/photos/guspim/2280690094/ sous licence libre -->
     <link href="/img/icone404.jpg" rel="shortcut icon">
     {% endif %}
-
-    {% if titre %}
-    <title>Restaurant - {{ titre }}</title>
-    {% if titre == "Création d'un profil" %}
     <!-- Licence :
     Select2 is licensed under the Apache Software Foundation License Version 2.0
     and GPL Version 2.0. Coded by Igor Vaynberg. -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css"
           rel="stylesheet">
-    {% endif %}
+    {% if titre %}
+    <title>Restaurant - {{ titre }}</title>
     {% else %}
     <title>Restaurant - CMS</title>
     {% endif %}

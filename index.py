@@ -68,6 +68,8 @@ def home():
     conn_db = get_db()
     liste_etablissement = conn_db.liste_tous_restaurants()
 
+    # todo Faire des validations simple sur les champs en JS
+
     return render_template('home.html', titre=titre,
                            liste_etablissement=liste_etablissement,
                            liste_validation=liste_validation,
@@ -231,6 +233,7 @@ def api_creation_plainte():
 # Cette fonction est pour la tache D1 de l'interface web
 @app.route('/nouvelle_plainte', methods=["GET"])
 def creation_plainte():
+    # todo Refaire une liste des établissements au lieu d'un champ text
     titre = "Nouvelle plainte"
     return render_template("formulaire_plainte.html", titre=titre)
 
@@ -342,32 +345,44 @@ def authentification_requise(f):
     return decorated
 
 
+# todo Retirer les commentaires suivant :
+# todo @authentification_requise &
+# todo courriel = conn_db.recuperation_session_active(session["id"])
 # Cette fonction est pour la tache E2 et l'authentification avec succès
-@app.route('/connection/profil', methods=["GET", "POST"])
-@authentification_requise
+@app.route('/connection/profil', methods=["GET"])
+# @authentification_requise
 def profil_connecter():
-    # Validation que le id de session est toujours valide dans a BD
-    # Car nous détruisons les sessions à chaque jours à 00:15
     conn_db = get_db()
-    courriel = conn_db.recuperation_session_active(session["id"])
-    if courriel is None:
-        session.pop('id', None)
-        personne_non_autorisee()
-
-    elif request.method == "GET":
-        liste_champs_connecter = initial_champ_connecter()
+    # courriel = conn_db.recuperation_session_active(session["id"])
+    courriel = "b.mignault@gmail.com"
+    if request.method == "GET":
+        liste_infos = initial_infos_connecter()
         info_profil = conn_db.recuperation_profil(courriel)
-        info_etablissement = conn_db.recuperation_profil_etablissement(
-            info_profil[4])
-        liste_champs_connecter = remplissage_champ_connecter(
-            liste_champs_connecter, info_profil, info_etablissement)
+        etablissement = conn_db.recuperation_profil_etablissement(
+            info_profil[3])
+        etablissement_dispo = conn_db.recuperation_etablissement_restant(
+            info_profil[3])
+        liste_infos = remplissage_infos_connecter(liste_infos, info_profil)
 
         titre = "Vous êtes maintenant connecté !"
         return render_template("utilisateur_connecter.html", titre=titre,
-                               liste_champs_connecter=liste_champs_connecter)
+                               liste_infos=liste_infos,
+                               etablissement=etablissement,
+                               etablissement_dispo=etablissement_dispo)
 
-    elif request.method == "POST":
-        pass
+
+@app.route('/connecter/retirer_etablissement', methods=["POST"])
+# @authentification_requise
+def retirer_etablissement():
+    # todo Faire le retrait de la combinaison etablissement en surveillance
+    return redirect(url_for('.profil_connecter'))
+
+
+@app.route('/connecter/ajouter_etablissement', methods=["POST"])
+# @authentification_requise
+def ajouter_etablissement():
+    # todo Faire l'ajout de la combinaison etablissement en surveillance
+    return redirect(url_for('.profil_connecter'))
 
 
 @app.route('/deconnection')
@@ -377,7 +392,7 @@ def deconnection_profil():
     session.pop('id', None)
     conn_db = get_db()
     conn_db.detruire_session_active(id_session)
-    return redirect("/")
+    return redirect(url_for('.home'))
 
 
 def is_authenticated(session):

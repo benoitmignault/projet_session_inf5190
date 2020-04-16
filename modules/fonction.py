@@ -109,11 +109,11 @@ def mise_jour_bd():
     connection.disconnect()
 
 
-def initial_champ_connecter():
-    liste_champs = {"id_personne": "", "id_photo": "", "prenom": "", "nom": "",
-                    "courriel": "", "liste_etablissement": []}
+def initial_infos_connecter():
+    liste_infos = {"id_personne": "", "id_photo": "", "prenom": "", "nom": "",
+                   "courriel": ""}
 
-    return liste_champs
+    return liste_infos
 
 
 def initial_champ_interval():
@@ -317,17 +317,14 @@ def remplissage_champ_connexion(request, liste_champs):
     return liste_champs
 
 
-def remplissage_champ_connecter(liste_champs, info_profil, info_etablissement):
-    liste_champs['prenom'] = info_profil[0]
-    liste_champs['nom'] = info_profil[1]
-    liste_champs['id_photo'] = info_profil[2]
-    liste_champs['id_personne'] = info_profil[3]
-    liste_champs['courriel'] = info_profil[4]
+def remplissage_infos_connecter(liste_infos, info_profil):
+    liste_infos['prenom'] = info_profil[0]
+    liste_infos['nom'] = info_profil[1]
+    liste_infos['id_photo'] = info_profil[2]
+    liste_infos['id_personne'] = info_profil[3]
+    liste_infos['courriel'] = info_profil[4]
 
-    for etablissement in info_etablissement:
-        liste_champs['liste_etablissement'].append(etablissement)
-
-    return liste_champs
+    return liste_infos
 
 
 def remplissage_post_verification_conn(liste_champs, utilisateur):
@@ -479,7 +476,7 @@ def nombre_critiere_recherche(liste_champs):
 
 def validation_champ_connexion(liste_champs, liste_validation):
     if (not liste_validation['champ_courriel_vide'] and not
-            liste_validation['champ_password_vide']):
+    liste_validation['champ_password_vide']):
         liste_validation = sous_validation_courriel_connexion(liste_champs,
                                                               liste_validation)
         liste_validation = sous_validation_password_connexion(liste_champs,

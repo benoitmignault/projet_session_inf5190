@@ -265,11 +265,31 @@ class Database:
 
     def recuperation_profil_etablissement(self, id_personne):
         cursor = self.get_connection().cursor()
-        select = "SELECT etablissement "
+        select = "SELECT etablissement, id_surveillance "
         fromm = "FROM etablissement_surveiller "
         where = "WHERE id_personne = ? "
         order = "ORDER BY etablissement "
         sql = select + fromm + where + order
+        cursor.execute(sql, (id_personne,))
+        result = cursor.fetchall()
+        ensemble_trouve = recuperation_liste_etablissement(result)
+
+        return ensemble_trouve
+
+    def recuperation_etablissement_restant(self, id_personne):
+        cursor = self.get_connection().cursor()
+        select1 = "select distinct etablissement "
+        from1 = "from mauvais_restaurants "
+        where1 = "where etablissement not in "
+        sous_request1 = select1 + from1 + where1
+        sous_request2 = "( "
+        select2 = "select etablissement "
+        from2 = "from etablissement_surveiller "
+        where2 = "where id_personne = ? "
+        sous_request2 += select2 + from2 + where2
+        sous_request2 += ") "
+        order = "ORDER BY etablissement "
+        sql = sous_request1 + sous_request2 + order
         cursor.execute(sql, (id_personne,))
         result = cursor.fetchall()
         ensemble_trouve = recuperation_resultat_liste(result)
@@ -413,6 +433,18 @@ def recuperation_resultat_liste(result):
     if result is not None:
         for un_resto in result:
             ensemble_trouve.append(un_resto[0])
+
+    return ensemble_trouve
+
+
+# Cette fonction sera utilser pour la tache E2
+def recuperation_liste_etablissement(result):
+    ensemble_trouve = []
+    if result is not None:
+        for un_etablissement in result:
+            sous_ensemble = {'nom': un_etablissement[0],
+                             'id_surveillance': un_etablissement[1]}
+            ensemble_trouve.append(sous_ensemble)
 
     return ensemble_trouve
 
