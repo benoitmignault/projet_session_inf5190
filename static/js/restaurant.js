@@ -50,6 +50,10 @@ const btn_reset_connection = document.querySelector('#btn_reset_connection');
 const message_erreur_connection = document.querySelector('#message_erreur_connection');
 const champ_courriel_connection = document.querySelector('#courriel_conn');
 const champ_password_connection = document.querySelector('#password_conn');
+// Variable pour la gestion des établissements du profil
+const form_ajout_etablissement = document.querySelector('#ajout_etablissement');
+const btn_reset_etablissement = document.querySelector('#btn_reset_etablissement');
+const message_erreur_etablissement = document.querySelector('#message_erreur_etablissement');
 
 const pattern_date = new RegExp("^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$");
 const pattern_code = new RegExp("^[A-Z][0-9][A-Z][ ]{1}[0-9][A-Z][0-9]$");
@@ -140,17 +144,7 @@ function reset_nouveau_profil(){
         champ_courriel.defaultValue = "";
         champ_password.defaultValue = "";
         champ_password_conf.defaultValue = "";
-
-        $('.select2-selection__rendered .select2-selection__choice').each(function () {
-            $(this).remove(); // Remove li one by one
-        });
-        // Champ où est affiché la liste sans être la liste
-        var champ_liste_etablissement = document.querySelector('.select2-search__field');
-        var section_afficher_liste = document.querySelector('.select2-search--inline');
-        // Remise aux valeurs initiales du champ
-        champ_liste_etablissement.placeholder = "Choix d'(es) établissement(s)";
-        section_afficher_liste.style.width = "100%";
-        champ_liste_etablissement.style.width = "100%";
+        initialiser_selection_evoluee();
         result_profil.innerHTML = "";
         effacer_messages_erreurs(message_erreur_profil);
         initialiser_tous_champs("input[type=password]");
@@ -169,6 +163,26 @@ function reset_demande_connection(){
         initialiser_tous_champs("input[type=email]");
         initialiser_tous_champs("#connection_profil");
     });
+}
+
+function reset_gestion_etablissement(){
+    $(btn_reset_etablissement).click(function() {
+        effacer_messages_erreurs(message_erreur_etablissement);
+        initialiser_selection_evoluee();
+    });
+}
+
+function initialiser_selection_evoluee(){
+    $('.select2-selection__rendered .select2-selection__choice').each(function () {
+            $(this).remove(); // Remove li one by one
+    });
+    // Champ où est affiché la liste sans être la liste
+    var champ_liste_etablissement = document.querySelector('.select2-search__field');
+    var section_afficher_liste = document.querySelector('.select2-search--inline');
+    // Remise aux valeurs initiales du champ
+    champ_liste_etablissement.placeholder = "Choix d'(es) établissement(s)";
+    section_afficher_liste.style.width = "100%";
+    champ_liste_etablissement.style.width = "100%";
 }
 
 function initialiser_tous_champs(type_champs){
@@ -290,6 +304,18 @@ function demande_connection_profil(){
         if (champ_courriel_connection.value == "" || champ_password_connection.value == ""){
             e.preventDefault();
             alert("Veuiller saisir des informations dans les champs vides !");
+        } else {
+            $(this).unbind(e);
+        }
+    });
+}
+
+function modification_liste_etablissements(){
+    $(form_ajout_etablissement).submit(function (e) {
+        var liste_etablissements = document.querySelectorAll('.select2-selection__choice');
+        if (liste_etablissements.length == 0){
+            e.preventDefault();
+            alert("Veuiller saisir une liste établissements à surveiller !");
         } else {
             $(this).unbind(e);
         }
@@ -820,10 +846,12 @@ document.addEventListener('DOMContentLoaded', function () {
     demande_plainte();
     demande_nouveau_profil();
     demande_connection_profil();
+    modification_liste_etablissements();
     reset_recherche();
     reset_recherche_interval();
     reset_demande_plainte();
     reset_nouveau_profil();
     reset_demande_connection();
+    reset_gestion_etablissement();
     creation_select2();
 });
