@@ -349,7 +349,7 @@ def authentification_requise(f):
 # todo @authentification_requise &
 # todo courriel = conn_db.recuperation_session_active(session["id"])
 # Cette fonction est pour la tache E2 et l'authentification avec succès
-@app.route('/connection/profil', methods=["GET"])
+@app.route('/connecter/profil', methods=["GET"])
 # @authentification_requise
 def profil_connecter():
     conn_db = get_db()
@@ -371,18 +371,28 @@ def profil_connecter():
                                etablissement_dispo=etablissement_dispo)
 
 
-@app.route('/connecter/retirer_etablissement', methods=["POST"])
+# todo créer un jsonschema pour vérifier le json qu'on saisir
+@app.route('/api/connecter/retirer_etablissement', methods=["DELETE"])
 # @authentification_requise
 def retirer_etablissement():
-    # todo Faire le retrait de la combinaison etablissement en surveillance
-    return redirect(url_for('.profil_connecter'))
+    conn_db = get_db()
+    data = request.get_json()
+    id_surveillance = conn_db.verification_etablissement_surveiller(
+        data['id_surveillance'])
+
+    if id_surveillance is None:
+        return "", 404
+    else:
+        conn_db.supprimer_etablissement_profil(data['id_personne'],
+                                               id_surveillance)
+        return "", 200
 
 
-@app.route('/connecter/ajouter_etablissement', methods=["POST"])
+@app.route('/api/connecter/ajouter_etablissement', methods=["POST"])
 # @authentification_requise
 def ajouter_etablissement():
     # todo Faire l'ajout de la combinaison etablissement en surveillance
-    return redirect(url_for('.profil_connecter'))
+    return "", 200
 
 
 @app.route('/deconnection')

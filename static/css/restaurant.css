@@ -122,9 +122,13 @@ h2 {
     justify-content: center;
 }
 
+.container > .zone_recherche_resto > form,
+.container > .zone_recherche_resto > form > fieldset,
 .container > .zone_recherche_resto > fieldset{
     width: 100%;
 }
+
+.container > .zone_recherche_resto > form > fieldset,
 .container > .zone_recherche_resto > fieldset,
 .container > .zone_recherche_resto > form > .modif > fieldset{
     border-color: black;
@@ -156,6 +160,7 @@ h2 {
 Nouvelle manière d'afficher un legend au milieu
 */
 .container > .zone_recherche_resto > fieldset > .legendCenter,
+.container > .zone_recherche_resto > form > fieldset > .legendCenter,
 .container > .zone_recherche_resto > form > .modif > fieldset > .legendCenter{
     display: table;
     min-width: 0px;
@@ -278,27 +283,27 @@ Fin de l'ajout du recentrage de attribut legend
 
 }
 
-.container > .zone_recherche_resto > fieldset > .tableau_profil{
+.container > .zone_recherche_resto > form > fieldset > .tableau_profil{
     width: 50%;
     border-spacing: 0;
 }
 
 
-.container > .zone_recherche_resto > fieldset >.tableau_profil td,
-.container > .zone_recherche_resto > fieldset >.tableau_profil th{
+.container > .zone_recherche_resto > form > fieldset >.tableau_profil td,
+.container > .zone_recherche_resto > form > fieldset >.tableau_profil th{
     border: 1px solid black;
     padding: 5px;
 }
 
-.container > .zone_recherche_resto > fieldset >.tableau_profil td{
+.container > .zone_recherche_resto > form > fieldset >.tableau_profil td{
     text-align: center;
 }
 
-.container > .zone_recherche_resto > fieldset >.tableau_profil .supp{
+.container > .zone_recherche_resto > form > fieldset >.tableau_profil .supp{
     width: 10%;
 }
 
-.container > .zone_recherche_resto > fieldset >.tableau_profil .supp .bouton_supp{
+.container > .zone_recherche_resto > form > fieldset >.tableau_profil .supp .bouton_supp{
     padding: 0;
     background-image: url("/img/delete.png");
     border: 0;
@@ -309,7 +314,7 @@ Fin de l'ajout du recentrage de attribut legend
     background-size: 100%;
 }
 
-.container > .zone_recherche_resto > fieldset >.tableau_profil .bouton_supp:hover {
+.container > .zone_recherche_resto > form > fieldset >.tableau_profil .bouton_supp:hover {
     cursor: pointer;
 }
 

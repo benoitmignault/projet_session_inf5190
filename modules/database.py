@@ -166,6 +166,19 @@ class Database:
         else:
             return result[0][0]
 
+    def verification_etablissement_surveiller(self, id_surveillance):
+        cursor = self.get_connection().cursor()
+        select = "SELECT id_surveillance "
+        fromm = "FROM etablissement_surveiller "
+        where = "WHERE id_surveillance = ? "
+        sql = select + fromm + where
+        cursor.execute(sql, (id_surveillance,))
+        result = cursor.fetchall()
+        if len(result) is 0:
+            return None
+        else:
+            return result[0][0]
+
     def suppression_plainte_existante(self, no_plainte):
         connection = self.get_connection()
         sql = "DELETE from departement_plaintes where id_plainte = ?"
@@ -200,16 +213,24 @@ class Database:
         cursor = connection.cursor()
         cursor.execute("select max(id_personne) from profil_utilisateur")
         result = cursor.fetchall()
-        self.inserer_etablissement_surveiller_par_profil(result[0][0],
+        self.inserer_etablissement_surveiller_profil(result[0][0],
                                                          liste_etablissement)
 
-    def inserer_etablissement_surveiller_par_profil(self, id_personne, liste):
+    def inserer_etablissement_surveiller_profil(self, id_personne, liste):
         connection = self.get_connection()
         for un_etablissement in liste:
             insert_bd = "INSERT INTO etablissement_surveiller " \
                         "(id_personne, etablissement) VALUES (?, ?)"
             connection.execute(insert_bd, (id_personne, un_etablissement))
             connection.commit()
+
+    def supprimer_etablissement_profil(self, id_personne, id_surveillance):
+        connection = self.get_connection()
+        delete = "DELETE from etablissement_surveiller "
+        where = "where id_personne = ? and id_surveillance = ? "
+        sql = delete + where
+        connection.execute(sql, (id_personne, id_surveillance))
+        connection.commit()
 
     def recuperation_info_connexion(self, courriel):
         cursor = self.get_connection().cursor()

@@ -7,40 +7,43 @@
     <div class='zone_recherche_resto'>
 
     </div>
-    <!-- Utilisation nouvelle d'un bouton X : https://fr.pngtree.com/element/down?id=Mjc3NDkzMA==&type=1 -->
+    <!-- Utilisation nouvelle d'un bouton X :
+    https://fr.pngtree.com/element/down?id=Mjc3NDkzMA==&type=1 -->
     <h2>Section pour gérer vos établissements à surveiller</h2>
     <div class='zone_recherche_resto'>
-        <fieldset>
-            <legend class="legendCenter">Voici votre liste actuel</legend>
-            <table class="tableau_profil">
-                <thead>
-                <tr>
-                    <th>Nom de l'établissement</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for un_etablissement in etablissement %}
-                <tr>
-                    <td>{{un_etablissement["nom"]}}</td>
-                    <td class="supp">
-                        <form method="post"
-                              action="/connecter/retirer_etablissement">
-                            <input class="bouton_supp" type="submit" value="">
-                            <input type="hidden" name="id_surveillance"
-                                   value="{{un_etablissement['id_surveillance']}}">
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </fieldset>
+        <form method="post" id="retrait_etablissement"
+              action="/api/connecter/retirer_etablissement">
+            <input type="hidden" name="id_personne" id="id_personne"
+                   value="{{liste_infos['id_personne']}}">
+            <fieldset>
+                <legend class="legendCenter">Voici votre liste actuel</legend>
+                <table class="tableau_profil">
+                    <thead>
+                    <tr>
+                        <th>Nom de l'établissement</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for un_etablissement in etablissement %}
+                    <tr class="{{un_etablissement['id_surveillance']}}">
+                        <td>{{un_etablissement["nom"]}}</td>
+                        <td class="supp">
+                            <input class="bouton_supp"
+                                   name="retrait" id="{{un_etablissement['id_surveillance']}}"
+                                   type="submit" value="">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </fieldset>
+        </form>
         <fieldset>
             <legend class="legendCenter">Voici la liste des établissements
                 disponible
             </legend>
-            <form method="post" action="/connecter/ajouter_etablissement"
+            <form method="post" action="/api/connecter/ajouter_etablissement"
                   id="ajout_etablissement">
                 <div class="modif">
                     <div class="information">
@@ -52,7 +55,8 @@
                                     id="ajout_resto_profil" multiple="multiple"
                                     name="ajout_resto_profil[]"
                                     title="Saisir un/des établissement(s) en particulier">
-                                {% for un_etablissement in etablissement_dispo %}
+                                {% for un_etablissement in etablissement_dispo
+                                %}
                                 <option value="{{un_etablissement}}">
                                     {{un_etablissement}}
                                 </option>
