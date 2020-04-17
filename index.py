@@ -383,19 +383,32 @@ def retirer_etablissement():
     if id_surveillance is None:
         return "", 404
     else:
-        # conn_db.supprimer_etablissement_profil(data['id_personne'],
-        #                                       id_surveillance)
+        conn_db.supprimer_etablissement_profil(
+            data['id_personne'], id_surveillance)
         etablissement_dispo = conn_db.recuperation_etablissement_restant(
             data['id_personne'])
 
         return jsonify(etablissement_dispo), 200
 
 
+# todo créer un jsonschema pour vérifier le json qu'on saisir
 @app.route('/api/connecter/ajouter_etablissement', methods=["POST"])
 # @authentification_requise
 def ajouter_etablissement():
-    # todo Faire l'ajout de la combinaison etablissement en surveillance
-    return "", 200
+    conn_db = get_db()
+    liste_champs_ajout = initial_champ_ajout_etablissement()
+    liste_champs_ajout = remplissage_champ_ajout_etablissement(
+        request, liste_champs_ajout)
+    conn_db.inserer_etablissement_surveiller_profil(
+        liste_champs_ajout['id_personne'],
+        liste_champs_ajout['liste_etablissement'])
+
+    etablissement = conn_db.recuperation_profil_etablissement(
+        liste_champs_ajout['id_personne'])
+    etablissement_dispo = conn_db.recuperation_etablissement_restant(
+        liste_champs_ajout['id_personne'])
+    return jsonify({"etablissement": etablissement,
+                    "etablissement_dispo": etablissement_dispo}), 200
 
 
 @app.route('/deconnection')

@@ -147,6 +147,12 @@ def initial_champ_nouveau_profil():
     return liste_champs
 
 
+def initial_champ_ajout_etablissement():
+    liste_champs = {"id_personne": 0, "liste_etablissement": []}
+
+    return liste_champs
+
+
 def initial_champ_connexion():
     liste_champs = {"courriel": "", "password": "", "salt": "", "hash": "",
                     "password_hasher": "", "messages": []}
@@ -370,6 +376,17 @@ def remplissage_champ_nouveau_profil(request, liste_champs):
     liste_champs['salt'] = salt
     liste_champs['password_hasher'] = hashlib.sha512(
         str(liste_champs['password'] + salt).encode("utf-8")).hexdigest()
+
+    for un_etablissement in data['liste_etablissement']:
+        liste_champs['liste_etablissement'].append(un_etablissement)
+
+    return liste_champs
+
+
+def remplissage_champ_ajout_etablissement(request, liste_champs):
+    data = request.get_json()
+    liste_champs['id_personne'] = data['id_personne']
+    print(liste_champs['id_personne'])
 
     for un_etablissement in data['liste_etablissement']:
         liste_champs['liste_etablissement'].append(un_etablissement)

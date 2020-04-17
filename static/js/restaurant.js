@@ -55,14 +55,16 @@ const champ_password_connection = document.querySelector('#password_conn');
 const tableau_etablissement = document.querySelector('.tableau_profil');
 const list_etablissement_dispo = document.querySelector('#ajout_resto_profil');
 
+
 // Variable pour la gestion des établissements du profil
 const form_ajout_etablissement = document.querySelector('#ajout_etablissement');
 const btn_reset_etablissement = document.querySelector('#btn_reset_etablissement');
 const message_erreur_etablissement = document.querySelector('#message_erreur_etablissement');
+const champ_id_personne_ajout = document.querySelector('#id_personne_ajout');
 
 // Variable pour retirer un établissement de la liste de surveillance
 const form_retrait_etablissement = document.querySelector('#retrait_etablissement');
-const champ_id_personne = document.querySelector('#id_personne');
+const champ_id_personne_supp = document.querySelector('#id_personne_supp');
 
 const pattern_date = new RegExp("^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$");
 const pattern_code = new RegExp("^[A-Z][0-9][A-Z][ ]{1}[0-9][A-Z][0-9]$");
@@ -331,12 +333,13 @@ function retrait_etablissement_profil(){
 
 function ajout_etablissements_profil(){
     $(form_ajout_etablissement).submit(function (e) {
+        e.preventDefault();
         var liste_etablissements = document.querySelectorAll('.select2-selection__choice');
         if (liste_etablissements.length == 0){
-            e.preventDefault();
             alert("Veuiller saisir une liste établissements à surveiller !");
         } else {
-            $(this).unbind(e);
+            //$(this).unbind(e);
+            appel_ajax_ajout_etablissement_profil(liste_etablissements);
         }
     });
 }
@@ -780,24 +783,50 @@ function appel_ajax_nouveau_profil(){
     ajax.send(data_json);
 }
 
+function appel_ajax_ajout_etablissement_profil(liste_etablissements){
+    var ajax = new XMLHttpRequest();
+    ajax.onreadystatechange = function() {
+        if (ajax.readyState === XMLHttpRequest.DONE) {
+            if (ajax.status === 200) {
+                var liste = JSON.parse(ajax.responseText);
+                refaire_tableau_etablissement(liste["etablissement"]);
+                refaire_etablissement_disponible(liste["etablissement_dispo"]);
+            } else {
+                message_erreur_etablissement.innerHTML += "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
+            }
+        }
+    };
+
+    var data = {
+            "id_personne": champ_id_personne_ajout.value,
+            "liste_etablissement": []
+    };
+
+    liste_etablissements.forEach(function(un_etablissement){
+        data["liste_etablissement"].push(un_etablissement.title.trim());
+    });
+
+    var data_json = JSON.stringify(data);
+    ajax.open("POST", "/api/connecter/ajouter_etablissement", true);
+    ajax.setRequestHeader("Content-Type", "application/json");
+    ajax.send(data_json);
+}
+
 function appel_ajax_retrait_etablissement_profil(id_surveillance){
     var ajax = new XMLHttpRequest();
     ajax.onreadystatechange = function() {
         if (ajax.readyState === XMLHttpRequest.DONE) {
             if (ajax.status === 200) {
                 var liste = JSON.parse(ajax.responseText);
-                //supprimer_ligne_tableau_etablissement(id_surveillance);
+                supprimer_ligne_tableau_etablissement(id_surveillance);
                 refaire_etablissement_disponible(liste);
-
             }
         }
     };
-
     var data = {
             "id_surveillance": id_surveillance,
-            "id_personne": champ_id_personne.value
+            "id_personne": champ_id_personne_supp.value
     };
-
     var data_json = JSON.stringify(data);
     ajax.open("DELETE", "/api/connecter/retirer_etablissement", true);
     ajax.setRequestHeader("Content-Type", "application/json");
@@ -811,6 +840,30 @@ function refaire_etablissement_disponible(liste){
         var option = liste[i];
         // Pour refaire toutes les options MAJ en fonction de l'ajout ou du retrait
         $(list_etablissement_dispo).append(new Option(option, option));
+    }
+}
+
+function refaire_tableau_etablissement(liste){
+    $(tableau_etablissement).find("tr:gt(0)").remove();
+    for(var i = 0; i < liste.length; i++) {
+        const un_etablissement = Object.entries(liste[i]);
+        var id_surveillance = 0;
+        var etablissement = "";
+        for (const [cle, valeur] of un_etablissement) {
+            if (cle == "id_surveillance"){
+                id_surveillance = valeur;
+            } else if (cle == "nom"){
+                etablissement = valeur;
+            }
+        }
+        var nouvelle_ligne = "<tr class=\""+id_surveillance+"\">";
+        var colonne1 = "<td>"+etablissement+"</td>";
+        var colonne2 = "<td class=\"supp\"><input class=\"bouton_supp\" name=\"retrait\" ";
+        colonne2 += "type=\"submit\" value=\"\" id=\""+id_surveillance+"\" </td>";
+        var fin_ligne = "</tr>";
+        var ligne = nouvelle_ligne + colonne1 + colonne2 + fin_ligne;
+
+        $('.tableau_profil > tbody:last-child').append(ligne);
     }
 }
 

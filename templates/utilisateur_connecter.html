@@ -13,7 +13,7 @@
     <div class='zone_recherche_resto'>
         <form method="post" id="retrait_etablissement"
               action="/api/connecter/retirer_etablissement">
-            <input type="hidden" name="id_personne" id="id_personne"
+            <input type="hidden" name="id_personne" id="id_personne_supp"
                    value="{{liste_infos['id_personne']}}">
             <fieldset>
                 <legend class="legendCenter">Voici votre liste actuel</legend>
@@ -45,6 +45,8 @@
             </legend>
             <form method="post" action="/api/connecter/ajouter_etablissement"
                   id="ajout_etablissement">
+                <input type="hidden" name="id_personne" id="id_personne_ajout"
+                   value="{{liste_infos['id_personne']}}">
                 <div class="modif">
                     <div class="information">
                         <label for="ajout_resto_profil">Liste des établissements
