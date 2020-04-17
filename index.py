@@ -383,9 +383,12 @@ def retirer_etablissement():
     if id_surveillance is None:
         return "", 404
     else:
-        conn_db.supprimer_etablissement_profil(data['id_personne'],
-                                               id_surveillance)
-        return "", 200
+        # conn_db.supprimer_etablissement_profil(data['id_personne'],
+        #                                       id_surveillance)
+        etablissement_dispo = conn_db.recuperation_etablissement_restant(
+            data['id_personne'])
+
+        return jsonify(etablissement_dispo), 200
 
 
 @app.route('/api/connecter/ajouter_etablissement', methods=["POST"])

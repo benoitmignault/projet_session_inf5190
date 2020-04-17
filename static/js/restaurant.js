@@ -53,6 +53,7 @@ const champ_password_connection = document.querySelector('#password_conn');
 
 // Variable commune pour les deux appels ajax de la section des établissements
 const tableau_etablissement = document.querySelector('.tableau_profil');
+const list_etablissement_dispo = document.querySelector('#ajout_resto_profil');
 
 // Variable pour la gestion des établissements du profil
 const form_ajout_etablissement = document.querySelector('#ajout_etablissement');
@@ -784,12 +785,10 @@ function appel_ajax_retrait_etablissement_profil(id_surveillance){
     ajax.onreadystatechange = function() {
         if (ajax.readyState === XMLHttpRequest.DONE) {
             if (ajax.status === 200) {
-                //var liste = JSON.parse(ajax.responseText);
-                // Supprimer la ligne qu'on enleve
-                var d = document.getElementsByClassName(id_surveillance);
-                for (var i = 0; i < d.length; i++) {
-                    d[i].parentElement.removeChild(d[i]);
-                }
+                var liste = JSON.parse(ajax.responseText);
+                //supprimer_ligne_tableau_etablissement(id_surveillance);
+                refaire_etablissement_disponible(liste);
+
             }
         }
     };
@@ -803,6 +802,23 @@ function appel_ajax_retrait_etablissement_profil(id_surveillance){
     ajax.open("DELETE", "/api/connecter/retirer_etablissement", true);
     ajax.setRequestHeader("Content-Type", "application/json");
     ajax.send(data_json);
+}
+
+function refaire_etablissement_disponible(liste){
+    // On supprime toutes les vieilles options
+    $(list_etablissement_dispo).empty();
+    for(var i = 0; i < liste.length; i++) {
+        var option = liste[i];
+        // Pour refaire toutes les options MAJ en fonction de l'ajout ou du retrait
+        $(list_etablissement_dispo).append(new Option(option, option));
+    }
+}
+
+function supprimer_ligne_tableau_etablissement(id_surveillance){
+    var d = document.getElementsByClassName(id_surveillance);
+    for (var i = 0; i < d.length; i++) {
+        d[i].parentElement.removeChild(d[i]);
+    }
 }
 
 function appel_ajax_profil_succes_mais_erreur(){
