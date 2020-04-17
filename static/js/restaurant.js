@@ -338,7 +338,6 @@ function ajout_etablissements_profil(){
         if (liste_etablissements.length == 0){
             alert("Veuiller saisir une liste établissements à surveiller !");
         } else {
-            //$(this).unbind(e);
             appel_ajax_ajout_etablissement_profil(liste_etablissements);
         }
     });

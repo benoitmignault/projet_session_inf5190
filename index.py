@@ -8,6 +8,8 @@ from flask import render_template, request, session, url_for
 from flask_json_schema import JsonSchema
 from flask_json_schema import JsonValidationError
 
+from gestion_etablissement_profil import ajouter_plusieurs_etablissement, \
+    supprimer_etablissement
 from modules.fonction import *
 from validateur_plainte_json_schema import nouvelle_plainte_etablissement
 from validateur_profil_json_schema import nouveau_profil
@@ -30,6 +32,7 @@ def not_found_404(e):
 @app.errorhandler(JsonValidationError)
 def validation_error(erreur):
     errors = [validation.message for validation in erreur.errors]
+
     return jsonify({"Le champ en problème": erreur.message,
                     "Le message d'erreur": errors}), 400
 
@@ -373,6 +376,7 @@ def profil_connecter():
 
 # todo créer un jsonschema pour vérifier le json qu'on saisir
 @app.route('/api/connecter/retirer_etablissement', methods=["DELETE"])
+@schema.validate(supprimer_etablissement)
 # @authentification_requise
 def retirer_etablissement():
     conn_db = get_db()
@@ -393,6 +397,7 @@ def retirer_etablissement():
 
 # todo créer un jsonschema pour vérifier le json qu'on saisir
 @app.route('/api/connecter/ajouter_etablissement', methods=["POST"])
+@schema.validate(ajouter_plusieurs_etablissement)
 # @authentification_requise
 def ajouter_etablissement():
     conn_db = get_db()

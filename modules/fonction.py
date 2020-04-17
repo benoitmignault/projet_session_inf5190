@@ -386,7 +386,6 @@ def remplissage_champ_nouveau_profil(request, liste_champs):
 def remplissage_champ_ajout_etablissement(request, liste_champs):
     data = request.get_json()
     liste_champs['id_personne'] = data['id_personne']
-    print(liste_champs['id_personne'])
 
     for un_etablissement in data['liste_etablissement']:
         liste_champs['liste_etablissement'].append(un_etablissement)
