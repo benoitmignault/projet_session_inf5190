@@ -16,8 +16,10 @@
                 </div>
             </div>
             <form method="post" enctype="multipart/form-data"
-                  action="/api/connecter/ajout_photo"
+                  action="/connecter/ajout_photo"
                   id="nouvelle_photo">
+                <input type="hidden" name="id_photo" id="id_photo"
+                       value="{{liste_infos['id_photo']}}">
                 <input type="hidden" name="id_personne" id="id_personne"
                        value="{{liste_infos['id_personne']}}">
                 <div class="modif">

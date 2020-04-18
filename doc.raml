@@ -38,7 +38,7 @@ baseUri: http://127.0.0.1:5000/
           200:
             body:
               application/json:
-                example:
+                example:  |
                   [
                     {
                       "etablissement": "RESTAURANT BASHA",
@@ -64,7 +64,7 @@ baseUri: http://127.0.0.1:5000/
             200:
               body:
                 application/json:
-                  example:
+                  example:  |
                     [
                       {
                         "Adresse": "4219 Rue Notre-Dame Ouest ",
@@ -128,7 +128,7 @@ baseUri: http://127.0.0.1:5000/
           201:
             body:
               application/json:
-                example:
+                example:  |
                   [
                     {
                       "voici le numero de la plainte": 13
@@ -185,7 +185,7 @@ baseUri: http://127.0.0.1:5000/
           201:
             body:
               application/json:
-                example:
+                example:  |
                   [
                     {
                       "Création du nouveau profil": "Succès !"
@@ -213,17 +213,19 @@ baseUri: http://127.0.0.1:5000/
               type: string
               minItems: 1
             description: La liste des établissements pour faire un suivis
-            example:
+            example:  |
               [
                 "3 AMIGOS RESTO/BAR",
                 "ACADEMIE SOLOMON SCHECHTER"
               ]
             required: true
+        body:
+         application/json:
         responses:
           200:
             body:
               application/json:
-                example:
+                example:  |
                   [
                     [
                       "etablissement":
@@ -261,11 +263,13 @@ baseUri: http://127.0.0.1:5000/
             description: Identifiant de la combinaison établissement X avec utilisateur
             example: 23
             required: true
+        body:
+         application/json:
         responses:
           200:
             body:
               application/json:
-                example:
+                example: |
                   [
                     [
                       "etablissement_dispo":

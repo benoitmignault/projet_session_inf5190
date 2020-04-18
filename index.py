@@ -375,7 +375,7 @@ def profil_connecter():
                                etablissement_dispo=etablissement_dispo)
 
 
-@app.route('/api/connecter/ajout_photo', methods=["POST"])
+@app.route('/connecter/ajout_photo', methods=["POST"])
 # @authentification_requise
 def ajouter_photo():
     fichier_photo = None
