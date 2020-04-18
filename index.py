@@ -349,16 +349,12 @@ def authentification_requise(f):
     return decorated
 
 
-# todo Retirer les commentaires suivant :
-# todo @authentification_requise &
-# todo courriel = conn_db.recuperation_session_active(session["id"])
 # Cette fonction est pour la tache E2 et l'authentification avec succès
 @app.route('/connecter/profil', methods=["GET"])
-# @authentification_requise
+@authentification_requise
 def profil_connecter():
     conn_db = get_db()
-    # courriel = conn_db.recuperation_session_active(session["id"])
-    courriel = "b.mignault@gmail.com"
+    courriel = conn_db.recuperation_session_active(session["id"])
     if request.method == "GET":
         liste_infos = initial_infos_connecter()
         info_profil = conn_db.recuperation_profil(courriel)
@@ -376,7 +372,7 @@ def profil_connecter():
 
 
 @app.route('/connecter/gestion_photo', methods=["POST"])
-# @authentification_requise
+@authentification_requise
 def ajouter_photo():
     fichier_photo = None
     id_photo_nouvelle = None
@@ -423,7 +419,7 @@ def ajouter_photo():
 
 
 @app.route('/api/connecter/supprimer_photo', methods=["DELETE"])
-# @authentification_requise
+@authentification_requise
 def supprimer_photo():
     conn_db = get_db()
     data = request.get_json()
@@ -460,7 +456,7 @@ def faire_afficher_photo(id_photo, type_photo):
 # todo créer un jsonschema pour vérifier le json qu'on saisir
 @app.route('/api/connecter/ajouter_etablissement', methods=["POST"])
 @schema.validate(ajouter_plusieurs_etablissement)
-# @authentification_requise
+@authentification_requise
 def ajouter_etablissement():
     conn_db = get_db()
     liste_champs_ajout = initial_champ_ajout_etablissement()
@@ -480,7 +476,7 @@ def ajouter_etablissement():
 
 @app.route('/api/connecter/retirer_etablissement', methods=["DELETE"])
 @schema.validate(supprimer_etablissement)
-# @authentification_requise
+@authentification_requise
 def retirer_etablissement():
     conn_db = get_db()
     data = request.get_json()

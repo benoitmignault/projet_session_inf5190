@@ -351,23 +351,22 @@ function ajout_etablissements_profil(){
 
 function ajout_modif_retrait_photo_profil(){
     $(form_gestion_photo).on('submit', function(e) {
+    var $btn = $(document.activeElement);
+
+    if ( $(champ_fichier_photo).get(0).files.length == 0 && $btn.attr("name") === "supprimer"){
         e.preventDefault();
-        var $btn = $(document.activeElement);
-        if ( $btn.length && $(form_gestion_photo).has($btn) && $btn.is('input[type="submit"]') && $btn.is('[name]') ) {
-            switch ($btn.attr("name")){
-                case "ajout" : case "modifier":
-                    if ($(champ_fichier_photo).get(0).files.length == 0){
-                        alert("Veuiller sélectionner un fichier pour votre photo de profile !");
-                    } else {
-                        console.log("on peut aller ajouter");
-                        $(this).unbind(e);
-                    }
-                    break;
-                case "supprimer":
-                    console.log("supprimer");
-                    appel_ajax_supprimer_photo_profil();
-            }
+        appel_ajax_supprimer_photo_profil();
+
+    } else if ( $(champ_fichier_photo).get(0).files.length == 1 && $btn.attr("name") === "supprimer"){
+        e.preventDefault();
+        alert("Attention ! Au moment de détruire votre photo de profil, veuiller à ne pas sélectionner de nouvelle !");
+
+    } else {
+        if ( $(champ_fichier_photo).get(0).files.length == 0 ){
+            e.preventDefault();
+            alert("Veuiller sélectionner un fichier pour votre photo de profile !");
         }
+    }
     });
 }
 
