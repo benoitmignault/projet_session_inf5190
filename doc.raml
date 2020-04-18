@@ -279,3 +279,21 @@ baseUri: http://127.0.0.1:5000/
                         ]
                     ]
                   ]
+    /supprimer_photo:
+      delete:
+        description: Retirer une photo du profil utilisateur
+        queryParameters:
+          id_personne:
+            type: integer
+            description: Identifiant de la personne qui le relier à son profil
+            example: 3
+            required: true
+          id_photo:
+            type: string
+            description: Identifiant de la photo stocké dans la base de données
+            example: 9c07907dd4064dcd8909ba938ddf3ed5
+            required: true
+        body:
+         application/json:
+        responses:
+          200:

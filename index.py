@@ -381,7 +381,8 @@ def ajouter_photo():
     fichier_photo = None
     id_photo_nouvelle = None
     id_photo_ancienne = None
-    id_personne = None
+    id_personne = ""
+    type_photo = ""
 
     if "photo" in request.files:
         fichier_photo = request.files["photo"]
