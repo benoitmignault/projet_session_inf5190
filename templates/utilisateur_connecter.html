@@ -9,11 +9,17 @@
             <legend class="legendCenter">Voici votre photo de profil</legend>
             <div class="header PhotoMoi">
                 <div class="unePassionPhoto">
-                    <img src="" height=50 width=50>
+                    {% if liste_infos['id_photo'] != None %}
+                    <img src="/image/{{liste_infos['id_photo']}}.png" height=50
+                         width=50>
+                    {% endif %}
                 </div>
             </div>
-            <form method="post" action="/api/modification_photo_profil"
+            <form method="post" enctype="multipart/form-data"
+                  action="/api/connecter/ajout_photo"
                   id="nouvelle_photo">
+                <input type="hidden" name="id_personne" id="id_personne"
+                       value="{{liste_infos['id_personne']}}">
                 <div class="modif">
                     <div class="information">
                         <label for="photo">Choisisser votre photo :</label>
@@ -25,10 +31,12 @@
                     <div class="troisBTN">
                         <input class="bouton" type='submit' name="ajout"
                                value="Ajouter...">
+                        <!--
                         <input class="bouton" type='submit' name="modifier"
                                value="Modifier...">
                         <input class="bouton" type='submit' name="supprimer"
                                value="Supprimer...">
+                        -->
                     </div>
                 </div>
             </form>

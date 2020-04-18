@@ -214,7 +214,7 @@ class Database:
         cursor.execute("select max(id_personne) from profil_utilisateur")
         result = cursor.fetchall()
         self.inserer_etablissement_surveiller_profil(result[0][0],
-                                                         liste_etablissement)
+                                                     liste_etablissement)
 
     def inserer_etablissement_surveiller_profil(self, id_personne, liste):
         connection = self.get_connection()
@@ -316,6 +316,36 @@ class Database:
         ensemble_trouve = recuperation_resultat_liste(result)
 
         return ensemble_trouve
+
+    def ajouter_photo(self, id_photo, fichier):
+        connection = self.get_connection()
+        connection.execute(
+            "insert into photo_utilisateur(id_photo, photo) values(?, ?)",
+            [id_photo, sqlite3.Binary(fichier.read())])
+        connection.commit()
+
+    def recuperer_photo(self, id_photo):
+        cursor = self.get_connection().cursor()
+        select = "SELECT photo "
+        fromm = "from photo_utilisateur "
+        where = "where id_photo = ? "
+        sql = select + fromm + where
+        cursor.execute(sql, (id_photo,))
+        picture = cursor.fetchone()
+        if picture is None:
+            return None
+        else:
+            blob_data = picture[0]
+            return blob_data
+
+    def ajout_id_photo_profil(self, id_photo, id_personne):
+        connection = self.get_connection()
+        update = "UPDATE profil_utilisateur "
+        sett = "set id_photo = ? "
+        where = "where id_personne = ? "
+        sql = update + sett + where
+        connection.execute(sql, (id_photo, id_personne))
+        connection.commit()
 
 
 def remplissage_condition_sql(liste_champs):

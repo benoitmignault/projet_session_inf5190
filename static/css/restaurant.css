@@ -86,6 +86,24 @@ h2 {
     margin: 0px;
 }
 
+.container > .zone_recherche_resto > fieldset > .header{
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: row;
+    width: 40%;
+    text-align: center;
+    align-items: center;
+    margin: auto;
+}
+
+.container > .zone_recherche_resto > fieldset > .header > .unePassionPhoto {
+    width: 100%;
+    text-align: center;
+    line-height: 50px;
+    font-size: 18px;
+}
+
+
 .container > .zone_recherche_resto > #result_profil,
 .container > .zone_recherche_resto > #result_interval_etablissement,
 .container > .zone_recherche_resto > #result_interval,

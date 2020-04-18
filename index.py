@@ -3,7 +3,7 @@ from functools import wraps
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.combining import OrTrigger
 from apscheduler.triggers.cron import CronTrigger
-from flask import Flask, Response, jsonify, redirect
+from flask import Flask, Response, jsonify, redirect, make_response
 from flask import render_template, request, session, url_for
 from flask_json_schema import JsonSchema
 from flask_json_schema import JsonValidationError
@@ -285,6 +285,7 @@ def api_creation_profil():
 @app.route('/nouveau_profil', methods=["GET"])
 def creation_profil():
     conn_db = get_db()
+
     liste_etablissement = conn_db.liste_tous_restaurants()
     titre = "Création d'un profil"
     return render_template('creation_profil.html', titre=titre,
@@ -374,24 +375,35 @@ def profil_connecter():
                                etablissement_dispo=etablissement_dispo)
 
 
-@app.route('/api/connecter/retirer_etablissement', methods=["DELETE"])
-@schema.validate(supprimer_etablissement)
+@app.route('/api/connecter/ajout_photo', methods=["POST"])
 # @authentification_requise
-def retirer_etablissement():
+def ajouter_photo():
+    fichier_photo = None
+    id_photo = None
+    if "photo" in request.files:
+        fichier_photo = request.files["photo"]
+        id_photo = str(uuid.uuid4().hex)
+
+    if id_photo is not None:
+        conn_db = get_db()
+        id_personne = request.form["id_personne"]
+        conn_db.ajouter_photo(id_photo, fichier_photo)
+        conn_db.ajout_id_photo_profil(id_photo, id_personne)
+
+    return redirect(url_for('.profil_connecter'))
+
+
+@app.route('/image/<id_photo>.png')
+def faire_afficher_photo(id_photo):
     conn_db = get_db()
-    data = request.get_json()
-    id_surveillance = conn_db.verification_etablissement_surveiller(
-        data['id_surveillance'])
-
-    if id_surveillance is None:
-        return "", 404
+    binary_data = conn_db.recuperer_photo(id_photo)
+    if binary_data is None:
+        return Response(status=404)
     else:
-        conn_db.supprimer_etablissement_profil(
-            data['id_personne'], id_surveillance)
-        etablissement_dispo = conn_db.recuperation_etablissement_restant(
-            data['id_personne'])
+        response = make_response(binary_data)
+        response.headers.set('Content-Type', 'image/png')
 
-        return jsonify(etablissement_dispo), 200
+    return response
 
 
 # todo créer un jsonschema pour vérifier le json qu'on saisir
@@ -413,6 +425,26 @@ def ajouter_etablissement():
         liste_champs_ajout['id_personne'])
     return jsonify({"etablissement": etablissement,
                     "etablissement_dispo": etablissement_dispo}), 200
+
+
+@app.route('/api/connecter/retirer_etablissement', methods=["DELETE"])
+@schema.validate(supprimer_etablissement)
+# @authentification_requise
+def retirer_etablissement():
+    conn_db = get_db()
+    data = request.get_json()
+    id_surveillance = conn_db.verification_etablissement_surveiller(
+        data['id_surveillance'])
+
+    if id_surveillance is None:
+        return "", 404
+    else:
+        conn_db.supprimer_etablissement_profil(
+            data['id_personne'], id_surveillance)
+        etablissement_dispo = conn_db.recuperation_etablissement_restant(
+            data['id_personne'])
+
+        return jsonify(etablissement_dispo), 200
 
 
 @app.route('/deconnection')

@@ -66,6 +66,10 @@ const champ_id_personne_ajout = document.querySelector('#id_personne_ajout');
 const form_retrait_etablissement = document.querySelector('#retrait_etablissement');
 const champ_id_personne_supp = document.querySelector('#id_personne_supp');
 
+// Variable pour gérer la photo de profile
+const form_gestion_photo = document.querySelector('#nouvelle_photo');
+const champ_fichier_photo = document.querySelector('#photo');
+
 const pattern_date = new RegExp("^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$");
 const pattern_code = new RegExp("^[A-Z][0-9][A-Z][ ]{1}[0-9][A-Z][0-9]$");
 const pattern_proprio = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,98}[a-z0-9A-Z.)]$");
@@ -339,6 +343,18 @@ function ajout_etablissements_profil(){
             alert("Veuiller saisir une liste établissements à surveiller !");
         } else {
             appel_ajax_ajout_etablissement_profil(liste_etablissements);
+        }
+    });
+}
+
+function validation_ajout_photo_profil(){
+    $(form_gestion_photo).submit(function (e) {
+        console.log(champ_fichier_photo);
+        if ($(champ_fichier_photo).get(0).files.length == 0) {
+            e.preventDefault();
+            alert("Veuiller sélectionner un fichier pour votre photo de profile !");
+        } else {
+            $(this).unbind(e);
         }
     });
 }
@@ -961,6 +977,7 @@ document.addEventListener('DOMContentLoaded', function () {
     demande_connection_profil();
     ajout_etablissements_profil();
     retrait_etablissement_profil();
+    validation_ajout_photo_profil();
     reset_recherche();
     reset_recherche_interval();
     reset_demande_plainte();
