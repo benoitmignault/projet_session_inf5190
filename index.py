@@ -375,22 +375,59 @@ def profil_connecter():
                                etablissement_dispo=etablissement_dispo)
 
 
-@app.route('/connecter/ajout_photo', methods=["POST"])
+@app.route('/connecter/gestion_photo', methods=["POST"])
 # @authentification_requise
 def ajouter_photo():
     fichier_photo = None
-    id_photo = None
+    id_photo_nouvelle = None
+    id_photo_ancienne = None
+    id_personne = None
+
     if "photo" in request.files:
         fichier_photo = request.files["photo"]
-        id_photo = str(uuid.uuid4().hex)
+        id_photo_nouvelle = str(uuid.uuid4().hex)
 
-    if id_photo is not None:
-        conn_db = get_db()
+    if "id_photo" in request.form:
+        id_photo_ancienne = request.form["id_photo"]
+
+    if "id_personne" in request.form:
         id_personne = request.form["id_personne"]
-        conn_db.ajouter_photo(id_photo, fichier_photo)
-        conn_db.ajout_id_photo_profil(id_photo, id_personne)
 
-    return redirect(url_for('.profil_connecter'))
+    if id_photo_nouvelle is not None:
+        conn_db = get_db()
+
+        if "ajout" in request.form:
+            conn_db.ajouter_photo(id_photo_nouvelle, fichier_photo)
+            conn_db.ajout_id_photo_profil(id_photo_nouvelle, id_personne)
+
+        elif "modifier" in request.form:
+            conn_db.supprimer_photo_profil(id_photo_ancienne)
+            conn_db.supprimer_lien_photo_profil(id_personne)
+            conn_db.ajouter_photo(id_photo_nouvelle, fichier_photo)
+            conn_db.ajout_id_photo_profil(id_photo_nouvelle, id_personne)
+
+        return redirect(url_for('.profil_connecter'))
+
+    else:
+        return "", 404
+
+
+@app.route('/api/connecter/supprimer_photo', methods=["DELETE"])
+# @authentification_requise
+def supprimer_photo():
+    conn_db = get_db()
+    data = request.get_json()
+    id_personne = data["id_personne"]
+    id_photo = data["id_photo"]
+
+    if id_personne == "" or id_photo == "":
+        return "", 404
+
+    else:
+        conn_db.supprimer_photo_profil(id_photo)
+        conn_db.supprimer_lien_photo_profil(id_personne)
+
+        return "", 200
 
 
 @app.route('/image/<id_photo>.png')

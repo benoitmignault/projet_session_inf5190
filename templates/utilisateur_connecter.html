@@ -4,9 +4,9 @@
     &larr;</h1>
 <div class="container">
     <p class="desktop" id="hautPageDesktop"></p>
-    <input type="hidden" name="id_photo" id="id_photo"
+    <input form="nouvelle_photo" type="hidden" name="id_photo" id="id_photo"
            value="{{liste_infos['id_photo']}}">
-    <input type="hidden" name="id_personne" id="id_personne"
+    <input form="nouvelle_photo" type="hidden" name="id_personne" id="id_personne"
            value="{{liste_infos['id_personne']}}">
     <h2>Section pour gérer votre photo de profil</h2>
     <div class='zone_recherche_resto'>
@@ -21,10 +21,10 @@
                 </div>
             </div>
             <form method="post" enctype="multipart/form-data"
-                  action="/connecter/ajout_photo" id="nouvelle_photo">
+                  action="/connecter/gestion_photo" id="nouvelle_photo">
                 <div class="modif">
                     <div class="information">
-                        <label for="photo">Choisisser votre photo :</label>
+                        <label for="photo">Choisir une photo :</label>
                         <div>
                             <input id="photo" name="photo" type="file"
                                    accept=".png, .jpg">

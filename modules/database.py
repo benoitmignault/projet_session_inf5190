@@ -347,6 +347,21 @@ class Database:
         connection.execute(sql, (id_photo, id_personne))
         connection.commit()
 
+    def supprimer_photo_profil(self, id_photo):
+        sql = "DELETE from photo_utilisateur where id_photo = ?"
+        connection = self.get_connection()
+        connection.execute(sql, (id_photo,))
+        connection.commit()
+
+    def supprimer_lien_photo_profil(self, id_personne):
+        connection = self.get_connection()
+        update = "UPDATE profil_utilisateur "
+        sett = "set id_photo = NULL "
+        where = "where id_personne = ? "
+        sql = update + sett + where
+        connection.execute(sql, (id_personne,))
+        connection.commit()
+
 
 def remplissage_condition_sql(liste_champs):
     # La préparation des critères en vue d'utiliser l'opérateur like aura

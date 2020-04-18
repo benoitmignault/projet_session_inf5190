@@ -211,13 +211,13 @@ baseUri: http://127.0.0.1:5000/
             type: array
             items:
               type: string
-              minItems: 1
             description: La liste des établissements pour faire un suivis
             example:  |
               [
                 "3 AMIGOS RESTO/BAR",
                 "ACADEMIE SOLOMON SCHECHTER"
               ]
+            minItems: 1
             required: true
         body:
          application/json:

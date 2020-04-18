@@ -70,6 +70,8 @@ const champ_fichier_photo = document.querySelector('#photo');
 const champ_btn_ajout_photo = document.querySelector('#ajout');
 const champ_btn_modifier_photo = document.querySelector('#modifier');
 const champ_btn_supprimer_photo = document.querySelector('#supprimer');
+const champ_id_photo = document.querySelector('#id_photo');
+const section_photo_profil = document.querySelector('.unePassionPhoto');
 
 const pattern_date = new RegExp("^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$");
 const pattern_code = new RegExp("^[A-Z][0-9][A-Z][ ]{1}[0-9][A-Z][0-9]$");
@@ -347,16 +349,47 @@ function ajout_etablissements_profil(){
     });
 }
 
-function validation_ajout_photo_profil(){
+function ajout_modif_retrait_photo_profil(){
     $(form_gestion_photo).submit(function (e) {
-        console.log(champ_fichier_photo);
-        if ($(champ_fichier_photo).get(0).files.length == 0) {
+        if ($(champ_fichier_photo).get(0).files.length == 0 &&
+            (champ_btn_supprimer_photo.getAttribute("disabled") == "disabled" ||
+                champ_btn_ajout_photo.getAttribute("disabled") == "disabled") ) {
             e.preventDefault();
             alert("Veuiller sélectionner un fichier pour votre photo de profile !");
-        } else {
+        } else if ($(champ_fichier_photo).get(0).files.length != 0 ||
+                champ_btn_ajout_photo.getAttribute("disabled") == "disabled"){
             $(this).unbind(e);
+        } else if (champ_btn_supprimer_photo.getAttribute("disabled") != "disabled"){
+            e.preventDefault();
+            appel_ajax_supprimer_photo_profil();
         }
     });
+}
+
+function validation_bouton_section_photo(){
+    if (champ_id_photo){
+        if (champ_id_photo.value == "None"){
+            champ_btn_ajout_photo.setAttribute("class", "bouton");
+            champ_btn_ajout_photo.removeAttribute("disabled");
+            champ_btn_ajout_photo.style.backgroundImage = "linear-gradient(to bottom, #507d99, #96cceb";
+            champ_btn_modifier_photo.setAttribute("class", "bouton disabled");
+            champ_btn_modifier_photo.setAttribute("disabled", "disabled");
+            champ_btn_modifier_photo.style.background = "darkgray";
+            champ_btn_supprimer_photo.setAttribute("class", "bouton disabled");
+            champ_btn_supprimer_photo.setAttribute("disabled", "disabled");
+            champ_btn_supprimer_photo.style.background = "darkgray";
+        } else {
+            champ_btn_modifier_photo.setAttribute("class", "bouton");
+            champ_btn_modifier_photo.removeAttribute("disabled");
+            champ_btn_modifier_photo.style.backgroundImage = "linear-gradient(to bottom, #507d99, #96cceb";
+            champ_btn_supprimer_photo.setAttribute("class", "bouton");
+            champ_btn_supprimer_photo.removeAttribute("disabled");
+            champ_btn_supprimer_photo.style.backgroundImage = "linear-gradient(to bottom, #507d99, #96cceb";
+            champ_btn_ajout_photo.setAttribute("class", "bouton disabled");
+            champ_btn_ajout_photo.setAttribute("disabled", "disabled");
+            champ_btn_ajout_photo.style.background = "darkgray";
+        }
+    }
 }
 
 function verification_interval(liste_validation){
@@ -849,6 +882,30 @@ function appel_ajax_retrait_etablissement_profil(id_surveillance){
     ajax.send(data_json);
 }
 
+function appel_ajax_supprimer_photo_profil(){
+    var ajax = new XMLHttpRequest();
+    ajax.onreadystatechange = function() {
+        if (ajax.readyState === XMLHttpRequest.DONE) {
+            if (ajax.status === 200) {
+                champ_id_photo.value = "None";
+                section_photo_profil.innerHTML = "";
+                validation_bouton_section_photo();
+            } else if (ajax.status === 404) {
+                alert("Attention ! La photo que vous tentez de supprimer n'existe déjà plus !");
+            }
+        }
+    };
+    var data = {
+            "id_photo": champ_id_photo.value,
+            "id_personne": parseInt(champ_id_personne.value)
+    };
+
+    var data_json = JSON.stringify(data);
+    ajax.open("DELETE", "/api/connecter/supprimer_photo", true);
+    ajax.setRequestHeader("Content-Type", "application/json");
+    ajax.send(data_json);
+}
+
 function refaire_etablissement_disponible(liste){
     // On supprime toutes les vieilles options
     $(list_etablissement_dispo).empty();
@@ -971,13 +1028,14 @@ function creation_select2(){
 document.addEventListener('DOMContentLoaded', function () {
     validation_champs_recherches();
     validation_champs_connection();
+    validation_bouton_section_photo();
     recherche_rapide();
     demande_plainte();
     demande_nouveau_profil();
     demande_connection_profil();
     ajout_etablissements_profil();
     retrait_etablissement_profil();
-    validation_ajout_photo_profil();
+    ajout_modif_retrait_photo_profil();
     reset_recherche();
     reset_recherche_interval();
     reset_demande_plainte();
