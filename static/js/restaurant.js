@@ -51,24 +51,25 @@ const message_erreur_connection = document.querySelector('#message_erreur_connec
 const champ_courriel_connection = document.querySelector('#courriel_conn');
 const champ_password_connection = document.querySelector('#password_conn');
 
-// Variable commune pour les deux appels ajax de la section des établissements
+// Variable commune pour les deux appels ajax de la section des établissements + photo
 const tableau_etablissement = document.querySelector('.tableau_profil');
 const list_etablissement_dispo = document.querySelector('#ajout_resto_profil');
-
+const champ_id_personne = document.querySelector('#id_personne');
 
 // Variable pour la gestion des établissements du profil
 const form_ajout_etablissement = document.querySelector('#ajout_etablissement');
 const btn_reset_etablissement = document.querySelector('#btn_reset_etablissement');
 const message_erreur_etablissement = document.querySelector('#message_erreur_etablissement');
-const champ_id_personne_ajout = document.querySelector('#id_personne_ajout');
 
 // Variable pour retirer un établissement de la liste de surveillance
 const form_retrait_etablissement = document.querySelector('#retrait_etablissement');
-const champ_id_personne_supp = document.querySelector('#id_personne_supp');
 
 // Variable pour gérer la photo de profile
 const form_gestion_photo = document.querySelector('#nouvelle_photo');
 const champ_fichier_photo = document.querySelector('#photo');
+const champ_btn_ajout_photo = document.querySelector('#ajout');
+const champ_btn_modifier_photo = document.querySelector('#modifier');
+const champ_btn_supprimer_photo = document.querySelector('#supprimer');
 
 const pattern_date = new RegExp("^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$");
 const pattern_code = new RegExp("^[A-Z][0-9][A-Z][ ]{1}[0-9][A-Z][0-9]$");
@@ -217,7 +218,6 @@ function initialiser_tous_champs(type_champs){
 }
 
 function effacer_messages_erreurs(message){
-    // Nous devons vérifier que les variables ne sont pas égales à «undefined»
     if (message){
         message.innerHTML = "";
     }
@@ -813,7 +813,7 @@ function appel_ajax_ajout_etablissement_profil(liste_etablissements){
     };
 
     var data = {
-            "id_personne": parseInt(champ_id_personne_ajout.value),
+            "id_personne": parseInt(champ_id_personne.value),
             "liste_etablissement": []
     };
 
@@ -840,7 +840,7 @@ function appel_ajax_retrait_etablissement_profil(id_surveillance){
     };
     var data = {
             "id_surveillance": parseInt(id_surveillance),
-            "id_personne": parseInt(champ_id_personne_supp.value)
+            "id_personne": parseInt(champ_id_personne.value)
     };
 
     var data_json = JSON.stringify(data);

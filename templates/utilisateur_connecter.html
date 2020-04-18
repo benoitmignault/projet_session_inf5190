@@ -3,6 +3,11 @@
 <h1>Bienvenue dans votre profil &rarr; <span class='userDisplay'>{{liste_infos['prenom']}} {{liste_infos['nom']}}</span>
     &larr;</h1>
 <div class="container">
+    <p class="desktop" id="hautPageDesktop"></p>
+    <input type="hidden" name="id_photo" id="id_photo"
+           value="{{liste_infos['id_photo']}}">
+    <input type="hidden" name="id_personne" id="id_personne"
+           value="{{liste_infos['id_personne']}}">
     <h2>Section pour gérer votre photo de profil</h2>
     <div class='zone_recherche_resto'>
         <fieldset>
@@ -16,12 +21,7 @@
                 </div>
             </div>
             <form method="post" enctype="multipart/form-data"
-                  action="/connecter/ajout_photo"
-                  id="nouvelle_photo">
-                <input type="hidden" name="id_photo" id="id_photo"
-                       value="{{liste_infos['id_photo']}}">
-                <input type="hidden" name="id_personne" id="id_personne"
-                       value="{{liste_infos['id_personne']}}">
+                  action="/connecter/ajout_photo" id="nouvelle_photo">
                 <div class="modif">
                     <div class="information">
                         <label for="photo">Choisisser votre photo :</label>
@@ -31,14 +31,16 @@
                         </div>
                     </div>
                     <div class="troisBTN">
-                        <input class="bouton" type='submit' name="ajout"
+                        <input id="ajout" class="bouton" type='submit'
+                               name="ajout"
                                value="Ajouter...">
-                        <!--
-                        <input class="bouton" type='submit' name="modifier"
+                        <input id="modifier" class="bouton" type='submit'
+                               name="modifier"
                                value="Modifier...">
-                        <input class="bouton" type='submit' name="supprimer"
+                        <input id="supprimer" class="bouton" type='submit'
+                               name="supprimer"
                                value="Supprimer...">
-                        -->
+
                     </div>
                 </div>
             </form>
@@ -120,6 +122,10 @@
         <div class="admin">
             <a class="bouton" href="/deconnection">Déconnexion</a>
         </div>
+    </div>
+    <div class="return">
+        <a class="desktop" href="#hautPageDesktop">
+            <img alt="Retour vers le haut" src="/img/fleche_haut.svg"></a>
     </div>
 </div>
 {% endblock content %}
