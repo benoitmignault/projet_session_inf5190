@@ -72,7 +72,6 @@ def initialisation_connexion_hors_flask():
 
 
 def mise_jour_bd():
-    print("Maj fait")
     connection = initialisation_connexion_hors_flask()
     liste_contrevenants = recuperation_information_url()
 
@@ -105,7 +104,7 @@ def mise_jour_bd():
         creation_courriel(liste_envoi)
         conn_auth = connexion_twitter()
         creation_tweet(conn_auth, liste_nom_contrevenant)
-
+        
     connection.disconnect()
 
 
