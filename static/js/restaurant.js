@@ -797,7 +797,7 @@ function appel_ajax_ajout_etablissement_profil(liste_etablissements){
     };
 
     var data = {
-            "id_personne": champ_id_personne_ajout.value,
+            "id_personne": parseInt(champ_id_personne_ajout.value),
             "liste_etablissement": []
     };
 
@@ -823,9 +823,10 @@ function appel_ajax_retrait_etablissement_profil(id_surveillance){
         }
     };
     var data = {
-            "id_surveillance": id_surveillance,
-            "id_personne": champ_id_personne_supp.value
+            "id_surveillance": parseInt(id_surveillance),
+            "id_personne": parseInt(champ_id_personne_supp.value)
     };
+
     var data_json = JSON.stringify(data);
     ajax.open("DELETE", "/api/connecter/retirer_etablissement", true);
     ajax.setRequestHeader("Content-Type", "application/json");

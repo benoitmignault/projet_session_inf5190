@@ -374,7 +374,6 @@ def profil_connecter():
                                etablissement_dispo=etablissement_dispo)
 
 
-# todo créer un jsonschema pour vérifier le json qu'on saisir
 @app.route('/api/connecter/retirer_etablissement', methods=["DELETE"])
 @schema.validate(supprimer_etablissement)
 # @authentification_requise

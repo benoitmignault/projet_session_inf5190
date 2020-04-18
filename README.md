@@ -72,6 +72,8 @@ nvm install node
 nvm install --lts
 sudo apt update
 sudo apt install nodejs
+
+npm i -g raml2html
 ```    
   * Poursuivons avec les autres modules :
 ```bash

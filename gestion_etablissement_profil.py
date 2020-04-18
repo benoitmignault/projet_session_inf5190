@@ -20,7 +20,7 @@ ajouter_plusieurs_etablissement = {
     'type': 'object',
     'properties': {
         'id_personne': {
-            'type': 'string'
+            'type': 'integer'
         },
         'liste_etablissement': {
             'type': 'array',
