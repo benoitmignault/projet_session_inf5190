@@ -166,19 +166,46 @@ class Database:
         else:
             return result[0][0]
 
+    def verification_etablissement_surveiller(self, id_surveillance):
+        cursor = self.get_connection().cursor()
+        select = "SELECT id_surveillance "
+        fromm = "FROM etablissement_surveiller "
+        where = "WHERE id_surveillance = ? "
+        sql = select + fromm + where
+        cursor.execute(sql, (id_surveillance,))
+        result = cursor.fetchall()
+        if len(result) is 0:
+            return None
+        else:
+            return result[0][0]
+
     def suppression_plainte_existante(self, no_plainte):
         connection = self.get_connection()
         sql = "DELETE from departement_plaintes where id_plainte = ?"
         connection.execute(sql, (no_plainte,))
         connection.commit()
 
-    def inserer_nouveau_profil(self, nom, prenom, courriel, password, salt,
-                               liste_etablissement):
+    def verification_profil_existant(self, courriel):
+        cursor = self.get_connection().cursor()
+        select = "SELECT courriel "
+        fromm = "FROM profil_utilisateur "
+        where = "WHERE courriel = ? "
+        sql = select + fromm + where
+        cursor.execute(sql, (courriel,))
+        result = cursor.fetchall()
+        if len(result) is 0:
+            return None
+        else:
+            return result[0][0]
+
+    def inserer_nouveau_profil(self, nom, prenom, courriel, password_hasher,
+                               salt, liste_etablissement):
         connection = self.get_connection()
         insert_bd = "INSERT INTO profil_utilisateur " \
-                    "(nom, prenom, courriel, password, salt) " \
+                    "(nom, prenom, courriel, password_hasher, salt) " \
                     "VALUES (?, ?, ?, ?, ?)"
-        connection.execute(insert_bd, (nom, prenom, courriel, password, salt))
+        connection.execute(insert_bd,
+                           (nom, prenom, courriel, password_hasher, salt))
         connection.commit()
         # Maintenant, on va récupérer le id_personne.
         # Ce dernier, il sera utilser pour associer chaque établissement
@@ -186,16 +213,156 @@ class Database:
         cursor = connection.cursor()
         cursor.execute("select max(id_personne) from profil_utilisateur")
         result = cursor.fetchall()
-        self.inserer_etablissement_surveiller_par_profil(result[0][0],
-                                                         liste_etablissement)
+        self.inserer_etablissement_surveiller_profil(result[0][0],
+                                                     liste_etablissement)
 
-    def inserer_etablissement_surveiller_par_profil(self, id_personne, liste):
+    def inserer_etablissement_surveiller_profil(self, id_personne, liste):
         connection = self.get_connection()
         for un_etablissement in liste:
             insert_bd = "INSERT INTO etablissement_surveiller " \
                         "(id_personne, etablissement) VALUES (?, ?)"
             connection.execute(insert_bd, (id_personne, un_etablissement))
             connection.commit()
+
+    def supprimer_etablissement_profil(self, id_personne, id_surveillance):
+        connection = self.get_connection()
+        delete = "DELETE from etablissement_surveiller "
+        where = "where id_personne = ? and id_surveillance = ? "
+        sql = delete + where
+        connection.execute(sql, (id_personne, id_surveillance))
+        connection.commit()
+
+    def recuperation_info_connexion(self, courriel):
+        cursor = self.get_connection().cursor()
+        select = "SELECT salt, password_hasher "
+        fromm = "FROM profil_utilisateur "
+        where = "WHERE courriel = ? "
+        sql = select + fromm + where
+        cursor.execute(sql, (courriel,))
+        result = cursor.fetchone()
+        if result is None:
+            return None
+        else:
+            return result[0], result[1]
+
+    def creation_session_active(self, id_session, courriel):
+        insert_bd = "INSERT INTO session_profil (id_session, courriel) " \
+                    "VALUES (?, ?)"
+        connection = self.get_connection()
+        connection.execute(insert_bd, (id_session, courriel))
+        connection.commit()
+
+    def detruire_session_active(self, id_session):
+        sql = "DELETE from session_profil where id_session = ?"
+        connection = self.get_connection()
+        connection.execute(sql, (id_session,))
+        connection.commit()
+
+    def recuperation_session_active(self, id_session):
+        cursor = self.get_connection().cursor()
+        select = "SELECT courriel "
+        fromm = "FROM session_profil "
+        where = "WHERE id_session = ? "
+        sql = select + fromm + where
+        cursor.execute(sql, (id_session,))
+        result = cursor.fetchone()
+        if result is None:
+            return None
+        else:
+            return result[0]
+
+    def recuperation_profil(self, courriel):
+        cursor = self.get_connection().cursor()
+        select = "SELECT prenom, nom, id_photo, id_personne, courriel, " \
+                 "type_photo "
+        fromm = "FROM profil_utilisateur "
+        where = "WHERE courriel = ? "
+        sql = select + fromm + where
+        cursor.execute(sql, (courriel,))
+        result = cursor.fetchone()
+        if result is None:
+            return None
+        else:
+            return result[0], result[1], result[2], result[3], result[4], \
+                   result[5]
+
+    def recuperation_profil_etablissement(self, id_personne):
+        cursor = self.get_connection().cursor()
+        select = "SELECT etablissement, id_surveillance "
+        fromm = "FROM etablissement_surveiller "
+        where = "WHERE id_personne = ? "
+        order = "ORDER BY etablissement "
+        sql = select + fromm + where + order
+        cursor.execute(sql, (id_personne,))
+        result = cursor.fetchall()
+        ensemble_trouve = recuperation_liste_etablissement(result)
+
+        return ensemble_trouve
+
+    def recuperation_etablissement_restant(self, id_personne):
+        cursor = self.get_connection().cursor()
+        select1 = "select distinct etablissement "
+        from1 = "from mauvais_restaurants "
+        where1 = "where etablissement not in "
+        sous_request1 = select1 + from1 + where1
+        sous_request2 = "( "
+        select2 = "select etablissement "
+        from2 = "from etablissement_surveiller "
+        where2 = "where id_personne = ? "
+        sous_request2 += select2 + from2 + where2
+        sous_request2 += ") "
+        order = "ORDER BY etablissement "
+        sql = sous_request1 + sous_request2 + order
+        cursor.execute(sql, (id_personne,))
+        result = cursor.fetchall()
+        ensemble_trouve = recuperation_resultat_liste(result)
+
+        return ensemble_trouve
+
+    def ajouter_photo(self, id_photo, fichier):
+        connection = self.get_connection()
+        connection.execute(
+            "insert into photo_utilisateur(id_photo, photo) values(?, ?)",
+            [id_photo, sqlite3.Binary(fichier.read())])
+        connection.commit()
+
+    def recuperer_photo(self, id_photo):
+        cursor = self.get_connection().cursor()
+        select = "SELECT photo "
+        fromm = "from photo_utilisateur "
+        where = "where id_photo = ? "
+        sql = select + fromm + where
+        cursor.execute(sql, (id_photo,))
+        picture = cursor.fetchone()
+        if picture is None:
+            return None
+        else:
+            blob_data = picture[0]
+            return blob_data
+
+    def ajout_id_photo_profil(self, id_photo, id_personne, type_photo):
+        connection = self.get_connection()
+        update = "UPDATE profil_utilisateur "
+        sett = "set id_photo = ? , type_photo = ? "
+        where = "where id_personne = ? "
+        sql = update + sett + where
+        connection.execute(sql, (id_photo, type_photo, id_personne))
+        connection.commit()
+
+    def supprimer_photo_profil(self, id_photo):
+        sql = "DELETE from photo_utilisateur where id_photo = ?"
+        connection = self.get_connection()
+        connection.execute(sql, (id_photo,))
+        connection.commit()
+
+    def supprimer_lien_photo_profil(self, id_personne):
+        connection = self.get_connection()
+        update = "UPDATE profil_utilisateur "
+        sett = "set id_photo = NULL , type_photo = NULL "
+        where = "where id_personne = ? "
+        sql = update + sett + where
+        connection.execute(sql, (id_personne,))
+        connection.commit()
 
 
 def remplissage_condition_sql(liste_champs):
@@ -327,13 +494,25 @@ def recuperation_resultat_regrouper(result):
     return ensemble_trouve
 
 
-# Cette fonction sera utiliser pour la tache A6
+# Cette fonction sera utiliser pour la tache A6, E2
 def recuperation_resultat_liste(result):
     ensemble_trouve = []
 
     if result is not None:
         for un_resto in result:
             ensemble_trouve.append(un_resto[0])
+
+    return ensemble_trouve
+
+
+# Cette fonction sera utilser pour la tache E2
+def recuperation_liste_etablissement(result):
+    ensemble_trouve = []
+    if result is not None:
+        for un_etablissement in result:
+            sous_ensemble = {'nom': un_etablissement[0],
+                             'id_surveillance': un_etablissement[1]}
+            ensemble_trouve.append(sous_ensemble)
 
     return ensemble_trouve
 

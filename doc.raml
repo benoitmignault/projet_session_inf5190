@@ -11,7 +11,7 @@ baseUri: http://127.0.0.1:5000/
           200:
             body:
               text/csv:
-                example:  |
+                example:
                   Etablissement,Nombre
                   RESTAURANT BASHA,23
 
@@ -22,7 +22,7 @@ baseUri: http://127.0.0.1:5000/
           200:
             body:
               text/xml:
-                example:  |
+                example:
                   <?xml version='1.0' encoding='utf-8'?>
                   <contrevenants>
                     <contrevenant>
@@ -64,7 +64,7 @@ baseUri: http://127.0.0.1:5000/
             200:
               body:
                 application/json:
-                  example: |
+                  example:  |
                     [
                       {
                         "Adresse": "4219 Rue Notre-Dame Ouest ",
@@ -128,12 +128,13 @@ baseUri: http://127.0.0.1:5000/
           201:
             body:
               application/json:
-                example: |
+                example:  |
                   [
                     {
                       "voici le numero de la plainte": 13
                     }
                   ]
+
   /plainte:
     /{id_plainte}:
       delete:
@@ -143,6 +144,7 @@ baseUri: http://127.0.0.1:5000/
             description: La plainte a bien été enlevé du système.
           404:
             description: La plainte n'existe pas dans notre système.
+
   /nouveau_profil:
     post:
       description: Création d'un nouveau profil d'utilisateur
@@ -171,12 +173,10 @@ baseUri: http://127.0.0.1:5000/
         liste_etablissement:
           type: array
           description: La liste des établissement que l'utilisateur veut surveiller
-          example: |
+          example:
             [
-              [
-                "PIZZA EXPRESSO",
-                "ALIMENTS MARINA"
-              ]
+              "PIZZA EXPRESSO",
+              "ALIMENTS MARINA"
             ]
           minItems: 1
           required: true
@@ -185,10 +185,115 @@ baseUri: http://127.0.0.1:5000/
           201:
             body:
               application/json:
-                example: |
+                example:  |
                   [
                     {
                       "Création du nouveau profil": "Succès !"
                     }
                   ]
+                  [
+                    {
+                      "Impossible de créer le profil": "Courriel est déjà présent !"
+                    }
+                  ]
 
+  /connecter:
+    /ajouter_etablissement:
+      post:
+        description: Ajouter d'un ou plusieurs établissements pour les surveiller pour un profil
+        queryParameters:
+          id_personne:
+            type: integer
+            description: Identifiant de la personne qui le relier à son profil
+            example: 23
+            required: true
+          liste_etablissement:
+            type: array
+            items:
+              type: string
+            description: La liste des établissements pour faire un suivis
+            example:  |
+              [
+                "3 AMIGOS RESTO/BAR",
+                "ACADEMIE SOLOMON SCHECHTER"
+              ]
+            minItems: 1
+            required: true
+        body:
+         application/json:
+        responses:
+          200:
+            body:
+              application/json:
+                example:  |
+                  [
+                    [
+                      "etablissement":
+                        [
+                          {
+                            "id_surveillance": 64,
+                            "nom": "3 AMIGOS  RESTO/BAR"
+                          },
+                          {
+                            "id_surveillance": 23,
+                            "nom": "8098 INTERMARCHE LAGORIA (BELANGER)"
+                          }
+                        ]
+                    ],
+                    [
+                      "etablissement_dispo":
+                        [
+                          "AL AMINE",
+                          "ALIMENTATION GUSTA"
+                        ]
+                    ]
+                  ]
+
+    /retirer_etablissement:
+      delete:
+        description: Retirer un établissement de la lsite de suivi
+        queryParameters:
+          id_personne:
+            type: integer
+            description: Identifiant de la personne qui le relier à son profil
+            example: 3
+            required: true
+          id_surveillance:
+            type: integer
+            description: Identifiant de la combinaison établissement X avec utilisateur
+            example: 23
+            required: true
+        body:
+         application/json:
+        responses:
+          200:
+            body:
+              application/json:
+                example: |
+                  [
+                    [
+                      "etablissement_dispo":
+                        [
+                          "AL AMINE",
+                          "ALIMENTATION GUSTA"
+                        ]
+                    ]
+                  ]
+    /supprimer_photo:
+      delete:
+        description: Retirer une photo du profil utilisateur
+        queryParameters:
+          id_personne:
+            type: integer
+            description: Identifiant de la personne qui le relier à son profil
+            example: 3
+            required: true
+          id_photo:
+            type: string
+            description: Identifiant de la photo stocké dans la base de données
+            example: 9c07907dd4064dcd8909ba938ddf3ed5
+            required: true
+        body:
+         application/json:
+        responses:
+          200:

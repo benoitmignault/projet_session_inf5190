@@ -32,6 +32,10 @@ h1 {
     width: 60%;
 }
 
+h1 > .userDisplay{
+    color: red;
+}
+
 h2,h1 {
     text-align: center;
 }
@@ -82,6 +86,25 @@ h2 {
     margin: 0px;
 }
 
+.container > .zone_recherche_resto > fieldset > .header{
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: row;
+    width: 40%;
+    text-align: center;
+    align-items: center;
+    margin: auto;
+}
+
+.container > .zone_recherche_resto > fieldset > .header > .unePassionPhoto {
+    width: 100%;
+    text-align: center;
+    line-height: 50px;
+    font-size: 18px;
+}
+
+
+.container > .zone_recherche_resto > #result_profil,
 .container > .zone_recherche_resto > #result_interval_etablissement,
 .container > .zone_recherche_resto > #result_interval,
 .container > .zone_recherche_resto > #result_plainte,
@@ -117,6 +140,14 @@ h2 {
     justify-content: center;
 }
 
+.container > .zone_recherche_resto > form,
+.container > .zone_recherche_resto > form > fieldset,
+.container > .zone_recherche_resto > fieldset{
+    width: 100%;
+}
+
+.container > .zone_recherche_resto > form > fieldset,
+.container > .zone_recherche_resto > fieldset,
 .container > .zone_recherche_resto > form > .modif > fieldset{
     border-color: black;
     padding: 10px;
@@ -124,11 +155,16 @@ h2 {
     border-radius: 10px;
 }
 
-.container > .zone_recherche_resto > form > .modif > p{
-    margin: 0;
-    margin-bottom: 15px;
+.container > .zone_recherche_resto > form > .modif{
+    padding: 10px;
 }
 
+.container > .zone_recherche_resto > form > .modif > p{
+    margin: 0;
+    margin-bottom: 10px;
+}
+
+.container > .zone_recherche_resto > #result_profil,
 .container > .zone_recherche_resto > #result_plainte,
 .container > .zone_recherche_resto > #result_interval_etablissement,
 .container > .zone_recherche_resto > #result_interval{
@@ -141,6 +177,8 @@ h2 {
 /*
 Nouvelle manière d'afficher un legend au milieu
 */
+.container > .zone_recherche_resto > fieldset > .legendCenter,
+.container > .zone_recherche_resto > form > fieldset > .legendCenter,
 .container > .zone_recherche_resto > form > .modif > fieldset > .legendCenter{
     display: table;
     min-width: 0px;
@@ -179,6 +217,10 @@ Fin de l'ajout du recentrage de attribut legend
     margin-left: 30px;
 }
 
+.container > .zone_recherche_resto > form > div > div > div > input[type=email],
+.container > .zone_recherche_resto > form > div > div > div > input[type=password],
+.container > .zone_recherche_resto > form > div > fieldset > div > div > input[type=email],
+.container > .zone_recherche_resto > form > div > fieldset > div > div > input[type=password],
 .container > .zone_recherche_resto > form > div > fieldset > div > div > input[type=number],
 .container > .zone_recherche_resto > form > div > div > div > input[type=text],
 .container > .zone_recherche_resto > form > div > fieldset > div > div > input[type=text],
@@ -203,12 +245,14 @@ Fin de l'ajout du recentrage de attribut legend
     background-color: white;
 }
 
+.container > .zone_recherche_resto > .aucun,
 .container > .zone_recherche_resto > form > .aucun,
 .aucun{
     font-weight: bold;
     color:red;
     margin: 0;
     margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 .err_400{
@@ -232,6 +276,7 @@ Fin de l'ajout du recentrage de attribut legend
     font-weight: bold;
     margin: 0;
     margin-bottom: 10px;
+    margin-top: 10px;
 }
 
 .container > .zone_recherche_resto > p,
@@ -240,19 +285,58 @@ Fin de l'ajout du recentrage de attribut legend
     font-weight: bold;
 }
 
+.container > .zone_recherche_resto > #result_profil > .tabeau_resto,
 .container > .zone_recherche_resto > #result_plainte > .tabeau_resto,
 .container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto,
 .container > .zone_recherche_resto > #result_interval > .tabeau_resto,
 .container > .zone_recherche_resto > #recherche_par_interval,
 .container > .zone_recherche_resto > #nouvelle_plainte,
+.container > .zone_recherche_resto > #nouveau_profil,
+.container > .zone_recherche_resto > #connection_profil,
 .container > .zone_recherche_resto > #recherche,
 .container > .zone_recherche_resto > .tabeau_resto{
     width: 100%;
     border-radius: 10px;
     border: 2px solid black;
-    padding: 10px;
+
 }
 
+.container > .zone_recherche_resto > form > fieldset > .tableau_profil{
+    width: 50%;
+    border-spacing: 0;
+}
+
+
+.container > .zone_recherche_resto > form > fieldset >.tableau_profil td,
+.container > .zone_recherche_resto > form > fieldset >.tableau_profil th{
+    border: 1px solid black;
+    padding: 5px;
+}
+
+.container > .zone_recherche_resto > form > fieldset >.tableau_profil td{
+    text-align: center;
+}
+
+.container > .zone_recherche_resto > form > fieldset >.tableau_profil .supp{
+    width: 10%;
+}
+
+.container > .zone_recherche_resto > form > fieldset >.tableau_profil .supp .bouton_supp{
+    padding: 0;
+    background-image: url("/img/delete.png");
+    border: 0;
+    background-color: #c8c8c8;
+    display: block;
+    width: 25px;
+    height: 25px;
+    background-size: 100%;
+}
+
+.container > .zone_recherche_resto > form > fieldset >.tableau_profil .bouton_supp:hover {
+    cursor: pointer;
+}
+
+.container > .zone_recherche_resto > #result_profil > .tabeau_resto,
 .container > .zone_recherche_resto > #result_plainte > .tabeau_resto,
 .container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto{
     margin-bottom: 15px;
@@ -297,28 +381,26 @@ Fin de l'ajout du recentrage de attribut legend
     width: 20%;
 }
 
+.container > .zone_recherche_resto > #result_profil > .tabeau_resto .plainte_cle,
 .container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_cle,
-.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .cle,
-.container > .zone_recherche_resto > .tabeau_resto .cle{
+.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .cle{
     font-weight: bold;
     text-align: right;
-    width: 30%;
+}
+.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .cle{
+    width: 25%;
 }
 
-.container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_valeur,
-.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .valeur,
-.container > .zone_recherche_resto > .tabeau_resto .valeur{
+.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .valeur{
     text-align: justify;
-    width: 70%;
+    width: 75%;
 }
 
-.container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_cle{
-    width: 70%;
-    color: #006400;
-}
-
+.container > .zone_recherche_resto > #result_profil > .tabeau_resto .plainte_cle,
+.container > .zone_recherche_resto > #result_profil > .tabeau_resto .plainte_valeur,
+.container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_cle,
 .container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_valeur{
-    width: 30%;
+    width: 50%;
     color: #006400;
 }
 
@@ -343,6 +425,7 @@ Fin de l'ajout du recentrage de attribut legend
     flex-direction: column;
 }
 
+.container > .zone_recherche_resto > fieldset > form > .modif > .information,
 .container > .zone_recherche_resto > form > .modif > fieldset > .information,
 .container > .zone_recherche_resto > form > .modif > .information{
     width: 100%;
@@ -353,6 +436,7 @@ Fin de l'ajout du recentrage de attribut legend
     flex-direction: column;
 }
 
+.container > .zone_recherche_resto > fieldset > form > .modif > .information > div,
 .container > .zone_recherche_resto > form > .modif > fieldset > .information > div,
 .container > .zone_recherche_resto > form > .modif > .information > div{
     width: 100%;
@@ -361,7 +445,9 @@ Fin de l'ajout du recentrage de attribut legend
     -webkit-flex-direction: row;
     flex-direction: row;
 }
+
 .container > .zone_recherche_resto > form > .modif > fieldset > .information > label,
+.container > .zone_recherche_resto > fieldset > form > .modif > .information > label,
 .container > .zone_recherche_resto > form > .modif > .information > label{
     text-align: left;
     font-size: 18px;
@@ -369,21 +455,25 @@ Fin de l'ajout du recentrage de attribut legend
     margin-right: 10px;
 }
 
+.container > .zone_recherche_resto > fieldset > form > .modif > .information > label:hover,
 .container > .zone_recherche_resto > form > .modif > fieldset > .information > label:hover,
 .container > .zone_recherche_resto > form > .modif > .information > label:hover{
     cursor: pointer;
 }
 
+.container > .zone_recherche_resto > form > .modif > .erreur > div > input[type=email],
+.container > .zone_recherche_resto > form > .modif > .erreur > div > input[type=password],
 .container > .zone_recherche_resto > form > .modif > .erreur > div > input[type=text]{
     border-color: red;
     background-color: #FCDEDE;
     border: 2px solid red;
 }
 
-.container > .zone_recherche_resto > #recherche.erreur{
+.container > .zone_recherche_resto > .erreur{
     border-color: red;
 }
 
+.container > .zone_recherche_resto > fieldset > form > .modif > .troisBTN > .bouton,
 .container > .zone_recherche_resto > form > .modif > .troisBTN > .bouton,
 .container > .zone_recherche_resto > .admin_modif > .bouton,
 .container > .zone_admin > .admin > .bouton,
@@ -411,6 +501,7 @@ Fin de l'ajout du recentrage de attribut legend
     margin-right: 0px;
 }
 
+.container > .zone_recherche_resto > fieldset > form > .modif > .troisBTN > .bouton:hover,
 .container > .zone_recherche_resto > form > . modif > .troisBTN > .bouton:hover,
 .container > .zone_recherche_resto > .admin_modif > .bouton:hover,
 .container_erreur > .zone_404 > .admin > .bouton_404:hover,
@@ -435,4 +526,12 @@ Fin de l'ajout du recentrage de attribut legend
 .container > .return > .desktop {
     width: 40px;
     text-align: center;
+}
+
+/* CSS modifié du fichier select2.min.css fourni via
+    https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/
+*/
+.container > .zone_recherche_resto > fieldset > #ajout_etablissement > .modif > .information > div > span > .selection > .select2-selection--multiple,
+.container > .zone_recherche_resto > #nouveau_profil > .modif > .information > div > span > .selection > .select2-selection--multiple{
+    border-radius: 10px;
 }

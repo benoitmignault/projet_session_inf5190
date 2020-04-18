@@ -1,0 +1,131 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Bienvenue dans votre profil &rarr; <span class='userDisplay'>{{liste_infos['prenom']}} {{liste_infos['nom']}}</span>
+    &larr;</h1>
+<div class="container">
+    <p class="desktop" id="hautPageDesktop"></p>
+    <input form="nouvelle_photo" type="hidden" name="id_photo" id="id_photo"
+           value="{{liste_infos['id_photo']}}">
+    <input form="nouvelle_photo" type="hidden" name="id_personne" id="id_personne"
+           value="{{liste_infos['id_personne']}}">
+    <h2>Section pour gérer votre photo de profil</h2>
+    <div class='zone_recherche_resto'>
+        <fieldset>
+            <legend class="legendCenter">Voici votre photo de profil</legend>
+            <div class="header PhotoMoi">
+                <div class="unePassionPhoto">
+                    {% if liste_infos['id_photo'] != None %}
+                    <img src="/image/{{liste_infos['id_photo']}}.{{liste_infos['type_photo']}}" height=50
+                         width=50>
+                    {% endif %}
+                </div>
+            </div>
+            <form method="post" enctype="multipart/form-data"
+                  action="/connecter/gestion_photo" id="nouvelle_photo">
+                <div class="modif">
+                    <div class="information">
+                        <label for="photo">Choisir une photo :</label>
+                        <div>
+                            <input id="photo" name="photo" type="file"
+                                   accept=".png, .jpg">
+                        </div>
+                    </div>
+                    <div class="troisBTN">
+                        <input id="ajout" class="bouton" type='submit'
+                               name="ajout"
+                               value="Ajouter...">
+                        <input id="modifier" class="bouton" type='submit'
+                               name="modifier"
+                               value="Modifier...">
+                        <input id="supprimer" class="bouton" type='submit'
+                               name="supprimer"
+                               value="Supprimer...">
+
+                    </div>
+                </div>
+            </form>
+        </fieldset>
+    </div>
+    <!-- Utilisation nouvelle d'un bouton X :
+    https://fr.pngtree.com/element/down?id=Mjc3NDkzMA==&type=1 -->
+    <h2>Section pour gérer vos établissements à surveiller</h2>
+    <div class='zone_recherche_resto'>
+        <form method="post" id="retrait_etablissement"
+              action="/api/connecter/retirer_etablissement">
+            <fieldset>
+                <input type="hidden" name="id_personne" id="id_personne_supp"
+                       value="{{liste_infos['id_personne']}}">
+                <table class="tableau_profil">
+                    <thead>
+                    <tr>
+                        <th>Nom de l'établissement</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for un_etablissement in etablissement %}
+                    <tr class="{{un_etablissement['id_surveillance']}}">
+                        <td>{{un_etablissement["nom"]}}</td>
+                        <td class="supp">
+                            <input class="bouton_supp"
+                                   name="retrait"
+                                   id="{{un_etablissement['id_surveillance']}}"
+                                   type="submit" value="">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </fieldset>
+        </form>
+        <fieldset>
+            <legend class="legendCenter">Voici la liste des établissements
+                disponible
+            </legend>
+            <form method="post" action="/api/connecter/ajouter_etablissement"
+                  id="ajout_etablissement">
+                <input type="hidden" name="id_personne" id="id_personne_ajout"
+                       value="{{liste_infos['id_personne']}}">
+                <div class="modif">
+                    <div class="information">
+                        <label for="ajout_resto_profil">Liste des établissements
+                            :</label>
+                        <div>
+                            <!-- https://select2.org/getting-started/basic-usage -->
+                            <select class="js-example-basic-multiple"
+                                    id="ajout_resto_profil" multiple="multiple"
+                                    name="ajout_resto_profil[]"
+                                    title="Saisir un/des établissement(s) en particulier">
+                                {% for un_etablissement in etablissement_dispo
+                                %}
+                                <option value="{{un_etablissement}}">
+                                    {{un_etablissement}}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="troisBTN">
+                        <input class="bouton" type='submit' value="Ajouter...">
+                        <input class="bouton" id="btn_reset_etablissement"
+                               type='reset'
+                               value="Effacer...">
+                    </div>
+                </div>
+                <ul class="aucun" id="message_erreur_etablissement"></ul>
+            </form>
+        </fieldset>
+    </div>
+
+    <h2>Section pour revenir à la page d'accueil</h2>
+    <div class='zone_admin'>
+        <div class="admin">
+            <a class="bouton" href="/deconnection">Déconnexion</a>
+        </div>
+    </div>
+    <div class="return">
+        <a class="desktop" href="#hautPageDesktop">
+            <img alt="Retour vers le haut" src="/img/fleche_haut.svg"></a>
+    </div>
+</div>
+{% endblock content %}

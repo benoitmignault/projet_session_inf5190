@@ -1,5 +1,5 @@
 import csv
-import re  # pour la gestion des patterns pour les différents champs input
+import re
 import smtplib
 import xml.etree.ElementTree as ET
 from email.mime.multipart import MIMEMultipart
@@ -30,6 +30,10 @@ PATTERN_NOM_RESTO = "^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,98}" \
 PATTERN_NOM_RUE = "^[a-z1-9A-Z][a-z0-9- 'A-Z]{1,33}[a-z0-9A-Z]$"
 
 PATTERN_DATE = "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$"
+
+PATTERN_COURRIEL = "^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$"
+
+PATTERN_PASSWORD = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*()?&])[A-Za-z\\d@()$!%*?&]{8,20}$"
 
 SOURCE_ADRESSE = "b.mignault.uqam.qc.ca@gmail.com"
 
@@ -104,6 +108,13 @@ def mise_jour_bd():
     connection.disconnect()
 
 
+def initial_infos_connecter():
+    liste_infos = {"id_personne": "", "id_photo": "", "prenom": "", "nom": "",
+                   "courriel": "", "type_photo": ""}
+
+    return liste_infos
+
+
 def initial_champ_interval():
     liste_champs = {"date_debut": "", "date_fin": ""}
 
@@ -130,7 +141,20 @@ def initial_champ_importation_xml():
 def initial_champ_nouveau_profil():
     liste_champs = {"nom": "", "prenom": "", "courriel": "", "password": "",
                     "liste_etablissement": [], "salt": "", "id_personne": 0,
-                    "id_photo": 0}
+                    "id_photo": 0, "password_hasher": ""}
+
+    return liste_champs
+
+
+def initial_champ_ajout_etablissement():
+    liste_champs = {"id_personne": 0, "liste_etablissement": []}
+
+    return liste_champs
+
+
+def initial_champ_connexion():
+    liste_champs = {"courriel": "", "password": "", "salt": "", "hash": "",
+                    "password_hasher": "", "messages": []}
 
     return liste_champs
 
@@ -252,6 +276,20 @@ def initial_champ_recherche():
     return liste_champs
 
 
+def initial_champ_connexion_validation():
+    liste_validation = {"situation_erreur": False,
+                        "champ_courriel_vide": False,
+                        "champ_password_vide": False,
+                        "champ_courriel_inv": False,
+                        "champ_password_inv": False,
+                        "champ_courriel_non_trouve": False,
+                        "champ_password_non_trouve": False,
+                        "longueur_courriel_inv": False,
+                        "longueur_password_inv": False}
+
+    return liste_validation
+
+
 def initial_champ_recherche_validation():
     liste_validation = {"situation_erreur": False,
                         "champ_proprietaire_vide": False,
@@ -277,6 +315,35 @@ def initial_champ_interval_validation():
     return liste_validation
 
 
+def remplissage_champ_connexion(request, liste_champs):
+    liste_champs['courriel'] = request['courriel_conn']
+    liste_champs['password'] = request['password_conn']
+
+    return liste_champs
+
+
+def remplissage_infos_connecter(liste_infos, info_profil):
+    liste_infos['prenom'] = info_profil[0]
+    liste_infos['nom'] = info_profil[1]
+    liste_infos['id_photo'] = info_profil[2]
+    liste_infos['id_personne'] = info_profil[3]
+    liste_infos['courriel'] = info_profil[4]
+    liste_infos['type_photo'] = info_profil[5]
+
+    return liste_infos
+
+
+def remplissage_post_verification_conn(liste_champs, utilisateur):
+    liste_champs['salt'] = utilisateur[0]
+    liste_champs['hash'] = utilisateur[1]
+
+    liste_champs['password_hasher'] = hashlib.sha512(
+        str(liste_champs['password'] + liste_champs['salt']).encode(
+            "utf-8")).hexdigest()
+
+    return liste_champs
+
+
 def remplissage_champ_recherche(request, liste_champs):
     liste_champs['proprietaire'] = request['proprietaire']
     liste_champs['etablissement'] = request['etablissement']
@@ -299,7 +366,7 @@ def remplissage_champ_nouvelle_plainte(request, liste_champs):
     return liste_champs
 
 
-def remplissage_champ_nouvelle_profil(request, liste_champs):
+def remplissage_champ_nouveau_profil(request, liste_champs):
     data = request.get_json()
     liste_champs['nom'] = data['nom']
     liste_champs['prenom'] = data['prenom']
@@ -307,7 +374,7 @@ def remplissage_champ_nouvelle_profil(request, liste_champs):
     liste_champs['password'] = data['password']
     salt = uuid.uuid4().hex
     liste_champs['salt'] = salt
-    liste_champs['password'] = hashlib.sha512(
+    liste_champs['password_hasher'] = hashlib.sha512(
         str(liste_champs['password'] + salt).encode("utf-8")).hexdigest()
 
     for un_etablissement in data['liste_etablissement']:
@@ -316,7 +383,16 @@ def remplissage_champ_nouvelle_profil(request, liste_champs):
     return liste_champs
 
 
-# Création de la nouvelle branche Recuperation_Manuelle_B1
+def remplissage_champ_ajout_etablissement(request, liste_champs):
+    data = request.get_json()
+    liste_champs['id_personne'] = data['id_personne']
+
+    for un_etablissement in data['liste_etablissement']:
+        liste_champs['liste_etablissement'].append(un_etablissement)
+
+    return liste_champs
+
+
 def creation_courriel(liste_envoi):
     string_courriel = recuperation_courriel_yaml()
 
@@ -412,6 +488,50 @@ def nombre_critiere_recherche(liste_champs):
         nombre += 1
 
     return nombre
+
+
+def validation_champ_connexion(liste_champs, liste_validation):
+    if (not liste_validation['champ_courriel_vide'] and not
+    liste_validation['champ_password_vide']):
+        liste_validation = sous_validation_courriel_connexion(liste_champs,
+                                                              liste_validation)
+        liste_validation = sous_validation_password_connexion(liste_champs,
+                                                              liste_validation)
+
+    return liste_validation
+
+
+def sous_validation_courriel_connexion(liste_champs, liste_validation):
+    if liste_champs['courriel'] == "":
+        liste_validation['champ_courriel_vide'] = True
+
+    else:
+        match_courriel = re.compile(PATTERN_COURRIEL).match
+        if match_courriel(liste_champs['courriel']) is None:
+            liste_validation['champ_courriel_inv'] = True
+
+        if len(liste_champs['courriel']) > 50:
+            liste_validation['longueur_courriel_inv'] = True
+
+    return liste_validation
+
+
+def sous_validation_password_connexion(liste_champs, liste_validation):
+    if liste_champs['password'] == "":
+        liste_validation['champ_password_vide'] = True
+
+    else:
+        match_password = re.compile(PATTERN_PASSWORD).match
+        if match_password(liste_champs['password']) is None:
+            liste_validation['champ_password_inv'] = True
+
+        if not (7 < len(liste_champs['password']) < 21):
+            liste_validation['longueur_password_inv'] = True
+
+        if not liste_champs['password_hasher'] == liste_champs['hash']:
+            liste_validation['champ_password_non_trouve'] = True
+
+    return liste_validation
 
 
 def validation_champs_interval(liste_champs, liste_validation):
@@ -580,5 +700,63 @@ def sous_message_erreur_nom_rue(messages, liste_validation):
     if liste_validation['longueur_rue_inv']:
         messages.append("Attention ! Le nom de la rue doit être entre "
                         "3 et 35 caractères !")
+
+    return messages
+
+
+def message_erreur_connexion(liste_validation):
+    messages = []
+    if (liste_validation['champ_courriel_vide'] and
+            liste_validation['champ_password_vide']):
+        messages.append("Attention les tous les champs sont vides !")
+
+    else:
+        messages = sous_message_erreur_courriel(messages, liste_validation)
+        messages = sous_message_erreur_password(messages, liste_validation)
+
+    return messages
+
+
+def sous_message_erreur_courriel(messages, liste_validation):
+    if liste_validation['champ_courriel_vide']:
+        messages.append("Au moment de vous connectez, vous n'avez rien saisie "
+                        "dans le champ «Courriel» !")
+    else:
+        if liste_validation['champ_courriel_inv']:
+            messages.append("Au moment de vous connectez, votre «Courriel» "
+                            "était invalide")
+
+        if liste_validation['champ_courriel_non_trouve']:
+            messages.append("Au moment de vous connectez, votre «Courriel» "
+                            "n'existait pas !")
+
+        if liste_validation['longueur_courriel_inv']:
+            messages.append("Attention la longueur permise pour le courriel "
+                            "est de 50 charactères !")
+
+    return messages
+
+
+def sous_message_erreur_password(messages, liste_validation):
+    if liste_validation['champ_password_vide']:
+        messages.append("Au moment de vous connectez, vous n'avez rien saisie "
+                        "dans le champ «mot de passe» !")
+
+    else:
+        if liste_validation['champ_password_inv']:
+            messages.append("Au moment de vous connectez, votre mot de passe "
+                            "saisie était invalide !")
+
+        if liste_validation['longueur_password_inv']:
+            messages.append("Attention la longueur permise pour le mot de passe"
+                            "se trouve entre 8 et 20 charactères !")
+
+        if liste_validation['champ_password_non_trouve'] and not \
+                liste_validation['champ_courriel_non_trouve']:
+            messages.append("Au moment de vous connectez, votre mot de passe "
+                            "n'était pas le bon avec votre courriel !")
+            messages.append("Vous devez vous créer un nouveau profil, comme la "
+                            "mécanique de réinitialisation de mot de passe "
+                            "n'est pas en place pour l'instant...")
 
     return messages

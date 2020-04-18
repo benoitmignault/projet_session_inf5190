@@ -32,12 +32,56 @@ const champ_prenom_plaignant = document.querySelector('#prenom_plaignant');
 const champ_nom_plaignant = document.querySelector('#nom_plaignant');
 const champ_description = document.querySelector('#description');
 
+// Variable pour la création du profil
+const form_nouveau_profil = document.querySelector('#nouveau_profil');
+const btn_reset_profil = document.querySelector('#btn_reset_profil');
+const message_erreur_profil = document.querySelector('#message_erreur_profil');
+const result_profil = document.querySelector('#result_profil');
+const champ_prenom = document.querySelector('#prenom');
+const champ_nom = document.querySelector('#nom');
+const champ_courriel = document.querySelector('#courriel');
+const champ_password = document.querySelector('#password');
+const champ_password_conf = document.querySelector('#password_conf');
+// Les variables de la liste des établissements seront crée au besoin
+
+// Variable pour la connection au profil
+const form_connection_profil = document.querySelector('#connection_profil');
+const btn_reset_connection = document.querySelector('#btn_reset_connection');
+const message_erreur_connection = document.querySelector('#message_erreur_connection');
+const champ_courriel_connection = document.querySelector('#courriel_conn');
+const champ_password_connection = document.querySelector('#password_conn');
+
+// Variable commune pour les deux appels ajax de la section des établissements + photo
+const tableau_etablissement = document.querySelector('.tableau_profil');
+const list_etablissement_dispo = document.querySelector('#ajout_resto_profil');
+const champ_id_personne = document.querySelector('#id_personne');
+
+// Variable pour la gestion des établissements du profil
+const form_ajout_etablissement = document.querySelector('#ajout_etablissement');
+const btn_reset_etablissement = document.querySelector('#btn_reset_etablissement');
+const message_erreur_etablissement = document.querySelector('#message_erreur_etablissement');
+
+// Variable pour retirer un établissement de la liste de surveillance
+const form_retrait_etablissement = document.querySelector('#retrait_etablissement');
+
+// Variable pour gérer la photo de profile
+const form_gestion_photo = document.querySelector('#nouvelle_photo');
+const champ_fichier_photo = document.querySelector('#photo');
+const champ_btn_ajout_photo = document.querySelector('#ajout');
+const champ_btn_modifier_photo = document.querySelector('#modifier');
+const champ_btn_supprimer_photo = document.querySelector('#supprimer');
+const champ_id_photo = document.querySelector('#id_photo');
+const section_photo_profil = document.querySelector('.unePassionPhoto');
+
 const pattern_date = new RegExp("^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$");
 const pattern_code = new RegExp("^[A-Z][0-9][A-Z][ ]{1}[0-9][A-Z][0-9]$");
 const pattern_proprio = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,98}[a-z0-9A-Z.)]$");
 const pattern_resto = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,63}[a-z0-9A-Z.)]$");
 const pattern_ville = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,31}[a-z0-9A-Z.)]$");
 const pattern_rue = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z]{1,33}[a-z0-9A-Z]$");
+const pattern_courriel = new RegExp("^([a-zA-Z0-9_\\.\\-\\+])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+$");
+const pattern_prenom_nom = new RegExp("^[A-Z][a-z-A-Z]{1,48}[a-z]$");
+const pattern_password = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*()?&])[A-Za-z\\d@()$!%*?&]{8,20}$");
 
 function initial_plainte_validation(){
     var liste_validation = {"champ_resto_vide": false, "champ_numero_vide": false,
@@ -46,6 +90,17 @@ function initial_plainte_validation(){
         "champ_date_inv": false, "champ_prenom_vide": false, "champ_nom_vide": false,
         "champ_description_vide": false, "champ_resto_inv": false, "champ_rue_inv": false,
         "champ_ville_inv": false, "requete_ajax_avec_erreur": false};
+
+    return liste_validation;
+}
+
+function initial_profil_validation(){
+    var liste_validation = {"champ_prenom_vide": false, "champ_nom_vide": false,
+        "champ_prenom_inv": false, "champ_nom_inv": false, "champ_courriel_vide": false,
+        "champ_password_vide": false, "champ_password_conf_vide": false,
+        "champ_courriel_inv": false, "champ_password_inv": false, "champ_password_conf_inv": false,
+        "champ_passwords_non_egal": false, "requete_ajax_avec_erreur": false,
+        "champ_liste_resto_profil_vide": false};
 
     return liste_validation;
 }
@@ -100,23 +155,84 @@ function reset_demande_plainte(){
     });
 }
 
+function reset_nouveau_profil(){
+    $(btn_reset_profil).click(function() {
+        champ_prenom.defaultValue = "";
+        champ_nom.defaultValue = "";
+        champ_courriel.defaultValue = "";
+        champ_password.defaultValue = "";
+        champ_password_conf.defaultValue = "";
+        initialiser_selection_evoluee();
+        result_profil.innerHTML = "";
+        effacer_messages_erreurs(message_erreur_profil);
+        initialiser_tous_champs("input[type=password]");
+        initialiser_tous_champs("input[type=email]");
+        initialiser_tous_champs("input[type=text]");
+        initialiser_tous_champs("#nouveau_profil");
+    });
+}
+
+function reset_demande_connection(){
+    $(btn_reset_connection).click(function() {
+        champ_courriel_connection.defaultValue = "";
+        champ_password_connection.defaultValue = "";
+        effacer_messages_erreurs(message_erreur_connection);
+        initialiser_tous_champs("input[type=password]");
+        initialiser_tous_champs("input[type=email]");
+        initialiser_tous_champs("#connection_profil");
+    });
+}
+
+function reset_gestion_etablissement(){
+    $(btn_reset_etablissement).click(function() {
+        effacer_messages_erreurs(message_erreur_etablissement);
+        initialiser_selection_evoluee();
+    });
+}
+
+function initialiser_selection_evoluee(){
+    $('.select2-selection__rendered .select2-selection__choice').each(function () {
+            $(this).remove(); // Remove li one by one
+    });
+    // Champ où est affiché la liste sans être la liste
+    var champ_liste_etablissement = document.querySelector('.select2-search__field');
+    var section_afficher_liste = document.querySelector('.select2-search--inline');
+    // Remise aux valeurs initiales du champ
+    champ_liste_etablissement.placeholder = "Choix d'(es) établissement(s)";
+    section_afficher_liste.style.width = "100%";
+    champ_liste_etablissement.style.width = "100%";
+}
+
 function initialiser_tous_champs(type_champs){
     var tous_champs = document.querySelectorAll(type_champs);
     tous_champs.forEach(function(un_champ){
-        if (type_champs == "input[type=text]" || type_champs == "#liste_resto"){
-            un_champ.style.background = "white";
-            un_champ.style.border = "1px solid #ccc";
-        } else if (type_champs == "#recherche_par_interval" || type_champs == "#recherche"){
+        if (type_champs == "#nouveau_profil" ||
+            type_champs == "#connection_profil" ||
+            type_champs == "#nouvelle_plainte" ||
+            type_champs == "#recherche_par_interval" ||
+            type_champs == "#recherche"){
             un_champ.style.border = "2px solid black";
+        } else {
+            un_champ.style.backgroundColor = "white";
+            un_champ.style.border = "1px solid #ccc";
         }
     });
 }
 
 function effacer_messages_erreurs(message){
-    // Nous devons vérifier que les variables ne sont pas égales à «undefined»
     if (message){
         message.innerHTML = "";
     }
+}
+
+function validation_champs_connection(){
+    $(champ_courriel_connection).change(function () {
+        validation_regex(champ_courriel_connection, pattern_courriel);
+    });
+
+    $(champ_password_connection).change(function () {
+        validation_regex(champ_password_connection, pattern_password);
+    });
 }
 
 function validation_champs_recherches(){
@@ -172,7 +288,7 @@ function recherche_rapide(){
 function demande_plainte(){
     $(form_nouvelle_plainte).submit(function (e) {
         e.preventDefault();
-        message_erreur_plainte.innerHTML = ""; // On remet la section des messages vide
+        message_erreur_plainte.innerHTML = "";
         var liste_validation = initial_plainte_validation();
         liste_validation = verification_nouvelle_plainte(liste_validation);
         message_erreur_nouvelle_plainte(liste_validation);
@@ -181,6 +297,103 @@ function demande_plainte(){
             appel_ajax_nouvelle_plainte();
         }
     });
+}
+
+function demande_nouveau_profil(){
+    $(form_nouveau_profil).submit(function (e) {
+        e.preventDefault();
+        message_erreur_profil.innerHTML = "";
+        var liste_validation = initial_profil_validation();
+        liste_validation = verification_nouveau_profil(liste_validation);
+        message_erreur_nouveau_profil(liste_validation);
+        liste_validation = verification_tous_champs_valide(liste_validation);
+
+        if (!liste_validation['requete_ajax_avec_erreur']){
+            // Il se pourrait que la requête précédente était invalide
+            initialiser_tous_champs("#nouveau_profil");
+            appel_ajax_nouveau_profil();
+        }
+    });
+}
+
+function demande_connection_profil(){
+    $(form_connection_profil).submit(function (e) {
+        if (champ_courriel_connection.value == "" || champ_password_connection.value == ""){
+            e.preventDefault();
+            alert("Veuiller saisir des informations dans les champs vides !");
+        } else {
+            $(this).unbind(e);
+        }
+    });
+}
+
+function retrait_etablissement_profil(){
+    $(form_retrait_etablissement).submit(function (e) {
+        e.preventDefault();
+        // Ça permet de récupérer l'informartion du bouton sélectionner
+        var $btn = $(document.activeElement);
+        var id_surveillance = $btn.attr("id")
+        appel_ajax_retrait_etablissement_profil(id_surveillance);
+    });
+}
+
+function ajout_etablissements_profil(){
+    $(form_ajout_etablissement).submit(function (e) {
+        e.preventDefault();
+        var liste_etablissements = document.querySelectorAll('.select2-selection__choice');
+        if (liste_etablissements.length == 0){
+            alert("Veuiller saisir une liste établissements à surveiller !");
+        } else {
+            appel_ajax_ajout_etablissement_profil(liste_etablissements);
+        }
+    });
+}
+
+function ajout_modif_retrait_photo_profil(){
+    $(form_gestion_photo).on('submit', function(e) {
+    var $btn = $(document.activeElement);
+
+    if ( $(champ_fichier_photo).get(0).files.length == 0 && $btn.attr("name") === "supprimer"){
+        e.preventDefault();
+        appel_ajax_supprimer_photo_profil();
+
+    } else if ( $(champ_fichier_photo).get(0).files.length == 1 && $btn.attr("name") === "supprimer"){
+        e.preventDefault();
+        alert("Attention ! Au moment de détruire votre photo de profil, veuiller à ne pas sélectionner de nouvelle !");
+
+    } else {
+        if ( $(champ_fichier_photo).get(0).files.length == 0 ){
+            e.preventDefault();
+            alert("Veuiller sélectionner un fichier pour votre photo de profile !");
+        }
+    }
+    });
+}
+
+function validation_bouton_section_photo(){
+    if (champ_id_photo){
+        if (champ_id_photo.value == "None"){
+            champ_btn_ajout_photo.setAttribute("class", "bouton");
+            champ_btn_ajout_photo.removeAttribute("disabled");
+            champ_btn_ajout_photo.style.backgroundImage = "linear-gradient(to bottom, #507d99, #96cceb";
+            champ_btn_modifier_photo.setAttribute("class", "bouton disabled");
+            champ_btn_modifier_photo.setAttribute("disabled", "disabled");
+            champ_btn_modifier_photo.style.background = "darkgray";
+            champ_btn_supprimer_photo.setAttribute("class", "bouton disabled");
+            champ_btn_supprimer_photo.setAttribute("disabled", "disabled");
+            champ_btn_supprimer_photo.style.background = "darkgray";
+        } else {
+            champ_btn_modifier_photo.setAttribute("class", "bouton");
+            champ_btn_modifier_photo.removeAttribute("disabled");
+            champ_btn_modifier_photo.style.backgroundImage = "linear-gradient(to bottom, #507d99, #96cceb";
+            champ_btn_supprimer_photo.setAttribute("class", "bouton");
+            champ_btn_supprimer_photo.removeAttribute("disabled");
+            champ_btn_supprimer_photo.style.backgroundImage = "linear-gradient(to bottom, #507d99, #96cceb";
+            champ_btn_ajout_photo.setAttribute("class", "bouton disabled");
+            champ_btn_ajout_photo.setAttribute("disabled", "disabled");
+            champ_btn_ajout_photo.style.background = "darkgray";
+        }
+    }
 }
 
 function verification_interval(liste_validation){
@@ -220,39 +433,41 @@ function verification_choix_etablissement(liste_validation){
 }
 
 function verification_nouvelle_plainte(liste_validation){
+    verification_champs_vides();
+
     if (champ_etablissement.value == "") {
         liste_validation['champ_resto_vide'] = true;
-    } else if (!(pattern_resto.test(champ_etablissement.value))) {
-        liste_validation['champ_resto_inv'] = true;
+    } else if (!(pattern_resto.test(champ_etablissement.value))){
+	    liste_validation['champ_resto_inv'] = true;
     }
 
     if (champ_no_civique.value == "") {
         liste_validation['champ_numero_vide'] = true;
-    } else if(isNaN(champ_no_civique.value)){
-	    liste_validation['champ_numero_inv'] = true;
-    }
+    } else if (isNaN(champ_no_civique.value)){
+	        liste_validation['champ_numero_inv'] = true;
+	}
 
     if (champ_nom_rue_plainte.value == "") {
         liste_validation['champ_rue_vide'] = true;
-    } else if(!(pattern_rue.test(champ_nom_rue_plainte.value))){
+    } else if (!(pattern_rue.test(champ_nom_rue_plainte.value))){
 	    liste_validation['champ_rue_inv'] = true;
     }
 
     if (champ_nom_ville.value == "") {
         liste_validation['champ_ville_vide'] = true;
-    } else if(!(pattern_rue.test())){
+    } else if (!(pattern_rue.test())){
 	    liste_validation['champ_ville_inv'] = true;
     }
 
     if (champ_code_postal.value == "") {
         liste_validation['champ_code_vide'] = true;
-    } else if(!(pattern_code.test(champ_code_postal.value.toUpperCase()))){
+    } else if (!(pattern_code.test(champ_code_postal.value.toUpperCase()))){
 	    liste_validation['champ_code_inv'] = true;
     }
 
     if (champ_date_visite.value == "") {
         liste_validation['champ_date_vide'] = true;
-    } else if(!(pattern_date.test(champ_date_visite.value))){
+    } else if (!(pattern_date.test(champ_date_visite.value))){
 	    liste_validation['champ_date_inv'] = true;
     }
 
@@ -268,16 +483,71 @@ function verification_nouvelle_plainte(liste_validation){
         liste_validation['champ_description_vide'] = true;
     }
 
+    return liste_validation;
+}
+
+function verification_nouveau_profil(liste_validation){
+    if (champ_prenom.value == "") {
+        liste_validation['champ_prenom_vide'] = true;
+    } else if(!(pattern_prenom_nom.test(champ_prenom.value))){
+	    liste_validation['champ_prenom_inv'] = true;
+    }
+
+    if (champ_nom.value == "") {
+        liste_validation['champ_nom_vide'] = true;
+    } else if(!(pattern_prenom_nom.test(champ_nom.value))){
+	    liste_validation['champ_nom_inv'] = true;
+    }
+
+    if (champ_courriel.value == "") {
+        liste_validation['champ_courriel_vide'] = true;
+    } else if(!(pattern_courriel.test(champ_courriel.value))){
+	    liste_validation['champ_courriel_inv'] = true;
+    }
+
+    if (champ_password.value == "") {
+        liste_validation['champ_password_vide'] = true;
+    } else if(!(pattern_password.test(champ_password.value))){
+	    liste_validation['champ_password_inv'] = true;
+    }
+
+    if (champ_password_conf.value == "") {
+        liste_validation['champ_password_conf_vide'] = true;
+    } else if(!(pattern_password.test(champ_password_conf.value))){
+	    liste_validation['champ_password_conf_inv'] = true;
+    }
+
+    if (!liste_validation['champ_password_vide'] && !liste_validation['champ_password_conf_vide']){
+        if (champ_password.value.localeCompare(champ_password_conf.value) != 0){
+            liste_validation['champ_passwords_non_egal'] = true;
+        }
+    }
+
+    // En fonction de la manière que fonctionne Select2 de Jquery,
+    // je dois compter le nombre de li dans le ul de la classe selection__rendered
+    // 1 équivaut au LI de base
+    if ($('.select2-selection__rendered li').length == 1){
+        liste_validation['champ_liste_resto_profil_vide'] = true;
+    }
+
+    verification_champs_vides();
+
+    return liste_validation;
+}
+
+function verification_champs_vides(){
     // Une manière simple d'afficher un message générale, s'il y a des champs vides
     // https://stackoverflow.com/questions/16211871/how-to-check-if-all-inputs-are-not-empty-with-jquery
     $('input').each(function() {
         if (!$(this).val()){
-            alert('Attention ! Il y a encore des champs vides !');
-            return false;
+            if (this.hasAttribute('placeholder') && this.placeholder !== "Choix d'(es) établissement(s)"){
+                return true;
+            } else {
+                alert('Attention ! Il y a encore des champs vides !');
+                return false;
+            }
         }
     });
-
-    return liste_validation;
 }
 
 function verification_tous_champs_valide(liste_validation){
@@ -361,6 +631,62 @@ function message_erreur_nouvelle_plainte(liste_validation){
     }
 }
 
+function message_erreur_nouveau_profil(liste_validation){
+    if (liste_validation['champ_prenom_inv']) {
+        message_erreur_profil.innerHTML += "<li>Veuillez saisir un prenom valide allant jusqu'à 50 charactères !</li>";
+        modification_erreur(champ_prenom);
+    } else {
+        modification_correct(champ_prenom);
+    }
+
+    if (liste_validation['champ_nom_inv']) {
+        message_erreur_profil.innerHTML += "<li>Veuillez saisir un nom valide allant jusqu'à 50 charactères !</li>";
+        modification_erreur(champ_nom);
+    } else {
+        modification_correct(champ_nom);
+    }
+
+    if (liste_validation['champ_courriel_inv']) {
+        message_erreur_profil.innerHTML += "<li>Veuillez saisir un courriel qui respect «exemple@domaine.com» !</li>";
+        modification_erreur(champ_courriel);
+    } else {
+        modification_correct(champ_courriel);
+    }
+
+    if (liste_validation['champ_password_inv']) {
+        message_erreur_profil.innerHTML += "<li>Veuillez saisir un mot de passe valide allant de 8 et 20 charactères !</li>";
+    }
+
+    if (liste_validation['champ_password_conf_inv']) {
+        message_erreur_profil.innerHTML += "<li>Veuillez saisir la confirmation du mot de passe valide allant de 8 et 20 charactères !</li>";
+    }
+
+    if (liste_validation['champ_passwords_non_egal']){
+        message_erreur_profil.innerHTML += "<li>Veuillez saisir un mot de passe et sa confirmatinon identique !</li>";
+    }
+
+    if (liste_validation['champ_password_inv'] && liste_validation['champ_passwords_non_egal']){
+        modification_erreur(champ_password);
+    } else {
+        modification_correct(champ_password);
+    }
+
+    if (liste_validation['champ_password_conf_inv'] && liste_validation['champ_passwords_non_egal']){
+        modification_erreur(champ_password_conf);
+    } else {
+        modification_correct(champ_password_conf);
+    }
+
+    if (liste_validation['champ_liste_resto_profil_vide']){
+        message_erreur_profil.innerHTML += "<li>Veuillez sélectionner au moins un établissement parmis la liste !";
+        var type_champ = document.querySelector(".select2-selection--multiple");
+        type_champ.style.border = "2px solid red";
+        type_champ.style.backgroundColor = "#FCDEDE";
+    } else {
+        initialiser_tous_champs(".select2-selection--multiple");
+    }
+}
+
 function ajustement_style_champs(liste_validation){
     if (liste_validation['champ_debut_inv'] || (liste_validation['champ_debut_vide'] && liste_validation['champ_liste_resto_vide'])){
         modification_erreur(champ_date_debut);
@@ -392,12 +718,12 @@ function ajustement_style_champs(liste_validation){
 
 function modification_erreur(champ){
     champ.style.border = "2px solid red";
-    champ.style.background = "#FCDEDE";
+    champ.style.backgroundColor = "#FCDEDE";
 }
 
 function modification_correct(champ){
     champ.style.border = "1px solid #ccc";
-    champ.style.background = "white";
+    champ.style.backgroundColor = "white";
 }
 
 function appel_ajax_interval(){
@@ -451,7 +777,7 @@ function appel_ajax_nouvelle_plainte(){
         if (ajax.readyState === XMLHttpRequest.DONE) {
             if (ajax.status === 201) {
                 var liste = JSON.parse(ajax.responseText);
-                result_plainte.innerHTML = creation_bloc_html_plainte(liste);
+                result_plainte.innerHTML = creation_bloc_html(liste);
             } else {
                 appel_ajax_plainte_succes_mais_erreur();
                 message_erreur_plainte.innerHTML += "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
@@ -472,6 +798,162 @@ function appel_ajax_nouvelle_plainte(){
     ajax.open("POST", "/api/nouvelle_plainte", true);
     ajax.setRequestHeader("Content-Type", "application/json");
     ajax.send(data_json);
+}
+
+function appel_ajax_nouveau_profil(){
+    var ajax = new XMLHttpRequest();
+    ajax.onreadystatechange = function() {
+        if (ajax.readyState === XMLHttpRequest.DONE) {
+            if (ajax.status === 201) {
+                var liste = JSON.parse(ajax.responseText);
+                result_profil.innerHTML = creation_bloc_html(liste);
+            } else{
+                appel_ajax_profil_succes_mais_erreur();
+                if (ajax.status === 404)  {
+                    result_profil.innerHTML = "<p class=\"aucun\">Impossible de créer le profil, car le Courriel est déjà présent !</p>";
+                } else {
+                    message_erreur_profil.innerHTML += "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
+                }
+            }
+        }
+    };
+    var data = {
+            "nom": champ_nom.value,
+            "prenom": champ_prenom.value,
+            "courriel": champ_courriel.value,
+            "password": champ_password.value,
+            "liste_etablissement": []
+    };
+    var liste_etablissements = document.querySelectorAll('.select2-selection__choice');
+    liste_etablissements.forEach(function(un_etablissement){
+        data["liste_etablissement"].push(un_etablissement.title.trim());
+    });
+
+    var data_json = JSON.stringify(data);
+    ajax.open("POST", "/api/nouveau_profil", true);
+    ajax.setRequestHeader("Content-Type", "application/json");
+    ajax.send(data_json);
+}
+
+function appel_ajax_ajout_etablissement_profil(liste_etablissements){
+    var ajax = new XMLHttpRequest();
+    ajax.onreadystatechange = function() {
+        if (ajax.readyState === XMLHttpRequest.DONE) {
+            if (ajax.status === 200) {
+                var liste = JSON.parse(ajax.responseText);
+                refaire_tableau_etablissement(liste["etablissement"]);
+                refaire_etablissement_disponible(liste["etablissement_dispo"]);
+            } else {
+                message_erreur_etablissement.innerHTML += "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
+            }
+        }
+    };
+
+    var data = {
+            "id_personne": parseInt(champ_id_personne.value),
+            "liste_etablissement": []
+    };
+
+    liste_etablissements.forEach(function(un_etablissement){
+        data["liste_etablissement"].push(un_etablissement.title.trim());
+    });
+
+    var data_json = JSON.stringify(data);
+    ajax.open("POST", "/api/connecter/ajouter_etablissement", true);
+    ajax.setRequestHeader("Content-Type", "application/json");
+    ajax.send(data_json);
+}
+
+function appel_ajax_retrait_etablissement_profil(id_surveillance){
+    var ajax = new XMLHttpRequest();
+    ajax.onreadystatechange = function() {
+        if (ajax.readyState === XMLHttpRequest.DONE) {
+            if (ajax.status === 200) {
+                var liste = JSON.parse(ajax.responseText);
+                supprimer_ligne_tableau_etablissement(id_surveillance);
+                refaire_etablissement_disponible(liste);
+            }
+        }
+    };
+    var data = {
+            "id_surveillance": parseInt(id_surveillance),
+            "id_personne": parseInt(champ_id_personne.value)
+    };
+
+    var data_json = JSON.stringify(data);
+    ajax.open("DELETE", "/api/connecter/retirer_etablissement", true);
+    ajax.setRequestHeader("Content-Type", "application/json");
+    ajax.send(data_json);
+}
+
+function appel_ajax_supprimer_photo_profil(){
+    var ajax = new XMLHttpRequest();
+    ajax.onreadystatechange = function() {
+        if (ajax.readyState === XMLHttpRequest.DONE) {
+            if (ajax.status === 200) {
+                champ_id_photo.value = "None";
+                section_photo_profil.innerHTML = "";
+                validation_bouton_section_photo();
+            } else if (ajax.status === 404) {
+                alert("Attention ! La photo que vous tentez de supprimer n'existe déjà plus !");
+            }
+        }
+    };
+    var data = {
+            "id_photo": champ_id_photo.value,
+            "id_personne": parseInt(champ_id_personne.value)
+    };
+
+    var data_json = JSON.stringify(data);
+    ajax.open("DELETE", "/api/connecter/supprimer_photo", true);
+    ajax.setRequestHeader("Content-Type", "application/json");
+    ajax.send(data_json);
+}
+
+function refaire_etablissement_disponible(liste){
+    // On supprime toutes les vieilles options
+    $(list_etablissement_dispo).empty();
+    for(var i = 0; i < liste.length; i++) {
+        var option = liste[i];
+        // Pour refaire toutes les options MAJ en fonction de l'ajout ou du retrait
+        $(list_etablissement_dispo).append(new Option(option, option));
+    }
+}
+
+function refaire_tableau_etablissement(liste){
+    $(tableau_etablissement).find("tr:gt(0)").remove();
+    for(var i = 0; i < liste.length; i++) {
+        const un_etablissement = Object.entries(liste[i]);
+        var id_surveillance = 0;
+        var etablissement = "";
+        for (const [cle, valeur] of un_etablissement) {
+            if (cle == "id_surveillance"){
+                id_surveillance = valeur;
+            } else if (cle == "nom"){
+                etablissement = valeur;
+            }
+        }
+        var nouvelle_ligne = "<tr class=\""+id_surveillance+"\">";
+        var colonne1 = "<td>"+etablissement+"</td>";
+        var colonne2 = "<td class=\"supp\"><input class=\"bouton_supp\" name=\"retrait\" ";
+        colonne2 += "type=\"submit\" value=\"\" id=\""+id_surveillance+"\" </td>";
+        var fin_ligne = "</tr>";
+        var ligne = nouvelle_ligne + colonne1 + colonne2 + fin_ligne;
+
+        $('.tableau_profil > tbody:last-child').append(ligne);
+    }
+}
+
+function supprimer_ligne_tableau_etablissement(id_surveillance){
+    var d = document.getElementsByClassName(id_surveillance);
+    for (var i = 0; i < d.length; i++) {
+        d[i].parentElement.removeChild(d[i]);
+    }
+}
+
+function appel_ajax_profil_succes_mais_erreur(){
+    result_profil.innerHTML = "";
+    form_nouveau_profil.style.border = "2px solid red";
 }
 
 function appel_ajax_interval_succes_mais_erreur(){
@@ -527,7 +1009,7 @@ function creation_bloc_html_etablissement(listes){
     return result_liste;
 }
 
-function creation_bloc_html_plainte(listes){
+function creation_bloc_html(listes){
     var result_liste = "";
     result_liste += "<table class=\"tabeau_resto\"><tbody>";
     for (var key in listes) {
@@ -541,11 +1023,28 @@ function creation_bloc_html_plainte(listes){
     return result_liste;
 }
 
+function creation_select2(){
+    $('.js-example-basic-multiple').select2({
+        placeholder: "Choix d'(es) établissement(s)"
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     validation_champs_recherches();
+    validation_champs_connection();
+    validation_bouton_section_photo();
     recherche_rapide();
     demande_plainte();
+    demande_nouveau_profil();
+    demande_connection_profil();
+    ajout_etablissements_profil();
+    retrait_etablissement_profil();
+    ajout_modif_retrait_photo_profil();
     reset_recherche();
     reset_recherche_interval();
     reset_demande_plainte();
+    reset_nouveau_profil();
+    reset_demande_connection();
+    reset_gestion_etablissement();
+    creation_select2();
 });

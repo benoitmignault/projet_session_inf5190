@@ -1,11 +1,15 @@
+from functools import wraps
+
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.combining import OrTrigger
 from apscheduler.triggers.cron import CronTrigger
-from flask import Flask, Response, jsonify, redirect
+from flask import Flask, Response, jsonify, redirect, make_response
 from flask import render_template, request, session, url_for
 from flask_json_schema import JsonSchema
 from flask_json_schema import JsonValidationError
 
+from gestion_etablissement_profil import ajouter_plusieurs_etablissement, \
+    supprimer_etablissement
 from modules.fonction import *
 from validateur_plainte_json_schema import nouvelle_plainte_etablissement
 from validateur_profil_json_schema import nouveau_profil
@@ -18,16 +22,17 @@ app.secret_key = "(*&*&322387he738220)(*(*22347657"
 
 
 @app.errorhandler(404)
-def not_found(e):
+def not_found_404(e):
     erreur_404 = True
-    titre = "Page inexistante - 404"
+    titre = "Page inexistante"
     return render_template("erreur_404.html", titre=titre,
-                           erreur_404=erreur_404)
+                           erreur_404=erreur_404), 404
 
 
 @app.errorhandler(JsonValidationError)
 def validation_error(erreur):
     errors = [validation.message for validation in erreur.errors]
+
     return jsonify({"Le champ en problème": erreur.message,
                     "Le message d'erreur": errors}), 400
 
@@ -65,6 +70,8 @@ def home():
 
     conn_db = get_db()
     liste_etablissement = conn_db.liste_tous_restaurants()
+
+    # todo Faire des validations simple sur les champs en JS
 
     return render_template('home.html', titre=titre,
                            liste_etablissement=liste_etablissement,
@@ -204,31 +211,34 @@ def recherche_contrevenants_csv():
     return Response(csv_information, mimetype='text/csv')
 
 
-# Cette fonction est pour la tache D1
-@app.route('/api/nouvelle_plainte', methods=["GET", "POST"])
+# Cette fonction est pour la tache D1 du service REST
+@app.route('/api/nouvelle_plainte', methods=["POST"])
 @schema.validate(nouvelle_plainte_etablissement)
-def creation_plainte():
-    if request.method == "POST":
-        liste_champs_plainte = initial_champ_nouvelle_plainte()
-        liste_champs_plainte = remplissage_champ_nouvelle_plainte(
-            request, liste_champs_plainte)
-        conn_db = get_db()
-        liste_champs_plainte['id_plainte'] = conn_db.inserer_nouvelle_plainte(
-            liste_champs_plainte['etablissement'],
-            liste_champs_plainte['no_civique'],
-            liste_champs_plainte['nom_rue'],
-            liste_champs_plainte['ville'],
-            liste_champs_plainte['date_visite'],
-            liste_champs_plainte['prenom_plaignant'],
-            liste_champs_plainte['nom_plaignant'],
-            liste_champs_plainte['description'])
+def api_creation_plainte():
+    liste_champs_plainte = initial_champ_nouvelle_plainte()
+    liste_champs_plainte = remplissage_champ_nouvelle_plainte(
+        request, liste_champs_plainte)
+    conn_db = get_db()
+    liste_champs_plainte['id_plainte'] = conn_db.inserer_nouvelle_plainte(
+        liste_champs_plainte['etablissement'],
+        liste_champs_plainte['no_civique'],
+        liste_champs_plainte['nom_rue'],
+        liste_champs_plainte['ville'],
+        liste_champs_plainte['date_visite'],
+        liste_champs_plainte['prenom_plaignant'],
+        liste_champs_plainte['nom_plaignant'],
+        liste_champs_plainte['description'])
 
-        return jsonify({"Voici le numéro de la plainte ouverte":
+    return jsonify({"Voici le numéro de la plainte ouverte":
                         liste_champs_plainte['id_plainte']}), 201
 
-    elif request.method == "GET":
-        titre = "Nouvelle plainte"
-        return render_template("formulaire_plainte.html", titre=titre)
+
+# Cette fonction est pour la tache D1 de l'interface web
+@app.route('/nouvelle_plainte', methods=["GET"])
+def creation_plainte():
+    # todo Refaire une liste des établissements au lieu d'un champ text
+    titre = "Nouvelle plainte"
+    return render_template("formulaire_plainte.html", titre=titre)
 
 
 # Cette fonction est pour la tache D2
@@ -245,21 +255,264 @@ def suppression_plainte(id_plainte):
 
 
 # Cette fonction est pour la tache E1
-@app.route('/api/nouveau_profil', methods=["GET", "POST"])
+@app.route('/api/nouveau_profil', methods=["POST"])
 @schema.validate(nouveau_profil)
-def creation_profil():
-    if request.method == "POST":
-        liste_champs_profil = initial_champ_nouveau_profil()
-        liste_champs_profil = remplissage_champ_nouvelle_profil(
-            request, liste_champs_profil)
-        conn_db = get_db()
+def api_creation_profil():
+    conn_db = get_db()
+    liste_champs_profil = initial_champ_nouveau_profil()
+    liste_champs_profil = remplissage_champ_nouveau_profil(
+        request, liste_champs_profil)
+
+    courriel = conn_db.verification_profil_existant(
+        liste_champs_profil['courriel'])
+
+    if courriel is None:
         conn_db.inserer_nouveau_profil(
             liste_champs_profil['nom'], liste_champs_profil['prenom'],
-            liste_champs_profil['courriel'], liste_champs_profil['password'],
+            liste_champs_profil['courriel'],
+            liste_champs_profil['password_hasher'],
             liste_champs_profil['salt'],
             liste_champs_profil['liste_etablissement'])
 
         return jsonify({"Création du nouveau profil": "Succès !"}), 201
+
+    else:
+        return jsonify({"Impossible de créer le profil":
+                            "Courriel est déjà présent !"}), 404
+
+
+# Cette fonction est pour la tache E2
+@app.route('/nouveau_profil', methods=["GET"])
+def creation_profil():
+    conn_db = get_db()
+
+    liste_etablissement = conn_db.liste_tous_restaurants()
+    titre = "Création d'un profil"
+    return render_template('creation_profil.html', titre=titre,
+                           liste_etablissement=liste_etablissement)
+
+
+# Cette fonction est pour la tache E2
+@app.route('/connection', methods=["GET", "POST"])
+def connexion_profil():
+    if request.method == "GET":
+        titre = "Page de Connexion !"
+        return render_template("connection.html", courriel="", password="",
+                               titre=titre, messages=[], erreur=False)
+
+    elif request.method == "POST":
+        liste_champs_connexion = initial_champ_connexion()
+        liste_validation_connexion = initial_champ_connexion_validation()
+        liste_champs_connexion = remplissage_champ_connexion(
+            request.form, liste_champs_connexion)
+        conn_db = get_db()
+        utilisateur = conn_db.recuperation_info_connexion(
+            liste_champs_connexion['courriel'])
+        if utilisateur is None:
+            liste_validation_connexion['champ_courriel_non_trouve'] = True
+
+        else:
+            liste_champs_connexion = remplissage_post_verification_conn(
+                liste_champs_connexion, utilisateur)
+
+        liste_validation_connexion = validation_champ_connexion(
+            liste_champs_connexion, liste_validation_connexion)
+        liste_validation_connexion = situation_erreur_interval(
+            liste_validation_connexion)
+
+        if not liste_validation_connexion['situation_erreur']:
+            id_session = uuid.uuid4().hex
+            conn_db.creation_session_active(id_session,
+                                            liste_champs_connexion['courriel'])
+            session["id"] = id_session
+            return redirect(url_for('.profil_connecter'))
+
+        else:
+            liste_champs_connexion['messages'] = message_erreur_connexion(
+                liste_validation_connexion)
+            titre = "Erreur de la Connexion !"
+
+            return render_template("connection.html", titre=titre, erreur=True,
+                                   messages=liste_champs_connexion['messages'],
+                                   liste_validation=liste_validation_connexion,
+                                   courriel=liste_champs_connexion['courriel'],
+                                   password=liste_champs_connexion['password'])
+
+
+def authentification_requise(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not is_authenticated(session):
+            return personne_non_autorisee()
+        return f(*args, **kwargs)
+
+    return decorated
+
+
+# Cette fonction est pour la tache E2 et l'authentification avec succès
+@app.route('/connecter/profil', methods=["GET"])
+@authentification_requise
+def profil_connecter():
+    conn_db = get_db()
+    courriel = conn_db.recuperation_session_active(session["id"])
+    if request.method == "GET":
+        liste_infos = initial_infos_connecter()
+        info_profil = conn_db.recuperation_profil(courriel)
+        etablissement = conn_db.recuperation_profil_etablissement(
+            info_profil[3])
+        etablissement_dispo = conn_db.recuperation_etablissement_restant(
+            info_profil[3])
+        liste_infos = remplissage_infos_connecter(liste_infos, info_profil)
+
+        titre = "Vous êtes maintenant connecté !"
+        return render_template("utilisateur_connecter.html", titre=titre,
+                               liste_infos=liste_infos,
+                               etablissement=etablissement,
+                               etablissement_dispo=etablissement_dispo)
+
+
+@app.route('/connecter/gestion_photo', methods=["POST"])
+@authentification_requise
+def ajouter_photo():
+    fichier_photo = None
+    id_photo_nouvelle = None
+    id_photo_ancienne = None
+    id_personne = ""
+    type_photo = ""
+
+    if "photo" in request.files:
+        fichier_photo = request.files["photo"]
+        type_photo = request.files["photo"].content_type
+        if type_photo == "image/png":
+            type_photo = "png"
+
+        else:
+            type_photo = "jpg"
+
+        id_photo_nouvelle = str(uuid.uuid4().hex)
+
+    if "id_photo" in request.form:
+        id_photo_ancienne = request.form["id_photo"]
+
+    if "id_personne" in request.form:
+        id_personne = request.form["id_personne"]
+
+    if id_photo_nouvelle is not None:
+        conn_db = get_db()
+
+        if "ajout" in request.form:
+            conn_db.ajouter_photo(id_photo_nouvelle, fichier_photo)
+            conn_db.ajout_id_photo_profil(
+                id_photo_nouvelle, id_personne, type_photo)
+
+        elif "modifier" in request.form:
+            conn_db.supprimer_photo_profil(id_photo_ancienne)
+            conn_db.supprimer_lien_photo_profil(id_personne)
+            conn_db.ajouter_photo(id_photo_nouvelle, fichier_photo)
+            conn_db.ajout_id_photo_profil(
+                id_photo_nouvelle, id_personne, type_photo)
+
+        return redirect(url_for('.profil_connecter'))
+
+    else:
+        return "", 404
+
+
+@app.route('/api/connecter/supprimer_photo', methods=["DELETE"])
+@authentification_requise
+def supprimer_photo():
+    conn_db = get_db()
+    data = request.get_json()
+    id_personne = data["id_personne"]
+    id_photo = data["id_photo"]
+
+    if id_personne == "" or id_photo == "":
+        return "", 404
+
+    else:
+        conn_db.supprimer_photo_profil(id_photo)
+        conn_db.supprimer_lien_photo_profil(id_personne)
+
+        return "", 200
+
+
+@app.route('/image/<id_photo>.<type_photo>')
+def faire_afficher_photo(id_photo, type_photo):
+    conn_db = get_db()
+    binary_data = conn_db.recuperer_photo(id_photo)
+    if binary_data is None:
+        return Response(status=404)
+    else:
+        response = make_response(binary_data)
+        if type_photo == "png":
+            response.headers.set('Content-Type', 'image/png')
+
+        else:
+            response.headers.set('Content-Type', 'image/jpeg')
+
+    return response
+
+
+# todo créer un jsonschema pour vérifier le json qu'on saisir
+@app.route('/api/connecter/ajouter_etablissement', methods=["POST"])
+@schema.validate(ajouter_plusieurs_etablissement)
+@authentification_requise
+def ajouter_etablissement():
+    conn_db = get_db()
+    liste_champs_ajout = initial_champ_ajout_etablissement()
+    liste_champs_ajout = remplissage_champ_ajout_etablissement(
+        request, liste_champs_ajout)
+    conn_db.inserer_etablissement_surveiller_profil(
+        liste_champs_ajout['id_personne'],
+        liste_champs_ajout['liste_etablissement'])
+
+    etablissement = conn_db.recuperation_profil_etablissement(
+        liste_champs_ajout['id_personne'])
+    etablissement_dispo = conn_db.recuperation_etablissement_restant(
+        liste_champs_ajout['id_personne'])
+    return jsonify({"etablissement": etablissement,
+                    "etablissement_dispo": etablissement_dispo}), 200
+
+
+@app.route('/api/connecter/retirer_etablissement', methods=["DELETE"])
+@schema.validate(supprimer_etablissement)
+@authentification_requise
+def retirer_etablissement():
+    conn_db = get_db()
+    data = request.get_json()
+    id_surveillance = conn_db.verification_etablissement_surveiller(
+        data['id_surveillance'])
+
+    if id_surveillance is None:
+        return "", 404
+    else:
+        conn_db.supprimer_etablissement_profil(
+            data['id_personne'], id_surveillance)
+        etablissement_dispo = conn_db.recuperation_etablissement_restant(
+            data['id_personne'])
+
+        return jsonify(etablissement_dispo), 200
+
+
+@app.route('/deconnection')
+@authentification_requise
+def deconnection_profil():
+    id_session = session["id"]
+    session.pop('id', None)
+    conn_db = get_db()
+    conn_db.detruire_session_active(id_session)
+    return redirect(url_for('.home'))
+
+
+def is_authenticated(session):
+    return "id" in session
+
+
+def personne_non_autorisee():
+    return Response("Vous tentez d''accéder à une page web sécurité !<br>"
+                    "Veuillez vous authentifiez avec ce lien :<br> "
+                    "<a href=\"/connection\">Se Connecter</a>'"
+                    , 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 
 # La fonction sera exécuté à chaque jour à minuit, automatiquement
