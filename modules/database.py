@@ -273,7 +273,8 @@ class Database:
 
     def recuperation_profil(self, courriel):
         cursor = self.get_connection().cursor()
-        select = "SELECT prenom, nom, id_photo, id_personne, courriel "
+        select = "SELECT prenom, nom, id_photo, id_personne, courriel, " \
+                 "type_photo "
         fromm = "FROM profil_utilisateur "
         where = "WHERE courriel = ? "
         sql = select + fromm + where
@@ -282,7 +283,8 @@ class Database:
         if result is None:
             return None
         else:
-            return result[0], result[1], result[2], result[3], result[4]
+            return result[0], result[1], result[2], result[3], result[4], \
+                   result[5]
 
     def recuperation_profil_etablissement(self, id_personne):
         cursor = self.get_connection().cursor()
@@ -338,13 +340,13 @@ class Database:
             blob_data = picture[0]
             return blob_data
 
-    def ajout_id_photo_profil(self, id_photo, id_personne):
+    def ajout_id_photo_profil(self, id_photo, id_personne, type_photo):
         connection = self.get_connection()
         update = "UPDATE profil_utilisateur "
-        sett = "set id_photo = ? "
+        sett = "set id_photo = ? , type_photo = ? "
         where = "where id_personne = ? "
         sql = update + sett + where
-        connection.execute(sql, (id_photo, id_personne))
+        connection.execute(sql, (id_photo, type_photo, id_personne))
         connection.commit()
 
     def supprimer_photo_profil(self, id_photo):
@@ -356,7 +358,7 @@ class Database:
     def supprimer_lien_photo_profil(self, id_personne):
         connection = self.get_connection()
         update = "UPDATE profil_utilisateur "
-        sett = "set id_photo = NULL "
+        sett = "set id_photo = NULL , type_photo = NULL "
         where = "where id_personne = ? "
         sql = update + sett + where
         connection.execute(sql, (id_personne,))

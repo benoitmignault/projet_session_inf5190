@@ -385,6 +385,13 @@ def ajouter_photo():
 
     if "photo" in request.files:
         fichier_photo = request.files["photo"]
+        type_photo = request.files["photo"].content_type
+        if type_photo == "image/png":
+            type_photo = "png"
+
+        else:
+            type_photo = "jpg"
+
         id_photo_nouvelle = str(uuid.uuid4().hex)
 
     if "id_photo" in request.form:
@@ -398,13 +405,15 @@ def ajouter_photo():
 
         if "ajout" in request.form:
             conn_db.ajouter_photo(id_photo_nouvelle, fichier_photo)
-            conn_db.ajout_id_photo_profil(id_photo_nouvelle, id_personne)
+            conn_db.ajout_id_photo_profil(
+                id_photo_nouvelle, id_personne, type_photo)
 
         elif "modifier" in request.form:
             conn_db.supprimer_photo_profil(id_photo_ancienne)
             conn_db.supprimer_lien_photo_profil(id_personne)
             conn_db.ajouter_photo(id_photo_nouvelle, fichier_photo)
-            conn_db.ajout_id_photo_profil(id_photo_nouvelle, id_personne)
+            conn_db.ajout_id_photo_profil(
+                id_photo_nouvelle, id_personne, type_photo)
 
         return redirect(url_for('.profil_connecter'))
 
@@ -430,15 +439,19 @@ def supprimer_photo():
         return "", 200
 
 
-@app.route('/image/<id_photo>.png')
-def faire_afficher_photo(id_photo):
+@app.route('/image/<id_photo>.<type_photo>')
+def faire_afficher_photo(id_photo, type_photo):
     conn_db = get_db()
     binary_data = conn_db.recuperer_photo(id_photo)
     if binary_data is None:
         return Response(status=404)
     else:
         response = make_response(binary_data)
-        response.headers.set('Content-Type', 'image/png')
+        if type_photo == "png":
+            response.headers.set('Content-Type', 'image/png')
+
+        else:
+            response.headers.set('Content-Type', 'image/jpeg')
 
     return response
 

@@ -111,7 +111,7 @@ def mise_jour_bd():
 
 def initial_infos_connecter():
     liste_infos = {"id_personne": "", "id_photo": "", "prenom": "", "nom": "",
-                   "courriel": ""}
+                   "courriel": "", "type_photo": ""}
 
     return liste_infos
 
@@ -329,6 +329,7 @@ def remplissage_infos_connecter(liste_infos, info_profil):
     liste_infos['id_photo'] = info_profil[2]
     liste_infos['id_personne'] = info_profil[3]
     liste_infos['courriel'] = info_profil[4]
+    liste_infos['type_photo'] = info_profil[5]
 
     return liste_infos
 
