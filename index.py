@@ -71,8 +71,6 @@ def home():
     conn_db = get_db()
     liste_etablissement = conn_db.liste_tous_restaurants()
 
-    # todo Faire des validations simple sur les champs en JS
-
     return render_template('home.html', titre=titre,
                            liste_etablissement=liste_etablissement,
                            liste_validation=liste_validation,

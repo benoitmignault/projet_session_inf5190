@@ -124,6 +124,7 @@ h2 {
 
 .container > .zone_admin{
     background-color: initial;
+    margin-bottom: 10px;
 }
 
 .container > .zone_recherche_resto{
@@ -153,6 +154,10 @@ h2 {
     padding: 10px;
     margin-bottom: 15px;
     border-radius: 10px;
+}
+
+.container > .zone_recherche_resto > .fieldset2{
+    margin: 0;
 }
 
 .container > .zone_recherche_resto > form > .modif{
@@ -291,16 +296,15 @@ Fin de l'ajout du recentrage de attribut legend
 .container > .zone_recherche_resto > #result_plainte > .tabeau_resto,
 .container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto,
 .container > .zone_recherche_resto > #result_interval > .tabeau_resto,
-.container > .zone_recherche_resto > #recherche_par_interval,
-.container > .zone_recherche_resto > #nouvelle_plainte,
-.container > .zone_recherche_resto > #nouveau_profil,
-.container > .zone_recherche_resto > #connection_profil,
-.container > .zone_recherche_resto > #recherche,
+.container > .zone_recherche_resto > form,
 .container > .zone_recherche_resto > .tabeau_resto{
     width: 100%;
     border-radius: 10px;
     border: 2px solid black;
+}
 
+.container > .zone_recherche_resto > #retrait_etablissement{
+    border: initial;
 }
 
 .container > .zone_recherche_resto > form > fieldset > .tableau_profil{
@@ -473,7 +477,7 @@ Fin de l'ajout du recentrage de attribut legend
 }
 
 .container > .zone_recherche_resto > .erreur{
-    border-color: red;
+    border: 2px solid red;
 }
 
 .container > .zone_recherche_resto > fieldset > form > .modif > .troisBTN > .bouton,

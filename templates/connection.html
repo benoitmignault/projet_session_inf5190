@@ -2,6 +2,14 @@
 {% block content %}
 <h1>Bienvenue sur la page pour se connecter à son profil</h1>
 <div class="container">
+    <div class='zone_admin'>
+        <div class="admin">
+            <a class="bouton" href="/nouveau_profil">Créer son profil</a>
+        </div>
+        <div class="admin">
+            <a class="bouton" href="/">Page D'accueil</a>
+        </div>
+    </div>
     <div class='zone_recherche_resto'>
         {% set champ = '' %}
         {% if erreur %}
@@ -61,18 +69,6 @@
             {% endfor %}
             {% endif %}
         </ul>
-    </div>
-    <h2>Section pour créer un profil</h2>
-    <div class='zone_admin'>
-        <div class="admin">
-            <a class="bouton" href="/nouveau_profil">Créer son profil</a>
-        </div>
-    </div>
-    <h2>Section pour revenir à la page d'accueil</h2>
-    <div class='zone_admin'>
-        <div class="admin">
-            <a class="bouton" href="/">Page D'accueil</a>
-        </div>
     </div>
 </div>
 {% endblock content %}

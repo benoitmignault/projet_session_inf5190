@@ -11,6 +11,7 @@ const result_interval_etablissement = document.querySelector('#result_interval_e
 const champ_liste_resto = document.querySelector('#liste_resto');
 
 // Variables pour la recherche d'information générale pour être utiliser avec le bouton effacer
+const form_recherche = document.querySelector('#recherche');
 const champ_nom_resto = document.querySelector('#etablissement');
 const champ_nom_proprio = document.querySelector('#proprietaire');
 const champ_nom_rue = document.querySelector('#nom_rue');
@@ -76,7 +77,6 @@ const section_photo_profil = document.querySelector('.unePassionPhoto');
 const pattern_date = new RegExp("^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$");
 const pattern_code = new RegExp("^[A-Z][0-9][A-Z][ ]{1}[0-9][A-Z][0-9]$");
 const pattern_proprio = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,98}[a-z0-9A-Z.)]$");
-const pattern_resto = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,63}[a-z0-9A-Z.)]$");
 const pattern_ville = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,31}[a-z0-9A-Z.)]$");
 const pattern_rue = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z]{1,33}[a-z0-9A-Z]$");
 const pattern_courriel = new RegExp("^([a-zA-Z0-9_\\.\\-\\+])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+$");
@@ -84,11 +84,11 @@ const pattern_prenom_nom = new RegExp("^[A-Z][a-z-A-Z]{1,48}[a-z]$");
 const pattern_password = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*()?&])[A-Za-z\\d@()$!%*?&]{8,20}$");
 
 function initial_plainte_validation(){
-    var liste_validation = {"champ_resto_vide": false, "champ_numero_vide": false,
+    var liste_validation = {"champ_etablissement_vide": false, "champ_numero_vide": false,
         "champ_numero_inv": false, "champ_rue_vide": false, "champ_ville_vide": false,
         "champ_code_vide": false, "champ_code_inv": false, "champ_date_vide": false,
         "champ_date_inv": false, "champ_prenom_vide": false, "champ_nom_vide": false,
-        "champ_description_vide": false, "champ_resto_inv": false, "champ_rue_inv": false,
+        "champ_prenom_inv": false, "champ_nom_inv": false, "champ_description_vide": false, "champ_rue_inv": false,
         "champ_ville_inv": false, "requete_ajax_avec_erreur": false};
 
     return liste_validation;
@@ -105,7 +105,21 @@ function initial_profil_validation(){
     return liste_validation;
 }
 
+function initial_connection_validation(){
+    var liste_validation = {"champ_courriel_vide": false, "champ_password_vide": false,
+        "champ_courriel_inv": false, "champ_password_inv": false, "erreur_formulaire": false};
+
+    return liste_validation;
+}
+
 function initial_recherche_validation(){
+    var liste_validation = {"aucune_recherche": false,"champ_proprio_inv": false,
+        "champ_rue_inv": false, "erreur_formulaire": false};
+
+    return liste_validation;
+}
+
+function initial_recherche_interval_validation(){
     var liste_validation = {"champ_debut_inv": false, "aucun_choix": false,
         "champ_fin_inv": false, "champ_debut_vide": false, "champ_fin_vide": false,
         "champ_liste_resto_vide": false, "les_deux_choix": false, "champs_date_vides": false};
@@ -113,14 +127,14 @@ function initial_recherche_validation(){
     return liste_validation;
 }
 
+// Récupérer comment désecltionner mardi de la job
 function reset_recherche(){
     $(btn_reset_recher).click(function() {
         champ_nom_proprio.defaultValue = "";
         champ_nom_rue.defaultValue = "";
+        champ_nom_resto.options.selectedIndex = 0; // marche pas
         effacer_messages_erreurs(message_erreur_recher);
-        initialiser_tous_champs("#etablissement")
-        initialiser_tous_champs("input[type=text]");
-        initialiser_tous_champs("#recherche");
+        initialiser_tous_champs("#etablissement, #proprietaire, #nom_rue, #recherche");
     });
 }
 
@@ -131,9 +145,7 @@ function reset_recherche_interval(){
         result_interval.innerHTML = "";
         result_interval_etablissement.innerHTML = "";
         effacer_messages_erreurs(message_erreur_interval);
-        initialiser_tous_champs("input[type=text]");
-        initialiser_tous_champs("#liste_resto");
-        initialiser_tous_champs("#recherche_par_interval");
+        initialiser_tous_champs("#date_debut, #date_fin, #liste_resto, #recherche_par_interval");
     });
 }
 
@@ -150,8 +162,7 @@ function reset_demande_plainte(){
         champ_description.defaultValue = "";
         result_plainte.innerHTML = "";
         effacer_messages_erreurs(message_erreur_plainte);
-        initialiser_tous_champs("input[type=text]");
-        initialiser_tous_champs("#nouvelle_plainte");
+        initialiser_tous_champs("#nouvelle_plainte, input[type=text]");
     });
 }
 
@@ -165,10 +176,7 @@ function reset_nouveau_profil(){
         initialiser_selection_evoluee();
         result_profil.innerHTML = "";
         effacer_messages_erreurs(message_erreur_profil);
-        initialiser_tous_champs("input[type=password]");
-        initialiser_tous_champs("input[type=email]");
-        initialiser_tous_champs("input[type=text]");
-        initialiser_tous_champs("#nouveau_profil");
+        initialiser_tous_champs("input[type=password], input[type=email], input[type=text], #nouveau_profil");
     });
 }
 
@@ -177,9 +185,7 @@ function reset_demande_connection(){
         champ_courriel_connection.defaultValue = "";
         champ_password_connection.defaultValue = "";
         effacer_messages_erreurs(message_erreur_connection);
-        initialiser_tous_champs("input[type=password]");
-        initialiser_tous_champs("input[type=email]");
-        initialiser_tous_champs("#connection_profil");
+        initialiser_tous_champs("input[type=email], input[type=password], #connection_profil");
     });
 }
 
@@ -206,11 +212,7 @@ function initialiser_selection_evoluee(){
 function initialiser_tous_champs(type_champs){
     var tous_champs = document.querySelectorAll(type_champs);
     tous_champs.forEach(function(un_champ){
-        if (type_champs == "#nouveau_profil" ||
-            type_champs == "#connection_profil" ||
-            type_champs == "#nouvelle_plainte" ||
-            type_champs == "#recherche_par_interval" ||
-            type_champs == "#recherche"){
+        if (un_champ.localName == "form"){
             un_champ.style.border = "2px solid black";
         } else {
             un_champ.style.backgroundColor = "white";
@@ -225,42 +227,29 @@ function effacer_messages_erreurs(message){
     }
 }
 
-function validation_champs_connection(){
-    $(champ_courriel_connection).change(function () {
-        validation_regex(champ_courriel_connection, pattern_courriel);
+function recherche(){
+    $(form_recherche).submit(function (e) {
+        message_erreur_recher.innerHTML = "";
+        var liste_validation = initial_recherche_validation();
+        liste_validation = verification_recherche(liste_validation);
+        message_erreur_recherche(liste_validation);
+        ajustement_style_champs_rech(liste_validation);
+        liste_validation = verification_evocation_non_ajax(liste_validation);
+        if (liste_validation['erreur_formulaire']){
+            e.preventDefault();
+        }
     });
-
-    $(champ_password_connection).change(function () {
-        validation_regex(champ_password_connection, pattern_password);
-    });
-}
-
-function validation_champs_recherches(){
-    $(champ_nom_proprio).change(function () {
-        validation_regex(champ_nom_proprio, pattern_proprio);
-    });
-
-    $(champ_nom_rue).change(function () {
-        validation_regex(champ_nom_rue, pattern_rue);
-    });
-}
-
-function validation_regex(champ, pattern_regex){
-    if (!(pattern_regex.test(champ.value))) {
-        alert("Veuillez respecter les charactères permis et la longueur permise !");
-        champ.value = "";
-    }
 }
 
 function recherche_rapide(){
     $(form_interval).submit(function (e) {
         e.preventDefault();
-        message_erreur_interval.innerHTML = ""; // On remet la section des messages vide
-        var liste_validation = initial_recherche_validation();
+        message_erreur_interval.innerHTML = ""; //
+        var liste_validation = initial_recherche_interval_validation();
         liste_validation = verification_interval(liste_validation);
         liste_validation = verification_choix_etablissement(liste_validation);
-        message_erreur_recherche(liste_validation);
-        ajustement_style_champs(liste_validation);
+        message_erreur_recherche_rapide(liste_validation);
+        ajustement_style_champs_rech_rapide(liste_validation);
         if (!liste_validation['champs_date_vides'] && liste_validation['champ_liste_resto_vide']){
             result_interval.innerHTML = "";
             result_interval_etablissement.innerHTML = "";
@@ -288,7 +277,7 @@ function demande_plainte(){
         var liste_validation = initial_plainte_validation();
         liste_validation = verification_nouvelle_plainte(liste_validation);
         message_erreur_nouvelle_plainte(liste_validation);
-        liste_validation = verification_tous_champs_valide(liste_validation);
+        liste_validation = verification_evocation_ajax(liste_validation);
         if (!liste_validation['requete_ajax_avec_erreur']){
             appel_ajax_nouvelle_plainte();
         }
@@ -302,8 +291,7 @@ function demande_nouveau_profil(){
         var liste_validation = initial_profil_validation();
         liste_validation = verification_nouveau_profil(liste_validation);
         message_erreur_nouveau_profil(liste_validation);
-        liste_validation = verification_tous_champs_valide(liste_validation);
-
+        liste_validation = verification_evocation_ajax(liste_validation);
         if (!liste_validation['requete_ajax_avec_erreur']){
             // Il se pourrait que la requête précédente était invalide
             initialiser_tous_champs("#nouveau_profil");
@@ -314,11 +302,13 @@ function demande_nouveau_profil(){
 
 function demande_connection_profil(){
     $(form_connection_profil).submit(function (e) {
-        if (champ_courriel_connection.value == "" || champ_password_connection.value == ""){
+        message_erreur_connection.innerHTML = "";
+        var liste_validation = initial_connection_validation();
+        liste_validation = verification_connection_profil(liste_validation);
+        message_erreur_nouvelle_connection(liste_validation);
+        liste_validation = verification_evocation_non_ajax(liste_validation);
+        if (liste_validation['erreur_formulaire']){
             e.preventDefault();
-            alert("Veuiller saisir des informations dans les champs vides !");
-        } else {
-            $(this).unbind(e);
         }
     });
 }
@@ -369,27 +359,47 @@ function ajout_modif_retrait_photo_profil(){
 function validation_bouton_section_photo(){
     if (champ_id_photo){
         if (champ_id_photo.value == "None"){
-            champ_btn_ajout_photo.setAttribute("class", "bouton");
-            champ_btn_ajout_photo.removeAttribute("disabled");
-            champ_btn_ajout_photo.style.backgroundImage = "linear-gradient(to bottom, #507d99, #96cceb";
-            champ_btn_modifier_photo.setAttribute("class", "bouton disabled");
-            champ_btn_modifier_photo.setAttribute("disabled", "disabled");
-            champ_btn_modifier_photo.style.background = "darkgray";
-            champ_btn_supprimer_photo.setAttribute("class", "bouton disabled");
-            champ_btn_supprimer_photo.setAttribute("disabled", "disabled");
-            champ_btn_supprimer_photo.style.background = "darkgray";
+            activation_bouton(champ_btn_ajout_photo);
+            desactivation_bouton(champ_btn_modifier_photo);
+            desactivation_bouton(champ_btn_supprimer_photo);
         } else {
-            champ_btn_modifier_photo.setAttribute("class", "bouton");
-            champ_btn_modifier_photo.removeAttribute("disabled");
-            champ_btn_modifier_photo.style.backgroundImage = "linear-gradient(to bottom, #507d99, #96cceb";
-            champ_btn_supprimer_photo.setAttribute("class", "bouton");
-            champ_btn_supprimer_photo.removeAttribute("disabled");
-            champ_btn_supprimer_photo.style.backgroundImage = "linear-gradient(to bottom, #507d99, #96cceb";
-            champ_btn_ajout_photo.setAttribute("class", "bouton disabled");
-            champ_btn_ajout_photo.setAttribute("disabled", "disabled");
-            champ_btn_ajout_photo.style.background = "darkgray";
+            activation_bouton(champ_btn_modifier_photo);
+            activation_bouton(champ_btn_supprimer_photo);
+            desactivation_bouton(champ_btn_ajout_photo);
         }
     }
+}
+
+function activation_bouton(champ){
+    champ.setAttribute("class", "bouton");
+    champ.removeAttribute("disabled");
+    champ.style.backgroundImage = "linear-gradient(to bottom, #507d99, #96cceb";
+}
+
+function desactivation_bouton(champ){
+    champ.setAttribute("class", "bouton disabled");
+    champ.setAttribute("disabled", "disabled");
+    champ.style.background = "darkgray";
+}
+
+function verification_recherche(liste_validation){
+    if (champ_nom_resto.value == "" && champ_nom_proprio.value == "" && champ_nom_rue.value == "") {
+        liste_validation['aucune_recherche'] = true;
+    } else {
+        if (champ_nom_proprio.value != ""){
+            if (!(pattern_proprio.test(champ_nom_proprio.value))) {
+                liste_validation['champ_proprio_inv'] = true;
+            }
+        }
+
+        if (champ_nom_rue.value != ""){
+            if (!(pattern_rue.test(champ_nom_rue.value))) {
+                liste_validation['champ_rue_inv'] = true;
+            }
+        }
+    }
+
+    return liste_validation;
 }
 
 function verification_interval(liste_validation){
@@ -429,12 +439,10 @@ function verification_choix_etablissement(liste_validation){
 }
 
 function verification_nouvelle_plainte(liste_validation){
-    verification_champs_vides();
+    verification_champs_vides(); // Parce que tous les champs doivent être remplis
 
-    if (champ_etablissement.value == "") {
-        liste_validation['champ_resto_vide'] = true;
-    } else if (!(pattern_resto.test(champ_etablissement.value))){
-	    liste_validation['champ_resto_inv'] = true;
+    if (champ_etablissement.options.selectedIndex == 0) {
+        liste_validation['champ_etablissement_vide'] = true;
     }
 
     if (champ_no_civique.value == "") {
@@ -469,10 +477,14 @@ function verification_nouvelle_plainte(liste_validation){
 
     if (champ_prenom_plaignant.value == "") {
         liste_validation['champ_prenom_vide'] = true;
+    } else if (!(pattern_prenom_nom.test(champ_prenom_plaignant.value))){
+	    liste_validation['champ_prenom_inv'] = true;
     }
 
     if (champ_nom_plaignant.value == "") {
         liste_validation['champ_nom_vide'] = true;
+    } else if (!(pattern_prenom_nom.test(champ_nom_plaignant.value))){
+	    liste_validation['champ_nom_inv'] = true;
     }
 
     if (champ_description.value == "") {
@@ -483,6 +495,8 @@ function verification_nouvelle_plainte(liste_validation){
 }
 
 function verification_nouveau_profil(liste_validation){
+    verification_champs_vides();
+
     if (champ_prenom.value == "") {
         liste_validation['champ_prenom_vide'] = true;
     } else if(!(pattern_prenom_nom.test(champ_prenom.value))){
@@ -526,7 +540,21 @@ function verification_nouveau_profil(liste_validation){
         liste_validation['champ_liste_resto_profil_vide'] = true;
     }
 
-    verification_champs_vides();
+    return liste_validation;
+}
+
+function verification_connection_profil(liste_validation){
+    if (champ_courriel_connection.value == "") {
+        liste_validation['champ_courriel_vide'] = true;
+    } else if(!(pattern_courriel.test(champ_courriel_connection.value))){
+	    liste_validation['champ_courriel_inv'] = true;
+    }
+
+    if (champ_password_connection.value == "") {
+        liste_validation['champ_password_vide'] = true;
+    } else if(!(pattern_password.test(champ_password_connection.value))){
+	    liste_validation['champ_password_inv'] = true;
+    }
 
     return liste_validation;
 }
@@ -534,9 +562,9 @@ function verification_nouveau_profil(liste_validation){
 function verification_champs_vides(){
     // Une manière simple d'afficher un message générale, s'il y a des champs vides
     // https://stackoverflow.com/questions/16211871/how-to-check-if-all-inputs-are-not-empty-with-jquery
-    $('input').each(function() {
+    $('input[type=text]').each(function() {
         if (!$(this).val()){
-            if (this.hasAttribute('placeholder') && this.placeholder !== "Choix d'(es) établissement(s)"){
+            if (this.hasAttribute('placeholder') && ( this.placeholder !== "Choix d'(es) établissement(s)" || this.placeholder !== "À Sélectionner") ){
                 return true;
             } else {
                 alert('Attention ! Il y a encore des champs vides !');
@@ -546,7 +574,18 @@ function verification_champs_vides(){
     });
 }
 
-function verification_tous_champs_valide(liste_validation){
+function verification_evocation_non_ajax(liste_validation){
+    for (var key in liste_validation) {
+        if (liste_validation[key]){
+            liste_validation['erreur_formulaire'] = true;
+            break;
+        }
+    }
+
+    return liste_validation;
+}
+
+function verification_evocation_ajax(liste_validation){
     for (var key in liste_validation) {
         if (liste_validation[key]){
             liste_validation['requete_ajax_avec_erreur'] = true;
@@ -558,6 +597,20 @@ function verification_tous_champs_valide(liste_validation){
 }
 
 function message_erreur_recherche(liste_validation){
+    if (liste_validation['aucune_recherche']){
+            message_erreur_recher.innerHTML += "<li>Vous devez remplir au moins un des trois critères !</li>";
+    } else {
+        if (liste_validation['champ_proprio_inv']){
+            message_erreur_recher.innerHTML += "<li>Veuillez respecter les charactères permis et la longueur permise !</li>";
+        }
+
+        if (liste_validation['champ_rue_inv']){
+            message_erreur_recher.innerHTML += "<li>Veuillez respecter les charactères permis et la longueur permise !</li>";
+        }
+    }
+}
+
+function message_erreur_recherche_rapide(liste_validation){
     if (liste_validation['aucun_choix'] || liste_validation['les_deux_choix']){
         if (liste_validation['aucun_choix']){
             message_erreur_interval.innerHTML += "<li>Veuiller choisir au moins une des deux options !</li>";
@@ -584,69 +637,76 @@ function message_erreur_recherche(liste_validation){
 }
 
 function message_erreur_nouvelle_plainte(liste_validation){
-    if (liste_validation['champ_resto_inv']) {
-        message_erreur_plainte.innerHTML += "<li>Veuillez respecter les charactères permis et la longueur permise !</li>";
-        modification_erreur(champ_etablissement);
-    } else {
-        modification_correct(champ_etablissement);
-    }
-
     if (liste_validation['champ_numero_inv']) {
-        message_erreur_plainte.innerHTML += "<li>Veuillez saisir une donnée numérique !</li>";
-        modification_erreur(champ_no_civique);
+        message_erreur_plainte.innerHTML += "<li>Veuillez saisir un numéro civique numériquement !</li>";
+        modification_erreur_champs_selectionner('#no_civique');
     } else {
-        modification_correct(champ_no_civique);
+        modification_correct_champs_selectionner('#no_civique');
     }
 
     if (liste_validation['champ_rue_inv']) {
-        message_erreur_plainte.innerHTML += "<li>Veuillez respecter les charactères permis et la longueur permise !</li>";
-        modification_erreur(champ_nom_rue_plainte);
+        message_erreur_plainte.innerHTML += "<li>Votre rue doit respecter les charactères permis et la longueur permise !</li>";
+        modification_erreur_champs_selectionner('#nom_rue');
     } else {
-        modification_correct(champ_nom_rue_plainte);
+        modification_correct_champs_selectionner('#nom_rue');
     }
 
     if (liste_validation['champ_ville_inv']) {
-        message_erreur_plainte.innerHTML += "<li>Veuillez respecter les charactères permis et la longueur permise !</li>";
-        modification_erreur(champ_nom_ville);
+        message_erreur_plainte.innerHTML += "<li>Votre ville doit respecter les charactères permis et la longueur permise !</li>";
+        modification_erreur_champs_selectionner('#nom_ville');
     } else {
-        modification_correct(champ_nom_ville);
+        modification_correct_champs_selectionner('#nom_ville');
     }
 
     if (liste_validation['champ_code_inv']) {
-        message_erreur_plainte.innerHTML += "<li>Veuillez respecter le format H1H 1H1 !</li>";
-        modification_erreur(champ_code_postal);
+        message_erreur_plainte.innerHTML += "<li>Votre code postal doit respecter le format H1H 1H1 !</li>";
+        modification_erreur_champs_selectionner('#code_postal');
     } else {
-        modification_correct(champ_code_postal);
+        modification_correct_champs_selectionner('#code_postal');
     }
 
     if (liste_validation['champ_date_inv']) {
-        message_erreur_plainte.innerHTML += "<li>La date du dépôt de la plainte doit être au format ISO 8601 !</li>";
-        modification_erreur(champ_date_visite);
+        message_erreur_plainte.innerHTML += "<li>La date de la plainte doit être au format ISO 8601 !</li>";
+        modification_erreur_champs_selectionner('#date_visite');
     } else {
-        modification_correct(champ_date_visite);
+        modification_correct_champs_selectionner('#date_visite');
+    }
+
+    if (liste_validation['champ_prenom_inv']) {
+        message_erreur_plainte.innerHTML += "<li>Votre prénom doit respecter les charactères permis et la longueur permise !</li>";
+        modification_erreur_champs_selectionner('#prenom_plaignant');
+    } else {
+        modification_correct_champs_selectionner('#prenom_plaignant');
+    }
+
+    if (liste_validation['champ_nom_inv']) {
+        message_erreur_plainte.innerHTML += "<li>Votre nom doit respecter les charactères permis et la longueur permise !</li>";
+        modification_erreur_champs_selectionner('#nom_plaignant');
+    } else {
+        modification_correct_champs_selectionner('#nom_plaignant');
     }
 }
 
 function message_erreur_nouveau_profil(liste_validation){
     if (liste_validation['champ_prenom_inv']) {
         message_erreur_profil.innerHTML += "<li>Veuillez saisir un prenom valide allant jusqu'à 50 charactères !</li>";
-        modification_erreur(champ_prenom);
+        modification_erreur_champs_selectionner('#prenom');
     } else {
-        modification_correct(champ_prenom);
+        modification_correct_champs_selectionner('#prenom');
     }
 
     if (liste_validation['champ_nom_inv']) {
         message_erreur_profil.innerHTML += "<li>Veuillez saisir un nom valide allant jusqu'à 50 charactères !</li>";
-        modification_erreur(champ_nom);
+        modification_erreur_champs_selectionner('#nom');
     } else {
-        modification_correct(champ_nom);
+        modification_correct_champs_selectionner('#nom');
     }
 
     if (liste_validation['champ_courriel_inv']) {
         message_erreur_profil.innerHTML += "<li>Veuillez saisir un courriel qui respect «exemple@domaine.com» !</li>";
-        modification_erreur(champ_courriel);
+        modification_erreur_champs_selectionner('#courriel');
     } else {
-        modification_correct(champ_courriel);
+        modification_correct_champs_selectionner('#courriel');
     }
 
     if (liste_validation['champ_password_inv']) {
@@ -662,64 +722,105 @@ function message_erreur_nouveau_profil(liste_validation){
     }
 
     if (liste_validation['champ_password_inv'] && liste_validation['champ_passwords_non_egal']){
-        modification_erreur(champ_password);
+        modification_erreur_champs_selectionner('#password');
     } else {
-        modification_correct(champ_password);
+        modification_correct_champs_selectionner('#password');
     }
 
     if (liste_validation['champ_password_conf_inv'] && liste_validation['champ_passwords_non_egal']){
-        modification_erreur(champ_password_conf);
+        modification_erreur_champs_selectionner('#password_conf');
     } else {
-        modification_correct(champ_password_conf);
-    }
-
-    if (liste_validation['champ_liste_resto_profil_vide']){
-        message_erreur_profil.innerHTML += "<li>Veuillez sélectionner au moins un établissement parmis la liste !";
-        var type_champ = document.querySelector(".select2-selection--multiple");
-        type_champ.style.border = "2px solid red";
-        type_champ.style.backgroundColor = "#FCDEDE";
-    } else {
-        initialiser_tous_champs(".select2-selection--multiple");
+        modification_correct_champs_selectionner('#password_conf');
     }
 }
 
-function ajustement_style_champs(liste_validation){
-    if (liste_validation['champ_debut_inv'] || (liste_validation['champ_debut_vide'] && liste_validation['champ_liste_resto_vide'])){
-        modification_erreur(champ_date_debut);
+function message_erreur_nouvelle_connection(liste_validation){
+    if (liste_validation['champ_courriel_vide'] && liste_validation['champ_password_vide']){
+        message_erreur_connection.innerHTML += "<li>Veuillez saisir un courriel et un mot de passe, afin de vous connectez !</li>";
+        modification_erreur_champs_selectionner('#courriel_conn, #password_conn');
     } else {
-        modification_correct(champ_date_debut);
+        if (liste_validation['champ_courriel_vide']) {
+            message_erreur_connection.innerHTML += "<li>Veuillez saisir un courriel !</li>";
+            modification_erreur_champs_selectionner('#courriel_conn');
+        } else if (liste_validation['champ_courriel_inv']) {
+            message_erreur_connection.innerHTML += "<li>Veuillez saisir un courriel qui respect «exemple@domaine.com» !</li>";
+            modification_erreur_champs_selectionner('#courriel_conn');
+        } else {
+            modification_correct_champs_selectionner('#courriel_conn');
+        }
+
+        if (liste_validation['champ_password_vide']) {
+            message_erreur_connection.innerHTML += "<li>Veuillez saisir un mot de passe !</li>";
+            modification_erreur_champs_selectionner('#password_conn');
+        } else if (liste_validation['champ_password_inv']) {
+            message_erreur_connection.innerHTML += "<li>Veuillez saisir un mot de passe valide allant de 8 et 20 charactères !</li>";
+            modification_erreur_champs_selectionner('#password_conn');
+        } else {
+            modification_correct_champs_selectionner('#password_conn');
+        }
+    }
+}
+
+function modification_erreur_champs_selectionner(champs){
+    var tous_champs = document.querySelectorAll(champs);
+    tous_champs.forEach(function(un_champ){
+        un_champ.style.border = "2px solid red";
+        un_champ.style.backgroundColor = "#FCDEDE";
+    });
+}
+
+function modification_correct_champs_selectionner(champs){
+    var tous_champs = document.querySelectorAll(champs);
+    tous_champs.forEach(function(un_champ){
+        un_champ.style.border = "1px solid #ccc";
+        un_champ.style.backgroundColor = "white";
+    });
+}
+
+function ajustement_style_champs_rech(liste_validation){
+    if (liste_validation['aucune_recherche']){
+        modification_erreur_champs_selectionner("#etablissement, #proprietaire, #nom_rue");
+    } else {
+        if (liste_validation['champ_proprio_inv']){
+            modification_erreur_champs_selectionner("#proprietaire");
+        } else {
+            modification_correct_champs_selectionner("#proprietaire");
+        }
+
+        if (liste_validation['champ_rue_inv']){
+            modification_erreur_champs_selectionner("#nom_rue");
+        } else {
+            modification_correct_champs_selectionner("#nom_rue");
+        }
+    }
+}
+
+function ajustement_style_champs_rech_rapide(liste_validation){
+    if (liste_validation['champ_debut_inv'] || (liste_validation['champ_debut_vide'] && liste_validation['champ_liste_resto_vide'])){
+        modification_erreur_champs_selectionner("#date_debut");
+    } else {
+        modification_correct_champs_selectionner("#date_debut");
     }
 
     if (liste_validation['champ_fin_inv'] || (liste_validation['champ_fin_vide'] && liste_validation['champ_liste_resto_vide'])){
-        modification_erreur(champ_date_fin);
+        modification_erreur_champs_selectionner("#date_fin");
     } else {
-        modification_correct(champ_date_fin);
+        modification_correct_champs_selectionner("#date_fin");
     }
 
     if (liste_validation['champ_liste_resto_vide'] && (liste_validation['aucun_choix'] || liste_validation['les_deux_choix'])){
-        modification_erreur(champ_liste_resto);
+        modification_erreur_champs_selectionner("#liste_resto");
     } else {
-        modification_correct(champ_liste_resto);
+        modification_correct_champs_selectionner("#liste_resto");
     }
 
     if (liste_validation['aucun_choix'] || liste_validation['les_deux_choix']){
-        modification_erreur(champ_date_debut);
-        modification_erreur(champ_date_fin);
-        modification_erreur(champ_liste_resto);
+
+        modification_erreur_champs_selectionner("#date_debut, #date_fin, #liste_resto");
         form_interval.style.border = "2px solid red";
     } else {
         form_interval.style.border = "2px solid black";
     }
-}
-
-function modification_erreur(champ){
-    champ.style.border = "2px solid red";
-    champ.style.backgroundColor = "#FCDEDE";
-}
-
-function modification_correct(champ){
-    champ.style.border = "1px solid #ccc";
-    champ.style.backgroundColor = "white";
 }
 
 function appel_ajax_interval(){
@@ -1026,9 +1127,8 @@ function creation_select2(){
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    validation_champs_recherches();
-    validation_champs_connection();
     validation_bouton_section_photo();
+    recherche();
     recherche_rapide();
     demande_plainte();
     demande_nouveau_profil();

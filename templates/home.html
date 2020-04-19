@@ -4,20 +4,16 @@
     Montréal</h1>
 <div class="container">
     <p class="desktop" id="hautPageDesktop"></p>
-    <h2>Section pour accéder / créer notre page de profil</h2>
-    <div class='zone_admin'>
-        <div class="admin">
-            <a class="bouton" href="/connection">Se Connecter</a>
-        </div>
-        <div class="admin">
-            <a class="bouton" href="/nouveau_profil">Créer un profil</a>
-        </div>
-    </div>
-    <h2>Section pour déposer une plainte envers un établissement</h2>
     <div class='zone_admin'>
         <div class="admin">
             <a class="bouton" href="/nouvelle_plainte">Créer
                 une plainte</a>
+        </div>
+        <div class="admin">
+            <a class="bouton" href="/nouveau_profil">Créer un profil</a>
+        </div>
+        <div class="admin">
+            <a class="bouton" href="/connection">Se Connecter</a>
         </div>
     </div>
     <h2>Section pour rechercher des établissements rapidement</h2>
@@ -112,14 +108,20 @@
                     <div>
                         <select id="etablissement" name="etablissement"
                                 title="Saisir un établissement">
-                            <option selected value="">À Sélectionner
-                                </option>
-                                {% for un_etablissement in liste_etablissement
-                                %}
-                                <option value="{{un_etablissement}}">
-                                    {{un_etablissement}}
-                                </option>
-                                {% endfor %}
+                            <option value="">À Sélectionner
+                            </option>
+                            {% for un_etablissement in liste_etablissement %}
+                            {% if liste_champs['etablissement'] ==
+                            un_etablissement %}
+                            <option selected value="{{un_etablissement}}">
+                                {{un_etablissement}}
+                            </option>
+                            {% else %}
+                            <option value="{{un_etablissement}}">
+                                {{un_etablissement}}
+                            </option>
+                            {% endif %}
+                            {% endfor %}
                         </select>
                     </div>
                 </div>
@@ -160,13 +162,11 @@
                            value="Effacer...">
                 </div>
             </div>
-            {% if liste_validation['situation_erreur'] %}
             <ul class="aucun" id="message_erreur_recher">
                 {% for message in liste_champs['messages'] %}
                 <li>{{message}}</li>
                 {% endfor %}
             </ul>
-            {% endif %}
         </form>
     </div>
     <!-- https://publicdomainvectors.org/fr/gratuitement-des-vecteurs/Orange-fl%C3%A8che-pointant-vers-le-haut-de-dessin-vectoriel/9499.html -->
