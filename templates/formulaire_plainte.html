@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Voici la page pour déposer une plainte envers un étalissement de Montréal</h1>
+<h1>Voici la page pour déposer une plainte envers un étalissement de
+    Montréal</h1>
 <div class="container">
     <p class="desktop" id="hautPageDesktop"></p>
     <h2>Section pour déposer la plainte en question</h2>
@@ -12,17 +13,25 @@
             </ul>
             <div class="modif">
                 <div class="information">
-                    <label for="etablissement">Nom d'établissement :</label>
+                    <label for="etablissement">Liste des établissements
+                        :</label>
                     <div>
-                        <input id="etablissement" name="etablissement"
-                               title="Charactères alphanumériques, les espaces,
-                               l'apostrophe et le tiret sont permis"
-                               type="text"
-                               value="">
+                        <select id="etablissement" name="etablissement"
+                                title="Saisir un établissement">
+                            <option selected value="">À Sélectionner
+                            </option>
+                            {% for un_etablissement in liste_etablissement
+                            %}
+                            <option value="{{un_etablissement}}">
+                                {{un_etablissement}}
+                            </option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
                 <fieldset>
-                    <legend class="legendCenter">Veuiller saisir l'adresse de l'établissement
+                    <legend class="legendCenter">Veuiller saisir l'adresse de
+                        l'établissement
                     </legend>
                     <div class="information">
                         <label for="no_civique">Numéro civique :</label>
@@ -95,7 +104,7 @@
                     </div>
                 </div>
                 <div class="troisBTN">
-                    <input class="bouton" type='submit' value="Rechercher...">
+                    <input class="bouton" type='submit' value="Ajouter...">
                     <input class="bouton" id="btn_reset_plainte" type='reset'
                            value="Effacer...">
                 </div>

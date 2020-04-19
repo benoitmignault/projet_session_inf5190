@@ -236,9 +236,11 @@ def api_creation_plainte():
 # Cette fonction est pour la tache D1 de l'interface web
 @app.route('/nouvelle_plainte', methods=["GET"])
 def creation_plainte():
-    # todo Refaire une liste des établissements au lieu d'un champ text
     titre = "Nouvelle plainte"
-    return render_template("formulaire_plainte.html", titre=titre)
+    conn_db = get_db()
+    liste_etablissement = conn_db.liste_tous_restaurants()
+    return render_template("formulaire_plainte.html", titre=titre,
+                           liste_etablissement=liste_etablissement)
 
 
 # Cette fonction est pour la tache D2
@@ -521,6 +523,5 @@ mise_jour_contrevenants()
 # Cette fonction était pour la tache A1
 if __name__ == "__main__":
     importation_donnees()
-
 
 # Ajustement de tous mes champs etablissement pour des listes !!!!!!!!!!!!
