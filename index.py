@@ -521,3 +521,6 @@ mise_jour_contrevenants()
 # Cette fonction était pour la tache A1
 if __name__ == "__main__":
     importation_donnees()
+
+
+# Ajustement de tous mes champs etablissement pour des listes !!!!!!!!!!!!
