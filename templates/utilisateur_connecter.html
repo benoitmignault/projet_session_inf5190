@@ -1,12 +1,18 @@
 {% extends "layout.html" %}
 {% block content %}
+<p class="desktop" id="hautPageDesktop"></p>
 <h1>Bienvenue dans votre profil &rarr; <span class='userDisplay'>{{liste_infos['prenom']}} {{liste_infos['nom']}}</span>
     &larr;</h1>
 <div class="container">
-    <p class="desktop" id="hautPageDesktop"></p>
+    <div class='zone_admin'>
+        <div class="admin">
+            <a class="bouton" href="/deconnection">Déconnexion</a>
+        </div>
+    </div>
     <input form="nouvelle_photo" type="hidden" name="id_photo" id="id_photo"
            value="{{liste_infos['id_photo']}}">
-    <input form="nouvelle_photo" type="hidden" name="id_personne" id="id_personne"
+    <input form="nouvelle_photo" type="hidden" name="id_personne"
+           id="id_personne"
            value="{{liste_infos['id_personne']}}">
     <h2>Section pour gérer votre photo de profil</h2>
     <div class='zone_recherche_resto'>
@@ -15,7 +21,8 @@
             <div class="header PhotoMoi">
                 <div class="unePassionPhoto">
                     {% if liste_infos['id_photo'] != None %}
-                    <img src="/image/{{liste_infos['id_photo']}}.{{liste_infos['type_photo']}}" height=50
+                    <img src="/image/{{liste_infos['id_photo']}}.{{liste_infos['type_photo']}}"
+                         height=50
                          width=50>
                     {% endif %}
                 </div>
@@ -78,7 +85,7 @@
                 </table>
             </fieldset>
         </form>
-        <fieldset>
+        <fieldset class="fieldset2">
             <legend class="legendCenter">Voici la liste des établissements
                 disponible
             </legend>
@@ -115,13 +122,6 @@
                 <ul class="aucun" id="message_erreur_etablissement"></ul>
             </form>
         </fieldset>
-    </div>
-
-    <h2>Section pour revenir à la page d'accueil</h2>
-    <div class='zone_admin'>
-        <div class="admin">
-            <a class="bouton" href="/deconnection">Déconnexion</a>
-        </div>
     </div>
     <div class="return">
         <a class="desktop" href="#hautPageDesktop">

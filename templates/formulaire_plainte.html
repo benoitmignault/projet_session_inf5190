@@ -1,8 +1,14 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Voici la page pour déposer une plainte envers un étalissement de Montréal</h1>
+<p class="desktop" id="hautPageDesktop"></p>
+<h1>Voici la page pour déposer une plainte envers un étalissement de
+    Montréal</h1>
 <div class="container">
-    <p class="desktop" id="hautPageDesktop"></p>
+    <div class='zone_admin'>
+        <div class="admin">
+            <a class="bouton" href="/">Page D'accueil</a>
+        </div>
+    </div>
     <h2>Section pour déposer la plainte en question</h2>
     <div class='zone_recherche_resto'>
         <form method="post" action="/api/nouvelle_plainte"
@@ -12,22 +18,31 @@
             </ul>
             <div class="modif">
                 <div class="information">
-                    <label for="etablissement">Nom d'établissement :</label>
+                    <label for="etablissement">Liste des établissements
+                        :</label>
                     <div>
-                        <input id="etablissement" name="etablissement"
-                               title="Charactères alphanumériques, les espaces,
-                               l'apostrophe et le tiret sont permis"
-                               type="text"
-                               value="">
+                        <select id="etablissement" name="etablissement"
+                                title="Saisir un établissement">
+                            <option selected value="">À Sélectionner
+                            </option>
+                            {% for un_etablissement in liste_etablissement
+                            %}
+                            <option value="{{un_etablissement}}">
+                                {{un_etablissement}}
+                            </option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
                 <fieldset>
-                    <legend class="legendCenter">Veuiller saisir l'adresse de l'établissement
+                    <legend class="legendCenter">Veuiller saisir l'adresse de
+                        l'établissement
                     </legend>
                     <div class="information">
                         <label for="no_civique">Numéro civique :</label>
                         <div>
                             <input id="no_civique" name="no_civique" value=""
+                                   placeholder="12345"
                                    title="Charactères numériques seulement"
                                    type="number" maxlength="5">
                         </div>
@@ -38,6 +53,7 @@
                             <input id="nom_rue" name="nom_rue" type="text"
                                    title="Charactères alphanumériques, les espaces,
                                    l'apostrophe et le tiret sont permis"
+                                   placeholder="Rue Onrario"
                                    value="">
                         </div>
                     </div>
@@ -46,14 +62,15 @@
                         <div>
                             <input id="nom_ville" name="nom_ville" type="text"
                                    title="Charactères alphabétiques, les espaces,
-                               l'apostrophe et le tiret sont permis" value="">
+                               l'apostrophe et le tiret sont permis" value=""
+                                   placeholder="Montréal">
                         </div>
                     </div>
                     <div class="information">
                         <label for="code_postal">Code postal :</label>
                         <div>
                             <input id="code_postal" name="code_postal"
-                                   type="text"
+                                   type="text" placeholder="H1H 1H1"
                                    title="Charactères alphanumériques avec un espace"
                                    value="">
                         </div>
@@ -63,6 +80,7 @@
                     <label for="date_visite">Date de la déposition :</label>
                     <div>
                         <input id="date_visite" name="date_visite"
+                               placeholder="AAAA-MM-DD"
                                title="Charactères numériques avec 3 tirets
                                entre les chiffres" type="text" value="">
                     </div>
@@ -95,7 +113,7 @@
                     </div>
                 </div>
                 <div class="troisBTN">
-                    <input class="bouton" type='submit' value="Rechercher...">
+                    <input class="bouton" type='submit' value="Ajouter...">
                     <input class="bouton" id="btn_reset_plainte" type='reset'
                            value="Effacer...">
                 </div>
@@ -105,11 +123,6 @@
         <p>Résultat - Par rapport à la création de la plainte</p>
         <!-- Section pour le retour Ajax D1 -->
         <div id="result_plainte"></div>
-    </div>
-    <div class='zone_admin'>
-        <div class="admin">
-            <a class="bouton" href="/">Page D'accueil</a>
-        </div>
     </div>
     <!-- https://publicdomainvectors.org/fr/gratuitement-des-vecteurs/Orange-fl%C3%A8che-pointant-vers-le-haut-de-dessin-vectoriel/9499.html -->
     <div class="return">

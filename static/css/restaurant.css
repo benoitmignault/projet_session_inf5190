@@ -124,6 +124,7 @@ h2 {
 
 .container > .zone_admin{
     background-color: initial;
+    margin-bottom: 10px;
 }
 
 .container > .zone_recherche_resto{
@@ -153,6 +154,10 @@ h2 {
     padding: 10px;
     margin-bottom: 15px;
     border-radius: 10px;
+}
+
+.container > .zone_recherche_resto > .fieldset2{
+    margin: 0;
 }
 
 .container > .zone_recherche_resto > form > .modif{
@@ -223,6 +228,7 @@ Fin de l'ajout du recentrage de attribut legend
 .container > .zone_recherche_resto > form > div > fieldset > div > div > input[type=password],
 .container > .zone_recherche_resto > form > div > fieldset > div > div > input[type=number],
 .container > .zone_recherche_resto > form > div > div > div > input[type=text],
+.container > .zone_recherche_resto > form > div > div > div > select,
 .container > .zone_recherche_resto > form > div > fieldset > div > div > input[type=text],
 .container > .zone_recherche_resto > form > div > fieldset > div > div > select{
     border-radius: 10px;
@@ -238,6 +244,7 @@ Fin de l'ajout du recentrage de attribut legend
     width: 100%;
 }
 
+.container > .zone_recherche_resto > form > div > div > div > select,
 .container > .zone_recherche_resto > form > div > fieldset > div > div > select{
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -289,16 +296,15 @@ Fin de l'ajout du recentrage de attribut legend
 .container > .zone_recherche_resto > #result_plainte > .tabeau_resto,
 .container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto,
 .container > .zone_recherche_resto > #result_interval > .tabeau_resto,
-.container > .zone_recherche_resto > #recherche_par_interval,
-.container > .zone_recherche_resto > #nouvelle_plainte,
-.container > .zone_recherche_resto > #nouveau_profil,
-.container > .zone_recherche_resto > #connection_profil,
-.container > .zone_recherche_resto > #recherche,
+.container > .zone_recherche_resto > form,
 .container > .zone_recherche_resto > .tabeau_resto{
     width: 100%;
     border-radius: 10px;
     border: 2px solid black;
+}
 
+.container > .zone_recherche_resto > #retrait_etablissement{
+    border: initial;
 }
 
 .container > .zone_recherche_resto > form > fieldset > .tableau_profil{
@@ -461,6 +467,7 @@ Fin de l'ajout du recentrage de attribut legend
     cursor: pointer;
 }
 
+.container > .zone_recherche_resto > form > .modif > .erreur > div > select,
 .container > .zone_recherche_resto > form > .modif > .erreur > div > input[type=email],
 .container > .zone_recherche_resto > form > .modif > .erreur > div > input[type=password],
 .container > .zone_recherche_resto > form > .modif > .erreur > div > input[type=text]{
@@ -470,7 +477,7 @@ Fin de l'ajout du recentrage de attribut legend
 }
 
 .container > .zone_recherche_resto > .erreur{
-    border-color: red;
+    border: 2px solid red;
 }
 
 .container > .zone_recherche_resto > fieldset > form > .modif > .troisBTN > .bouton,
@@ -531,6 +538,8 @@ Fin de l'ajout du recentrage de attribut legend
 /* CSS modifié du fichier select2.min.css fourni via
     https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/
 */
+
+.container > .zone_recherche_resto > #recherche > .modif > .information > div > span > .selection > .select2-selection--single,
 .container > .zone_recherche_resto > fieldset > #ajout_etablissement > .modif > .information > div > span > .selection > .select2-selection--multiple,
 .container > .zone_recherche_resto > #nouveau_profil > .modif > .information > div > span > .selection > .select2-selection--multiple{
     border-radius: 10px;

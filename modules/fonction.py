@@ -23,17 +23,18 @@ URL = 'http://donnees.ville.montreal.qc.ca/dataset/a5c1f0b9-261f-4247-99d8-' \
       'f28da5000688/resource/92719d9b-8bf2-4dfd-b8e0-1021ffcaee2f/download/' \
       'inspection-aliments-contrevenants.xml'
 
-PATTERN_PROPRIO = "^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,63}" \
-                  "[a-z0-9A-Z.)]$"
-PATTERN_NOM_RESTO = "^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,98}" \
-                    "[a-z0-9A-Z.)]$"
-PATTERN_NOM_RUE = "^[a-z1-9A-Z][a-z0-9- 'A-Z]{1,33}[a-z0-9A-Z]$"
+PATTERN_PROPRIO = "^[1-9\\w+][\\w+0-9- .'@_!#$%^&*()<>?/\\|}{~:]{3,63}" \
+                  "[0-9\\w+.)]$"
+PATTERN_NOM_RESTO = "^[1-9\\w+][\\w+0-9- .'@_!#$%^&*()<>?/\\|}{~:]{3,98}" \
+                    "[\\w+0-9.)]$"
+PATTERN_NOM_RUE = "^[\\w+1-9][\\w+0-9- ']{1,33}[\\w+0-9]$"
 
 PATTERN_DATE = "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$"
 
-PATTERN_COURRIEL = "^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$"
+PATTERN_COURRIEL = "^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$"
 
-PATTERN_PASSWORD = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*()?&])[A-Za-z\\d@()$!%*?&]{8,20}$"
+PATTERN_PASSWORD = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*()?&])" \
+                   "[A-Za-z\\d@()$!%*?&]{8,20}$"
 
 SOURCE_ADRESSE = "b.mignault.uqam.qc.ca@gmail.com"
 
@@ -104,7 +105,7 @@ def mise_jour_bd():
         creation_courriel(liste_envoi)
         conn_auth = connexion_twitter()
         creation_tweet(conn_auth, liste_nom_contrevenant)
-        
+
     connection.disconnect()
 
 

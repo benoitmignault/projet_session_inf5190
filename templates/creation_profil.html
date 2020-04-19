@@ -1,8 +1,16 @@
 {% extends "layout.html" %}
 {% block content %}
+<p class="desktop" id="hautPageDesktop"></p>
 <h1>Bienvenue sur la page pour créer son profil</h1>
 <div class="container">
-    <p class="desktop" id="hautPageDesktop"></p>
+    <div class='zone_admin'>
+        <div class="admin">
+            <a class="bouton" href="/connection">Se Connecter</a>
+        </div>
+        <div class="admin">
+            <a class="bouton" href="/">Page D'accueil</a>
+        </div>
+    </div>
     <div class='zone_recherche_resto'>
         <form method="post" action="/api/nouveau_profil" id="nouveau_profil">
             <div class="modif">
@@ -89,23 +97,10 @@
         <!-- Section pour le retour Ajax D1 -->
         <div id="result_profil"></div>
     </div>
-    <h2>Section pour se connecter à son profil</h2>
-    <div class='zone_admin'>
-        <div class="admin">
-            <a class="bouton" href="/connection">Se Connecter</a>
-        </div>
-    </div>
-    <h2>Section pour revenir à la page d'accueil</h2>
-    <div class='zone_admin'>
-        <div class="admin">
-            <a class="bouton" href="/">Page D'accueil</a>
-        </div>
-    </div>
     <!-- https://publicdomainvectors.org/fr/gratuitement-des-vecteurs/Orange-fl%C3%A8che-pointant-vers-le-haut-de-dessin-vectoriel/9499.html -->
     <div class="return">
         <a class="desktop" href="#hautPageDesktop">
             <img alt="Retour vers le haut" src="/img/fleche_haut.svg"></a>
     </div>
-
 </div>
 {% endblock content %}
