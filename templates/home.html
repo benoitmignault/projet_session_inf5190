@@ -103,18 +103,24 @@
             </ul>
             <div class="modif">
                 {% set champ = '' %}
-                {% if liste_validation['champs_vides'] or
-                liste_validation['longueur_etablissement_inv'] or
-                liste_validation['champ_etablissement_inv'] %}
+                {% if liste_validation['champs_vides'] %}
                 {% set champ = 'erreur' %}
                 {% endif %}
                 <div class="information {{champ}}">
-                    <label for="etablissement">Nom d'établissement :</label>
+                    <label for="etablissement">Liste des établissements
+                        :</label>
                     <div>
-                        <input id="etablissement" name="etablissement"
-                               title="Charactères alphanumériques, les espaces, l'apostrophe et le tiret sont permis"
-                               type="text"
-                               value="{{liste_champs['etablissement']}}">
+                        <select id="etablissement" name="etablissement"
+                                title="Saisir un établissement">
+                            <option selected value="">À Sélectionner
+                                </option>
+                                {% for un_etablissement in liste_etablissement
+                                %}
+                                <option value="{{un_etablissement}}">
+                                    {{un_etablissement}}
+                                </option>
+                                {% endfor %}
+                        </select>
                     </div>
                 </div>
                 {% set champ = '' %}

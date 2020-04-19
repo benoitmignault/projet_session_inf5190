@@ -1,12 +1,13 @@
 {% extends "layout.html" %}
 {% block content %}
+<p class="desktop" id="hautPageDesktop"></p>
 <h1>Bienvenue dans votre profil &rarr; <span class='userDisplay'>{{liste_infos['prenom']}} {{liste_infos['nom']}}</span>
     &larr;</h1>
 <div class="container">
-    <p class="desktop" id="hautPageDesktop"></p>
     <input form="nouvelle_photo" type="hidden" name="id_photo" id="id_photo"
            value="{{liste_infos['id_photo']}}">
-    <input form="nouvelle_photo" type="hidden" name="id_personne" id="id_personne"
+    <input form="nouvelle_photo" type="hidden" name="id_personne"
+           id="id_personne"
            value="{{liste_infos['id_personne']}}">
     <h2>Section pour gérer votre photo de profil</h2>
     <div class='zone_recherche_resto'>
@@ -15,7 +16,8 @@
             <div class="header PhotoMoi">
                 <div class="unePassionPhoto">
                     {% if liste_infos['id_photo'] != None %}
-                    <img src="/image/{{liste_infos['id_photo']}}.{{liste_infos['type_photo']}}" height=50
+                    <img src="/image/{{liste_infos['id_photo']}}.{{liste_infos['type_photo']}}"
+                         height=50
                          width=50>
                     {% endif %}
                 </div>

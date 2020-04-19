@@ -115,10 +115,10 @@ function initial_recherche_validation(){
 
 function reset_recherche(){
     $(btn_reset_recher).click(function() {
-        champ_nom_resto.defaultValue = "";
         champ_nom_proprio.defaultValue = "";
         champ_nom_rue.defaultValue = "";
         effacer_messages_erreurs(message_erreur_recher);
+        initialiser_tous_champs("#etablissement")
         initialiser_tous_champs("input[type=text]");
         initialiser_tous_champs("#recherche");
     });
@@ -236,10 +236,6 @@ function validation_champs_connection(){
 }
 
 function validation_champs_recherches(){
-    $(champ_nom_resto).change(function () {
-        validation_regex(champ_nom_resto, pattern_resto);
-    });
-
     $(champ_nom_proprio).change(function () {
         validation_regex(champ_nom_proprio, pattern_proprio);
     });
