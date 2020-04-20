@@ -8,11 +8,11 @@ from flask import render_template, request, session, url_for
 from flask_json_schema import JsonSchema
 from flask_json_schema import JsonValidationError
 
-from gestion_etablissement_profil import ajouter_plusieurs_etablissement, \
-    supprimer_etablissement
+from json_schema.gestion_etablissement_profil import \
+    ajouter_plusieurs_etablissement, supprimer_etablissement
 from modules.fonction import *
-from validateur_plainte_json_schema import nouvelle_plainte_etablissement
-from validateur_profil_json_schema import nouveau_profil
+from json_schema.validateur_plainte import nouvelle_plainte_etablissement
+from json_schema.validateur_profil import nouveau_profil
 
 app = Flask(__name__, static_url_path='', static_folder='static')
 schema = JsonSchema(app)

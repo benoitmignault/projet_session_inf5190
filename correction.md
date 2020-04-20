@@ -34,23 +34,137 @@
 
    [Page de recherche](http://127.0.0.1:5000)
 
-#### A6 - On utilise la même interface web qu'en A5 mais avec une 2e option de recherche par établissement
+#### A6 - On utilise la même interface web qu'en A5 mais avec une 2e option de recherche par établissement.
     Cette 2e option utilisera une route différente comme on veut faire afficher 
     la liste des contravention d'un établissement
     Cette option de recherche se trouve toujours dans la 1ère section de l'interface web.
    [Page de recherche](http://127.0.0.1:5000)
 * Résultat 2 - Toutes l'information sur les amendes d'un établissement sélectionnémendes
    
-* http://127.0.0.1:5000/api/liste_amendes_etablissement/etablissement?choix=ALIMENTATION GUSTA
+* http://127.0.0.1:5000/api/liste_amendes_etablissement/etablissement?choix=AL-BAGHDADI
 
-#### B1
+##### Pour les deux prochaines taches, nous avons utilisé les informations suivantes :
+* b.mignault.uqam.qc.ca@gmail.com
+* Uqam123((SUPER)))
 
+#### B1 - À la suite de la mise à jour de la tache A3, un courriel est envoyé à chaque personne du ficheir YAML.
+    On doit saisir l'adresse courriel sous la variable adresse dans le fichier 
+    adresse_destination.yaml qui se trouver à la racine du projet.
+    
+    adresse:
    
+        - b.mignault@gmail.com
+        - etc....
+    
+  Utilisateur recevra un courriel seulement, s'il y a de nouveau contrevenant 
+  à la suite de la mise à jour de la base de donnée via la tache A3.
+ 
+#### B2 - Pour chaque nouveau contrevenant, un tweet sera envoyé.
+Dans le cadre du projet, nous avons créé un compte tweeter générique.
+Les api seront :
+    
+* API_KEY = "nIOLstoH2fvZllC6Vo8QpcpKP"
+* API_SECRET = "PoX7IFqCuKKMBjoYD4diGag3XgkWF4JthQ5ZsItt17TWtl3bIW"
+* ACCESS_TOKEN = "1243952698556383232-Qv98BnYtkFj8mje95QXox6yvLSUUTl"
+* ACCESS_TOKEN_SECRET = "8nclhl82lk4P52CLYTIQz94vHwlod3djHRzOcdNMq4iQ8"
 
+#### C1 - Un service REST pour obtenir la liste des établissements et leur quantité d'infraction
+    L'information est retourné en format JSON
+    On a simplement à utliser le lien suivant :
+    
+   [Lien pour obtenir l'information](http://127.0.0.1:5000/api/liste_des_contrevenants/json) 
    
-
-
-
-
+#### C2 - Un service REST pour obtenir la liste des établissements et leur quantité d'infraction
+    L'information est retourné en format XML
+    On a simplement à utliser le lien suivant :
+    
+   [Lien pour obtenir l'information](http://127.0.0.1:5000/api/liste_des_contrevenants/xml) 
    
+#### C3 - Un service REST pour obtenir la liste des établissements et leur quantité d'infraction
+    L'information est retourné en format CSV
+    On a simplement à utliser le lien suivant :
+    
+   [Lien pour obtenir l'information](http://127.0.0.1:5000/api/liste_des_contrevenants/csv)  
+
+#### D1 - Un service REST pour créer une plainte d'un établissement
+    Le service REST va récolter les informations nécessaire en JSON. 
+    Ces dernières doivent correspondre à la forme escompté via le fichier de 
+    validation JSON écrit en python.
+    
+    Ce fichier se trouve dans le dossier :
+    /json_schema pour le fichier validateur_plainte.py
+    
+    On ne peut pas simplement utiliser le lien suivant :
+   [Lien pour créer une plainte](http://127.0.0.1:5000/api/nouvelle_plainte) 
+   
+   On doit ajouter les informations sous le format JSON
+    
+    {
+        "etablissement": "AILE BUFFALO BILL",
+        "no_civique": 4084,
+        "nom_rue": "Rue Saint-Denis",
+        "ville": "Montréal H2W 2M5",
+        "date_visite": "2018-05-28",
+        "prenom_plaignant": "Benoît",
+        "nom_plaignant": "Mignault",
+        "description": "Nous avons remarqué la présence de petits animaux."
+    }
+    
+Une fois la plainte crée, le service va retourner le ID de la plainte 
+qui sera utile pour la tache suivante
+    
+#### D2 - Un service REST pour supprimer une plainte qu'on aurait crée
+    Le service REST aura besoin du id que le résultat du service REST de la tache 
+    précédente nous aura communiquer.
+    
+    Je ne peux mettre de lien cliquable vue que nous avons besoin d'un paramètre 
+    à la fin de l'URL.
+    
+    Voici un exemple :
+
+* http://127.0.0.1:5000/api/plainte/34
+
+#### E1 - Un service REST pour créer un profil utilisateur.
+    Ce profil utilisateur aura pour but de gérer les établissements à surveiller.
+    
+    Ces dernières doivent correspondre à la forme escompté via le fichier de 
+    validation JSON écrit en python.
+    
+    Ce fichier se trouve dans le dossier :
+    /json_schema pour le fichier validateur_profil.py
+    
+    On ne peut pas simplement utiliser le lien suivant :
+   [Lien pour créer un profil](http://127.0.0.1:5000/api/nouveau_profil) 
+   
+   On doit ajouter les informations sous le format JSON
+    
+    {
+        "nom": "Mignault",
+        "prenom": "Benoit",
+        "password": "Patate123(((",
+        "courriel": "b.mignault@gmail.com",
+        "liste_etablissement": 
+        [
+           "PIZZA EXPRESSO", "ALIMENTS MARINA"
+        ]
+    }
+    
+Un message de succès sera produit si tout ce passe bien, sinon un message 
+d'erreur sera affiché si le courriel est déjà présent dans la base de donnée
+
+#### E2 - Cette tache comprendra plusieurs choses.
+* Une interface web pour créer un profil qui sera envoyer via Ajax au service RESt de la tache E1
+
+Cette interface web est disponible à la l'adresse suivante : 
+
+[Lien pour créer un profil](http://127.0.0.1:5000/nouveau_profil) 
+
+* Une fois le profil crée, l'utilisateur est invité à se diriger vers le lien web suivant :
+
+[Lien pour se connecter à notre profil](http://127.0.0.1:5000/connection)
+
+En utilisant son courriel et mot de passe
+
+* Une fois connecter, l'utilisateur va pouvoir gérer sa photo de profil (format jpg et png) et sa liste des établissements à surveiller
+ 
     

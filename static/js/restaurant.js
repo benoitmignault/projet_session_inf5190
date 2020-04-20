@@ -5,10 +5,10 @@ const champ_date_fin = document.querySelector('#date_fin');
 const btn_reset_interval = document.querySelector('#btn_reset_interval');
 const message_erreur_interval = document.querySelector('#message_erreur_interval');
 const result_interval = document.querySelector('#result_interval');
-const result_interval_etablissement = document.querySelector('#result_interval_etablissement');
 
 // Variable pour la recherche par établissement précis après avoir sélectionner
 const champ_liste_resto = document.querySelector('#liste_resto');
+const result_interval_etablissement = document.querySelector('#result_interval_etablissement');
 
 // Variables pour la recherche d'information générale pour être utiliser avec le bouton effacer
 const form_recherche = document.querySelector('#recherche');
@@ -83,6 +83,7 @@ const pattern_courriel = new RegExp("^([a-zA-Z0-9_\\.\\-\\+])+\\@(([a-zA-Z0-9\\-
 const pattern_prenom_nom = new RegExp("^[A-Z][a-z-A-Z]{1,48}[a-z]$");
 const pattern_password = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*()?&])[A-Za-z\\d@()$!%*?&]{8,20}$");
 
+// Cette fonction sera pour la tache D1
 function initial_plainte_validation(){
     var liste_validation = {"champ_etablissement_vide": false, "champ_numero_vide": false,
         "champ_numero_inv": false, "champ_rue_vide": false, "champ_ville_vide": false,
@@ -94,6 +95,7 @@ function initial_plainte_validation(){
     return liste_validation;
 }
 
+// Cette fonction sera pour la tache E2
 function initial_profil_validation(){
     var liste_validation = {"champ_prenom_vide": false, "champ_nom_vide": false,
         "champ_prenom_inv": false, "champ_nom_inv": false, "champ_courriel_vide": false,
@@ -105,6 +107,7 @@ function initial_profil_validation(){
     return liste_validation;
 }
 
+// Cette fonction sera pour la tache E2
 function initial_connection_validation(){
     var liste_validation = {"champ_courriel_vide": false, "champ_password_vide": false,
         "champ_courriel_inv": false, "champ_password_inv": false, "erreur_formulaire": false};
@@ -112,6 +115,7 @@ function initial_connection_validation(){
     return liste_validation;
 }
 
+// Cette fonction sera pour la tache A2
 function initial_recherche_validation(){
     var liste_validation = {"aucune_recherche": false,"champ_proprio_inv": false,
         "champ_rue_inv": false, "erreur_formulaire": false};
@@ -119,6 +123,7 @@ function initial_recherche_validation(){
     return liste_validation;
 }
 
+// Cette fonction sera pour la tache A5 et A6
 function initial_recherche_interval_validation(){
     var liste_validation = {"champ_debut_inv": false, "aucun_choix": false,
         "champ_fin_inv": false, "champ_debut_vide": false, "champ_fin_vide": false,
@@ -127,6 +132,7 @@ function initial_recherche_interval_validation(){
     return liste_validation;
 }
 
+// Cette fonction sera pour la tache A2
 // Récupérer comment désecltionner mardi de la job
 function reset_recherche(){
     $(btn_reset_recher).click(function() {
@@ -138,6 +144,7 @@ function reset_recherche(){
     });
 }
 
+// Cette fonction sera pour la tache A5
 function reset_recherche_interval(){
     $(btn_reset_interval).click(function() {
         champ_date_debut.defaultValue = "";
@@ -149,6 +156,7 @@ function reset_recherche_interval(){
     });
 }
 
+// Cette fonction sera pour la tache D1
 function reset_demande_plainte(){
     $(btn_reset_plainte).click(function() {
         champ_etablissement.defaultValue = "";
@@ -166,6 +174,7 @@ function reset_demande_plainte(){
     });
 }
 
+// Cette fonction sera pour la tache E2
 function reset_nouveau_profil(){
     $(btn_reset_profil).click(function() {
         champ_prenom.defaultValue = "";
@@ -174,12 +183,12 @@ function reset_nouveau_profil(){
         champ_password.defaultValue = "";
         champ_password_conf.defaultValue = "";
         initialiser_selection_evoluee();
-        result_profil.innerHTML = "";
         effacer_messages_erreurs(message_erreur_profil);
         initialiser_tous_champs("input[type=password], input[type=email], input[type=text], #nouveau_profil");
     });
 }
 
+// Cette fonction sera pour la tache E2
 function reset_demande_connection(){
     $(btn_reset_connection).click(function() {
         champ_courriel_connection.defaultValue = "";
@@ -189,6 +198,7 @@ function reset_demande_connection(){
     });
 }
 
+// Cette fonction sera pour la tache E2
 function reset_gestion_etablissement(){
     $(btn_reset_etablissement).click(function() {
         effacer_messages_erreurs(message_erreur_etablissement);
@@ -196,6 +206,7 @@ function reset_gestion_etablissement(){
     });
 }
 
+// Cette fonction sera pour la tache E2
 function initialiser_selection_evoluee(){
     $('.select2-selection__rendered .select2-selection__choice').each(function () {
             $(this).remove(); // Remove li one by one
@@ -209,6 +220,7 @@ function initialiser_selection_evoluee(){
     champ_liste_etablissement.style.width = "100%";
 }
 
+// Cette fonction sera pour toutes les taches qui possèdent une interface web
 function initialiser_tous_champs(type_champs){
     var tous_champs = document.querySelectorAll(type_champs);
     tous_champs.forEach(function(un_champ){
@@ -221,12 +233,14 @@ function initialiser_tous_champs(type_champs){
     });
 }
 
+// Fonction utilisée pour retirer les messages d'erreurs de la secteur seulement si elle existe
 function effacer_messages_erreurs(message){
     if (message){
         message.innerHTML = "";
     }
 }
 
+// Cette fonction sera pour la tache A2 à des fins de validations
 function recherche(){
     $(form_recherche).submit(function (e) {
         message_erreur_recher.innerHTML = "";
@@ -241,7 +255,7 @@ function recherche(){
     });
 }
 
-// Cette fonction sera utilisée pour la tache A5 ou A6.
+// Cette fonction sera pour la tache A5 et A6 à des fins de validations et d'appel Ajax
 function recherche_rapide(){
     $(form_interval).submit(function (e) {
         e.preventDefault();
@@ -271,6 +285,7 @@ function recherche_rapide(){
     });
 }
 
+// Cette fonction sera pour la tache D1 à des fins de validations et d'appel Ajax
 function demande_plainte(){
     $(form_nouvelle_plainte).submit(function (e) {
         e.preventDefault();
@@ -285,6 +300,7 @@ function demande_plainte(){
     });
 }
 
+// Cette fonction sera pour la tache E2 à des fins de validations et d'appel Ajax
 function demande_nouveau_profil(){
     $(form_nouveau_profil).submit(function (e) {
         e.preventDefault();
@@ -301,6 +317,7 @@ function demande_nouveau_profil(){
     });
 }
 
+// Cette fonction sera pour la tache E2 à des fins de validations
 function demande_connection_profil(){
     $(form_connection_profil).submit(function (e) {
         message_erreur_connection.innerHTML = "";
@@ -314,6 +331,7 @@ function demande_connection_profil(){
     });
 }
 
+// Cette fonction sera pour la tache E2 pour un call Ajax
 function retrait_etablissement_profil(){
     $(form_retrait_etablissement).submit(function (e) {
         e.preventDefault();
@@ -324,6 +342,7 @@ function retrait_etablissement_profil(){
     });
 }
 
+// Cette fonction sera pour la tache E2 à des fins de validations et d'appel Ajax
 function ajout_etablissements_profil(){
     $(form_ajout_etablissement).submit(function (e) {
         e.preventDefault();
@@ -336,6 +355,7 @@ function ajout_etablissements_profil(){
     });
 }
 
+// Cette fonction sera pour la tache E2 à des fins de validations et d'appel Ajax pour la gestion de la photo de profil
 function ajout_modif_retrait_photo_profil(){
     $(form_gestion_photo).on('submit', function(e) {
     var $btn = $(document.activeElement);
@@ -357,6 +377,7 @@ function ajout_modif_retrait_photo_profil(){
     });
 }
 
+// Cette fonction sera pour la tache E2 à des fins de validations pour vérifier l'état des boutons
 function validation_bouton_section_photo(){
     if (champ_id_photo){
         if (champ_id_photo.value == "None"){
@@ -371,18 +392,21 @@ function validation_bouton_section_photo(){
     }
 }
 
+// Sous fonction de validation_bouton_section_photo
 function activation_bouton(champ){
     champ.setAttribute("class", "bouton");
     champ.removeAttribute("disabled");
     champ.style.backgroundImage = "linear-gradient(to bottom, #507d99, #96cceb";
 }
 
+// Sous fonction de validation_bouton_section_photo
 function desactivation_bouton(champ){
     champ.setAttribute("class", "bouton disabled");
     champ.setAttribute("disabled", "disabled");
     champ.style.background = "darkgray";
 }
 
+// Cette fonction sera pour la tache A2
 function verification_recherche(liste_validation){
     if (champ_nom_resto.value == "" && champ_nom_proprio.value == "" && champ_nom_rue.value == "") {
         liste_validation['aucune_recherche'] = true;
@@ -403,6 +427,7 @@ function verification_recherche(liste_validation){
     return liste_validation;
 }
 
+// Cette fonction sera pour la tache A5
 function verification_interval(liste_validation){
     if (champ_date_debut.value == "") {
         liste_validation['champ_debut_vide'] = true;
@@ -423,6 +448,7 @@ function verification_interval(liste_validation){
     return liste_validation;
 }
 
+// Cette fonction sera pour la tache A5 et A6
 function verification_choix_etablissement(liste_validation){
     if (champ_liste_resto.value == "") {
         liste_validation['champ_liste_resto_vide'] = true;
@@ -439,6 +465,7 @@ function verification_choix_etablissement(liste_validation){
     return liste_validation;
 }
 
+// Cette fonction sera pour la tache D2
 function verification_nouvelle_plainte(liste_validation){
     verification_champs_vides(); // Parce que tous les champs doivent être remplis
 
@@ -495,6 +522,7 @@ function verification_nouvelle_plainte(liste_validation){
     return liste_validation;
 }
 
+// Cette fonction sera pour la tache E2 pour créer un profil
 function verification_nouveau_profil(liste_validation){
     verification_champs_vides();
 
@@ -544,6 +572,7 @@ function verification_nouveau_profil(liste_validation){
     return liste_validation;
 }
 
+// Cette fonction sera pour la tache E2 pour se connecter
 function verification_connection_profil(liste_validation){
     if (champ_courriel_connection.value == "") {
         liste_validation['champ_courriel_vide'] = true;
@@ -560,6 +589,9 @@ function verification_connection_profil(liste_validation){
     return liste_validation;
 }
 
+// Cette fonction sera pour la tache D2 et E2
+// en raison du grand nombre de champs obligatoiresw à saisir
+// Nous avons pris la décision de faire un message générique pour les champs vides
 function verification_champs_vides(){
     // Une manière simple d'afficher un message générale, s'il y a des champs vides
     // https://stackoverflow.com/questions/16211871/how-to-check-if-all-inputs-are-not-empty-with-jquery
@@ -575,6 +607,7 @@ function verification_champs_vides(){
     });
 }
 
+// Cette fonction sera pour déterminer si on doit bloquer l'envoi du formulaire à la route Flask prévue
 function verification_evocation_non_ajax(liste_validation){
     for (var key in liste_validation) {
         if (liste_validation[key]){
@@ -586,6 +619,7 @@ function verification_evocation_non_ajax(liste_validation){
     return liste_validation;
 }
 
+// Cette fonction sera pour déterminer si on doit bloquer l'appel AJAX
 function verification_evocation_ajax(liste_validation){
     for (var key in liste_validation) {
         if (liste_validation[key]){
@@ -597,6 +631,7 @@ function verification_evocation_ajax(liste_validation){
     return liste_validation;
 }
 
+// Cette fonction sera pour la tache A2
 function message_erreur_recherche(liste_validation){
     if (liste_validation['aucune_recherche']){
             message_erreur_recher.innerHTML += "<li>Vous devez remplir au moins un des trois critères !</li>";
@@ -611,6 +646,7 @@ function message_erreur_recherche(liste_validation){
     }
 }
 
+// Cette fonction sera pour la tache A5 et A6
 function message_erreur_recherche_rapide(liste_validation){
     if (liste_validation['aucun_choix'] || liste_validation['les_deux_choix']){
         if (liste_validation['aucun_choix']){
@@ -637,6 +673,8 @@ function message_erreur_recherche_rapide(liste_validation){
     }
 }
 
+// Cette fonction sera pour la tache D1
+// Cette ne peut pas faire 25 lignes vue le nombre de messages d'erreurs possible
 function message_erreur_nouvelle_plainte(liste_validation){
     if (liste_validation['champ_numero_inv']) {
         message_erreur_plainte.innerHTML += "<li>Veuillez saisir un numéro civique numériquement !</li>";
@@ -688,6 +726,8 @@ function message_erreur_nouvelle_plainte(liste_validation){
     }
 }
 
+// Cette fonction sera pour la tache E2
+// Cette ne peut pas faire 25 lignes vue le nombre de messages d'erreurs possible
 function message_erreur_nouveau_profil(liste_validation){
     if (liste_validation['champ_prenom_inv']) {
         message_erreur_profil.innerHTML += "<li>Veuillez saisir un prenom valide allant jusqu'à 50 charactères !</li>";
@@ -735,6 +775,7 @@ function message_erreur_nouveau_profil(liste_validation){
     }
 }
 
+// Cette fonction sera pour la tache E2
 function message_erreur_nouvelle_connection(liste_validation){
     if (liste_validation['champ_courriel_vide'] && liste_validation['champ_password_vide']){
         message_erreur_connection.innerHTML += "<li>Veuillez saisir un courriel et un mot de passe, afin de vous connectez !</li>";
@@ -762,6 +803,7 @@ function message_erreur_nouvelle_connection(liste_validation){
     }
 }
 
+// Cette fonction sera pour les champs qui ont recu un tag d'erreur
 function modification_erreur_champs_selectionner(champs){
     var tous_champs = document.querySelectorAll(champs);
     tous_champs.forEach(function(un_champ){
@@ -770,6 +812,7 @@ function modification_erreur_champs_selectionner(champs){
     });
 }
 
+// Cette fonction sera pour les champs qui ont recu un tag correct
 function modification_correct_champs_selectionner(champs){
     var tous_champs = document.querySelectorAll(champs);
     tous_champs.forEach(function(un_champ){
@@ -778,6 +821,10 @@ function modification_correct_champs_selectionner(champs){
     });
 }
 
+// Cette fonction sera pour la tache A2
+// Cette fonction appellera les sous fonction
+// modification_erreur_champs_selectionner -> pour un champ en erreur
+// modification_erreur_champs_selectionner -> pour un champ correct
 function ajustement_style_champs_rech(liste_validation){
     if (liste_validation['aucune_recherche']){
         modification_erreur_champs_selectionner("#etablissement, #proprietaire, #nom_rue");
@@ -796,6 +843,10 @@ function ajustement_style_champs_rech(liste_validation){
     }
 }
 
+// Cette fonction sera pour la tache A5, A6
+// Cette fonction appellera les sous fonction
+// modification_erreur_champs_selectionner -> pour un champ en erreur
+// modification_erreur_champs_selectionner -> pour un champ correct
 function ajustement_style_champs_rech_rapide(liste_validation){
     if (liste_validation['champ_debut_inv'] || (liste_validation['champ_debut_vide'] && liste_validation['champ_liste_resto_vide'])){
         modification_erreur_champs_selectionner("#date_debut");
@@ -824,7 +875,7 @@ function ajustement_style_champs_rech_rapide(liste_validation){
     }
 }
 
-// Cette fonction est l'appel Ajax pour A5.
+// Cette fonction est l'appel Ajax pour A5
 function appel_ajax_interval(){
     var ajax = new XMLHttpRequest();
     ajax.onreadystatechange = function() {
@@ -835,12 +886,10 @@ function appel_ajax_interval(){
                     var resultat = creation_bloc_html_interval(liste);
                     result_interval.innerHTML = resultat;
                 } else {
-                    appel_ajax_interval_succes_mais_erreur();
-                    message_erreur_interval.innerHTML += "<li>L'interval de date ne contenait aucune donnée !</li>";
+                    appel_ajax_erreur(result_interval, form_interval, message_erreur_interval, "<li>L'interval de date ne contenait aucune donnée !</li>");
                 }
             } else {
-                appel_ajax_interval_succes_mais_erreur();
-                message_erreur_interval.innerHTML += "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
+                appel_ajax_erreur(result_interval, form_interval, message_erreur_interval, "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>");
             }
         }
     };
@@ -851,7 +900,7 @@ function appel_ajax_interval(){
     ajax.send();
 }
 
-// Cette fonction est l'appel Ajax pour A6.
+// Cette fonction est l'appel Ajax pour A6
 function appel_ajax_interval_etablissement(){
     var ajax = new XMLHttpRequest();
     ajax.onreadystatechange = function() {
@@ -860,8 +909,7 @@ function appel_ajax_interval_etablissement(){
                 var liste = JSON.parse(ajax.responseText);
                 result_interval_etablissement.innerHTML = creation_bloc_html_etablissement(liste);
             } else {
-                appel_ajax_interval_succes_mais_erreur();
-                message_erreur_interval.innerHTML += "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
+                appel_ajax_erreur(result_interval, form_interval, message_erreur_interval, "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>");
             }
         }
     };
@@ -871,6 +919,7 @@ function appel_ajax_interval_etablissement(){
     ajax.send();
 }
 
+// Cette fonction est l'appel Ajax pour D1
 function appel_ajax_nouvelle_plainte(){
     var ajax = new XMLHttpRequest();
     ajax.onreadystatechange = function() {
@@ -879,8 +928,8 @@ function appel_ajax_nouvelle_plainte(){
                 var liste = JSON.parse(ajax.responseText);
                 result_plainte.innerHTML = creation_bloc_html(liste);
             } else {
-                appel_ajax_plainte_succes_mais_erreur();
                 message_erreur_plainte.innerHTML += "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
+                appel_ajax_erreur(result_plainte, nouvelle_plainte, message_erreur_plainte, "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>");
             }
         }
     };
@@ -900,20 +949,22 @@ function appel_ajax_nouvelle_plainte(){
     ajax.send(data_json);
 }
 
+// Cette fonction est l'appel Ajax pour E2
 function appel_ajax_nouveau_profil(){
     var ajax = new XMLHttpRequest();
     ajax.onreadystatechange = function() {
         if (ajax.readyState === XMLHttpRequest.DONE) {
             if (ajax.status === 201) {
                 var liste = JSON.parse(ajax.responseText);
-                result_profil.innerHTML = creation_bloc_html(liste);
+                message_erreur_profil.innerHTML = creation_bloc_html(liste);
             } else{
-                appel_ajax_profil_succes_mais_erreur();
+                message_erreur = "";
                 if (ajax.status === 404)  {
-                    result_profil.innerHTML = "<p class=\"aucun\">Impossible de créer le profil, car le Courriel est déjà présent !</p>";
+                    message_erreur = "<li>Impossible de créer le profil, car le Courriel est déjà présent !</li>";
                 } else {
-                    message_erreur_profil.innerHTML += "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
+                    message_erreur = "<li>Attention ! Il y a eu une erreur avec la réponse du serveur !</li>";
                 }
+                appel_ajax_erreur(result_profil, form_nouveau_profil, message_erreur_profil, message_erreur);
             }
         }
     };
@@ -935,6 +986,7 @@ function appel_ajax_nouveau_profil(){
     ajax.send(data_json);
 }
 
+// Cette fonction est l'appel Ajax pour E2
 function appel_ajax_ajout_etablissement_profil(liste_etablissements){
     var ajax = new XMLHttpRequest();
     ajax.onreadystatechange = function() {
@@ -964,6 +1016,7 @@ function appel_ajax_ajout_etablissement_profil(liste_etablissements){
     ajax.send(data_json);
 }
 
+// Cette fonction est l'appel Ajax pour E2
 function appel_ajax_retrait_etablissement_profil(id_surveillance){
     var ajax = new XMLHttpRequest();
     ajax.onreadystatechange = function() {
@@ -986,6 +1039,7 @@ function appel_ajax_retrait_etablissement_profil(id_surveillance){
     ajax.send(data_json);
 }
 
+// Cette fonction est l'appel Ajax pour E2
 function appel_ajax_supprimer_photo_profil(){
     var ajax = new XMLHttpRequest();
     ajax.onreadystatechange = function() {
@@ -1010,6 +1064,7 @@ function appel_ajax_supprimer_photo_profil(){
     ajax.send(data_json);
 }
 
+// Cette fonction servira à refaire la lsite des établissements après l'appel AJAX
 function refaire_etablissement_disponible(liste){
     // On supprime toutes les vieilles options
     $(list_etablissement_dispo).empty();
@@ -1020,6 +1075,7 @@ function refaire_etablissement_disponible(liste){
     }
 }
 
+// Cette fonction servira à refaire la liste des établissements après l'appel AJAX
 function refaire_tableau_etablissement(liste){
     $(tableau_etablissement).find("tr:gt(0)").remove();
     for(var i = 0; i < liste.length; i++) {
@@ -1044,6 +1100,8 @@ function refaire_tableau_etablissement(liste){
     }
 }
 
+// Cette fonction servira à retirer «visuellement» la ligne qui convient
+// l'établissement comme nous avons réussi à la retiré côté serveur.
 function supprimer_ligne_tableau_etablissement(id_surveillance){
     var d = document.getElementsByClassName(id_surveillance);
     for (var i = 0; i < d.length; i++) {
@@ -1051,20 +1109,11 @@ function supprimer_ligne_tableau_etablissement(id_surveillance){
     }
 }
 
-function appel_ajax_profil_succes_mais_erreur(){
-    result_profil.innerHTML = "";
-    form_nouveau_profil.style.border = "2px solid red";
-}
-
-function appel_ajax_interval_succes_mais_erreur(){
-    result_interval.innerHTML = "";
-    result_interval_etablissement.innerHTML = "";
-    form_interval.style.border = "2px solid red";
-}
-
-function appel_ajax_plainte_succes_mais_erreur(){
-    result_plainte.innerHTML = "";
-    form_nouvelle_plainte.style.border = "2px solid red";
+// Cette fonction sera commune aux appels AJAX avec un code de retour différent de 200 ou 201
+function appel_ajax_erreur(section_result, formulaire, section_msg_erreur, msg_erreur){
+    section_result.innerHTML = "";
+    formulaire.style.border = "2px solid red";
+    section_msg_erreur.innerHTML = msg_erreur;
 }
 
 // Cette fonction sera pour afficher le résultat des établissements et leur nombre amandes respectifs.
@@ -1110,6 +1159,7 @@ function creation_bloc_html_etablissement(listes){
     return result_liste;
 }
 
+// Cette fonction sera utiliser pour afficher des informations relatives aux retour des appels AJAX
 function creation_bloc_html(listes){
     var result_liste = "";
     result_liste += "<table class=\"tabeau_resto\"><tbody>";
@@ -1124,12 +1174,14 @@ function creation_bloc_html(listes){
     return result_liste;
 }
 
+// Fonction pour saisir un texte pour le placeholder du Select spécial
 function creation_select2(){
     $('.js-example-basic-multiple').select2({
         placeholder: "Choix d'(es) établissement(s)"
     });
 }
 
+// Les fonctions ici seront prètes à utiliser au moment que le contenu de la page HTML soit loade rdans son entièter
 document.addEventListener('DOMContentLoaded', function () {
     validation_bouton_section_photo();
     recherche();

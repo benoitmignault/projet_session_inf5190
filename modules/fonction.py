@@ -48,6 +48,7 @@ ACCESS_TOKEN = "1243952698556383232-Qv98BnYtkFj8mje95QXox6yvLSUUTl"
 ACCESS_TOKEN_SECRET = "8nclhl82lk4P52CLYTIQz94vHwlod3djHRzOcdNMq4iQ8"
 
 
+# Cette fonction sera utiliser pour la tache B2 pour ouvrir la connection
 def connexion_twitter():
     try:
         conn_auth = tweepy.OAuthHandler(API_KEY, API_SECRET)
@@ -57,6 +58,7 @@ def connexion_twitter():
         return None
 
 
+# Instance d'ouverture de la BD avec Flask
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
@@ -65,6 +67,8 @@ def get_db():
     return g._database
 
 
+# Cette fonction sera utiliser en dehors de flask pour
+# créer une connection à la BD pour les taches A1, B1, B2
 def initialisation_connexion_hors_flask():
     connection = Database()
     connection.get_connection()
@@ -72,6 +76,7 @@ def initialisation_connexion_hors_flask():
     return connection
 
 
+# Cette fonction sera utiliser pour B1, B2
 def mise_jour_bd():
     connection = initialisation_connexion_hors_flask()
     liste_contrevenants = recuperation_information_url()
@@ -109,6 +114,7 @@ def mise_jour_bd():
     connection.disconnect()
 
 
+# Cette fonction sera utiliser pour E2, une fois sur l'interface du profil
 def initial_infos_connecter():
     liste_infos = {"id_personne": "", "id_photo": "", "prenom": "", "nom": "",
                    "courriel": "", "type_photo": ""}
@@ -123,6 +129,8 @@ def initial_champ_interval():
     return liste_champs
 
 
+# Cette fonction sera utiliser pour D1 pour le service RESt et l'interface
+# à remplir une plainte
 def initial_champ_nouvelle_plainte():
     liste_champs = {"id_plainte": 0, "etablissement": "", "no_civique": 0,
                     "nom_rue": "", "nom_plaignant": "", "description": "",
@@ -131,6 +139,7 @@ def initial_champ_nouvelle_plainte():
     return liste_champs
 
 
+# Cette fonction est commune pour les taches A1 et A3
 def initial_champ_importation_xml():
     liste_champs_xml = {"proprietaire": "", "categorie": "",
                         "etablissement": "", "no_civ": "", "nom_rue": "",
@@ -140,6 +149,7 @@ def initial_champ_importation_xml():
     return liste_champs_xml
 
 
+# Cette fonction est commune pour les taches E1 et E2
 def initial_champ_nouveau_profil():
     liste_champs = {"nom": "", "prenom": "", "courriel": "", "password": "",
                     "liste_etablissement": [], "salt": "", "id_personne": 0,
@@ -148,12 +158,16 @@ def initial_champ_nouveau_profil():
     return liste_champs
 
 
+# Cette fonction sera pour la tache E2 au niveau de l'ajout d'établissement à
+# surveiller pour l'utilisateur
 def initial_champ_ajout_etablissement():
     liste_champs = {"id_personne": 0, "liste_etablissement": []}
 
     return liste_champs
 
 
+# Cette fonction sera pour la tache E2 au moment de vouloir ouvrir
+# une session sur son profil
 def initial_champ_connexion():
     liste_champs = {"courriel": "", "password": "", "salt": "", "hash": "",
                     "password_hasher": "", "messages": []}
@@ -161,6 +175,8 @@ def initial_champ_connexion():
     return liste_champs
 
 
+# Cette fonction sera utiliser pour les taches A1, B1, B2
+# Récupération et convertion vers UTF-8 des informations provenant de l'URL
 def recuperation_information_url():
     resultat = requests.get(URL)
     resultat.encoding = 'utf-8'
@@ -183,6 +199,8 @@ def construction_xml(ensemble_trouve):
     return xml_information.getvalue()
 
 
+# Cette fonction sera pour les taches A1, B1, B2
+# Récupération des informations pour un contrevenant
 def remplissage_champs_importation_xml(liste_champs_xml, contrevenant):
     liste_champs_xml["proprietaire"] = contrevenant.find('proprietaire').text
     liste_champs_xml["categorie"] = contrevenant.find('categorie').text
@@ -215,6 +233,9 @@ def remplissage_champs_interval(liste_champs, date_debut, date_fin):
     return liste_champs
 
 
+# Cette fonction sera pour les taches A1, B1, B2
+# Les dates qui sont disponible sur le site de la ville de Montréal
+# ne sont pas sous le format ISO, donc il a fallu usé d'ingénieusité
 def convertisseur_date(date_a_convertir):
     date_morceau = date_a_convertir.split()
     jour = date_morceau[0]
@@ -234,6 +255,10 @@ def convertisseur_date(date_a_convertir):
     return nouveau_date
 
 
+# Cette tache est uniquement pour A1
+# Cette fonction est la toute première focntion du programme
+# qui doivent être démarrer, sinon la MAJ de la journée suivante à minuit fera
+# le travail
 def importation_donnees():
     liste_champs_xml = initial_champ_importation_xml()
     liste_contrevenants = recuperation_information_url()
@@ -253,6 +278,7 @@ def importation_donnees():
     connection.disconnect()
 
 
+# Cette tache sera pour C3
 def construction_csv(ensemble_trouve):
     csv_information = StringIO()
     information = csv.writer(csv_information)
@@ -272,6 +298,7 @@ def construction_csv(ensemble_trouve):
     return csv_information.getvalue()
 
 
+# Cette fonction sera pour la tache A2
 def initial_champ_recherche():
     liste_champs = {"proprietaire": "", "etablissement": "", "nom_rue": "",
                     "nb_restaurant_trouve": 0, "messages": {}, "nb_critere": 0}
@@ -279,6 +306,7 @@ def initial_champ_recherche():
     return liste_champs
 
 
+# Cette fonction sera pour la tache E2
 def initial_champ_connexion_validation():
     liste_validation = {"situation_erreur": False,
                         "champ_courriel_vide": False,
@@ -293,6 +321,7 @@ def initial_champ_connexion_validation():
     return liste_validation
 
 
+# Cette fonction sera pour la tache A2
 def initial_champ_recherche_validation():
     liste_validation = {"situation_erreur": False,
                         "champ_proprietaire_vide": False,
@@ -309,7 +338,7 @@ def initial_champ_recherche_validation():
 
     return liste_validation
 
-
+# Cette fonction sera pour la tache A4 et A5
 def initial_champ_interval_validation():
     liste_validation = {"situation_erreur": False, "champ_debut_inv": False,
                         "champ_fin_inv": False, "champ_debut_vide": False,
@@ -318,6 +347,7 @@ def initial_champ_interval_validation():
     return liste_validation
 
 
+# Cette fonction sera pour la tache E2
 def remplissage_champ_connexion(request, liste_champs):
     liste_champs['courriel'] = request['courriel_conn']
     liste_champs['password'] = request['password_conn']
@@ -325,6 +355,7 @@ def remplissage_champ_connexion(request, liste_champs):
     return liste_champs
 
 
+# Cette fonction sera pour la tache E2
 def remplissage_infos_connecter(liste_infos, info_profil):
     liste_infos['prenom'] = info_profil[0]
     liste_infos['nom'] = info_profil[1]
@@ -336,6 +367,7 @@ def remplissage_infos_connecter(liste_infos, info_profil):
     return liste_infos
 
 
+# Cette fonction sera pour la tache E2
 def remplissage_post_verification_conn(liste_champs, utilisateur):
     liste_champs['salt'] = utilisateur[0]
     liste_champs['hash'] = utilisateur[1]
@@ -347,6 +379,7 @@ def remplissage_post_verification_conn(liste_champs, utilisateur):
     return liste_champs
 
 
+# Cette fonction sera pour la tache A2
 def remplissage_champ_recherche(request, liste_champs):
     liste_champs['proprietaire'] = request['proprietaire']
     liste_champs['etablissement'] = request['etablissement']
@@ -355,6 +388,7 @@ def remplissage_champ_recherche(request, liste_champs):
     return liste_champs
 
 
+# Cette fonction sera pour la tache D1
 def remplissage_champ_nouvelle_plainte(request, liste_champs):
     data = request.get_json()
     liste_champs['etablissement'] = data['etablissement']
@@ -369,6 +403,7 @@ def remplissage_champ_nouvelle_plainte(request, liste_champs):
     return liste_champs
 
 
+# Cette fonction sera pour la tache E2
 def remplissage_champ_nouveau_profil(request, liste_champs):
     data = request.get_json()
     liste_champs['nom'] = data['nom']
@@ -386,6 +421,8 @@ def remplissage_champ_nouveau_profil(request, liste_champs):
     return liste_champs
 
 
+# Cette fonction sera pour la tache E2 dans la section pour ajouter
+# des établissement à surveiller
 def remplissage_champ_ajout_etablissement(request, liste_champs):
     data = request.get_json()
     liste_champs['id_personne'] = data['id_personne']
@@ -396,6 +433,8 @@ def remplissage_champ_ajout_etablissement(request, liste_champs):
     return liste_champs
 
 
+# Cette fonction sera pour la tache B1 en fonction du courriel qui se
+# trouve dans le fichier YAML
 def creation_courriel(liste_envoi):
     string_courriel = recuperation_courriel_yaml()
 
@@ -415,6 +454,7 @@ def creation_courriel(liste_envoi):
     server.quit()
 
 
+# Cette fonction sera pour la tache B1
 def creation_html_courriel(liste_envoi):
     msg_corps = """<html><head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -453,6 +493,7 @@ def creation_html_courriel(liste_envoi):
     return msg_corps
 
 
+# Cette fonction sera pour la tache B1
 def recuperation_courriel_yaml():
     string_courriel = ""
     racine_liste = []
@@ -469,6 +510,7 @@ def recuperation_courriel_yaml():
     return string_courriel
 
 
+# Cette fonction sera pour la tache B2
 def creation_tweet(conn_auth, liste):
     date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     api = tweepy.API(conn_auth)
@@ -478,6 +520,8 @@ def creation_tweet(conn_auth, liste):
         api.update_status(date + message + un_contrevenant)
 
 
+# Cette fonction sera pour la tache A2 pour déterminer combien de critères de
+# recherche effectueront
 def nombre_critiere_recherche(liste_champs):
     nombre = 0
 
@@ -493,6 +537,7 @@ def nombre_critiere_recherche(liste_champs):
     return nombre
 
 
+# Cette fonction sera pour la tache E2
 def validation_champ_connexion(liste_champs, liste_validation):
     if (not liste_validation['champ_courriel_vide'] and not
     liste_validation['champ_password_vide']):
@@ -504,6 +549,7 @@ def validation_champ_connexion(liste_champs, liste_validation):
     return liste_validation
 
 
+# Cette fonction sera pour la tache E2
 def sous_validation_courriel_connexion(liste_champs, liste_validation):
     if liste_champs['courriel'] == "":
         liste_validation['champ_courriel_vide'] = True
@@ -519,6 +565,7 @@ def sous_validation_courriel_connexion(liste_champs, liste_validation):
     return liste_validation
 
 
+# Cette fonction sera pour la tache E2
 def sous_validation_password_connexion(liste_champs, liste_validation):
     if liste_champs['password'] == "":
         liste_validation['champ_password_vide'] = True
@@ -572,6 +619,7 @@ def sous_validation_champs_invalide_ajax(liste_champs, liste_validation):
     return liste_validation
 
 
+# Cette fonction sera pour la tache A2
 def validation_champs_recherche(liste_champs, liste_validation):
     liste_validation = sous_validation_champs_vide(liste_champs,
                                                    liste_validation)
@@ -582,6 +630,7 @@ def validation_champs_recherche(liste_champs, liste_validation):
     return liste_validation
 
 
+# Cette fonction sera pour la tache A2
 def sous_validation_champs_vide(liste_champs, liste_validation):
     if liste_champs['proprietaire'] == "":
         liste_validation['champ_proprietaire_vide'] = True
@@ -600,6 +649,7 @@ def sous_validation_champs_vide(liste_champs, liste_validation):
     return liste_validation
 
 
+# Cette fonction sera pour la tache A2
 def sous_validation_champs_longueur(liste_champs, liste_validation):
     if not liste_validation['champ_proprietaire_vide']:
         if not (5 <= len(liste_champs['proprietaire']) <= 100):
@@ -616,6 +666,7 @@ def sous_validation_champs_longueur(liste_champs, liste_validation):
     return liste_validation
 
 
+# Cette fonction sera pour la tache A2
 def sous_validation_champs_invalide(liste_champs, liste_validation):
     if not liste_validation['champ_proprietaire_vide']:
         match_proprio = re.compile(PATTERN_PROPRIO).match
@@ -635,6 +686,7 @@ def sous_validation_champs_invalide(liste_champs, liste_validation):
     return liste_validation
 
 
+# Cette fonction sera pour la tache A2
 def situation_erreur(liste_validation):
     for cle, valeur in liste_validation.items():
         if (cle != "champ_proprietaire_vide" and
@@ -661,6 +713,7 @@ def situation_erreur_interval(liste_validation):
     return liste_validation
 
 
+# Cette fonction sera pour la tache A2
 def message_erreur_recherche(liste_validation):
     messages = []
     if liste_validation['champs_vides']:
@@ -678,6 +731,7 @@ def message_erreur_recherche(liste_validation):
     return messages
 
 
+# Cette fonction sera pour la tache A2
 def sous_message_erreur_proprietaire(messages, liste_validation):
     if liste_validation['champ_proprietaire_inv']:
         messages.append("Attention ! Le nom du propriétaire doit être "
@@ -690,6 +744,7 @@ def sous_message_erreur_proprietaire(messages, liste_validation):
     return messages
 
 
+# Cette fonction sera pour la tache A2
 def sous_message_erreur_etablissement(messages, liste_validation):
     if liste_validation['champ_etablissement_inv']:
         messages.append("Attention ! L'établissement doit être valide !")
@@ -701,6 +756,7 @@ def sous_message_erreur_etablissement(messages, liste_validation):
     return messages
 
 
+# Cette fonction sera pour la tache A2
 def sous_message_erreur_nom_rue(messages, liste_validation):
     if liste_validation['champ_rue_inv']:
         messages.append("Attention ! Le nom de la rue doit être valide !")
@@ -712,6 +768,7 @@ def sous_message_erreur_nom_rue(messages, liste_validation):
     return messages
 
 
+# Cette fonction sera pour la tache E2
 def message_erreur_connexion(liste_validation):
     messages = []
     if (liste_validation['champ_courriel_vide'] and
@@ -725,6 +782,7 @@ def message_erreur_connexion(liste_validation):
     return messages
 
 
+# Cette fonction sera pour la tache E2
 def sous_message_erreur_courriel(messages, liste_validation):
     if liste_validation['champ_courriel_vide']:
         messages.append("Au moment de vous connectez, vous n'avez rien saisie "
@@ -745,6 +803,7 @@ def sous_message_erreur_courriel(messages, liste_validation):
     return messages
 
 
+# Cette fonction sera pour la tache E2
 def sous_message_erreur_password(messages, liste_validation):
     if liste_validation['champ_password_vide']:
         messages.append("Au moment de vous connectez, vous n'avez rien saisie "
