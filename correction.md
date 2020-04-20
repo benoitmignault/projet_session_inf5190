@@ -41,7 +41,7 @@
    [Page de recherche](http://127.0.0.1:5000)
 * Résultat 2 - Toutes l'information sur les amendes d'un établissement sélectionnémendes
    
-* http://127.0.0.1:5000/api/liste_amendes_etablissement/etablissement?choix=AL-BAGHDADI
+* http://127.0.0.1:5000/api/liste_des_contrevenants/etablissement?choix=AL-BAGHDADI
 
 ##### Pour les deux prochaines taches, nous avons utilisé les informations suivantes :
 * b.mignault.uqam.qc.ca@gmail.com
