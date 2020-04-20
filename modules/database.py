@@ -76,18 +76,18 @@ class Database:
         result = cursor.fetchall()
         return result
 
-    def liste_contrevenant_interval(self, date_debut, date_fin):
+    def liste_contravention_interval(self, date_debut, date_fin):
         cursor = self.get_connection().cursor()
-        select = "select proprietaire, categorie, etablissement, " \
-                 "no_civique, nom_rue, ville, description, date_infraction, " \
-                 "date_jugement, montant_amende, id_resto "
+        select = "select categorie, no_civique, nom_rue, " \
+                 "ville, description, date_infraction, date_jugement," \
+                 "montant_amende, etablissement "
         fromm = "from mauvais_restaurants "
         where = "where date_infraction BETWEEN ? AND ? "
         order = "order by date_infraction "
         sql = select + fromm + where + order
         cursor.execute(sql, (date_debut, date_fin))
         result = cursor.fetchall()
-        ensemble_trouve = recuperation_resultat(result)
+        ensemble_trouve = recuperation_liste_contravention(result)
 
         return ensemble_trouve
 
@@ -120,16 +120,16 @@ class Database:
 
     def liste_contravention_etablissement(self, nom):
         cursor = self.get_connection().cursor()
-        select = "select categorie, no_civique, nom_rue, ville, description," \
-                 "date_infraction, date_jugement, montant_amende "
+        select = "select categorie, no_civique, nom_rue, " \
+                 "ville, description, date_infraction, date_jugement," \
+                 "montant_amende, etablissement "
         fromm = "from mauvais_restaurants "
         where = "where etablissement = ? "
         order = "order by date_infraction "
         sql = select + fromm + where + order
         cursor.execute(sql, (nom,))
         result = cursor.fetchall()
-        ensemble_trouve = recuperation_liste_contravention_etablissement(
-            result)
+        ensemble_trouve = recuperation_liste_contravention(result)
 
         return ensemble_trouve
 
@@ -517,12 +517,13 @@ def recuperation_liste_etablissement(result):
     return ensemble_trouve
 
 
-# Cette fonction sera utiliser pour la tache A6
-def recuperation_liste_contravention_etablissement(result):
+# Cette fonction sera utiliser pour la tache A4 et A6
+def recuperation_liste_contravention(result):
     ensemble_trouve = []
     if result is not None:
         for contravention in result:
-            sous_ensemble = {'Catégorie': contravention[0],
+            sous_ensemble = {'etablissement': contravention[8],
+                             'Catégorie': contravention[0],
                              'Adresse':
                                  contravention[1] + " " + contravention[2],
                              'Ville': contravention[3],

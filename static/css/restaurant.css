@@ -118,7 +118,6 @@ h2 {
     flex-wrap: wrap;
     padding: 10px;
     border-radius: 10px;
-    justify-content: center;
     align-items: center;
 }
 
@@ -288,7 +287,6 @@ Fin de l'ajout du recentrage de attribut legend
 
 .container > .zone_recherche_resto > p,
 .container > .zone_recherche_resto > form > .modif > fieldset > p{
-    padding-left : 50px;
     font-weight: bold;
 }
 

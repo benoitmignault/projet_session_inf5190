@@ -116,6 +116,7 @@ def initial_infos_connecter():
     return liste_infos
 
 
+# Cette fonction est commune pour les taches A4 et A5
 def initial_champ_interval():
     liste_champs = {"date_debut": "", "date_fin": ""}
 
@@ -206,6 +207,7 @@ def remplissage_champs_importation_xml(liste_champs_xml, contrevenant):
     return liste_champs_xml
 
 
+# Cette fonction est commune pour les taches A4 et A5
 def remplissage_champs_interval(liste_champs, date_debut, date_fin):
     liste_champs['date_debut'] = date_debut
     liste_champs['date_fin'] = date_fin
@@ -535,15 +537,17 @@ def sous_validation_password_connexion(liste_champs, liste_validation):
     return liste_validation
 
 
+# Cette fonction est commune pour les taches A4 et A5
 def validation_champs_interval(liste_champs, liste_validation):
-    liste_validation = sous_validation_champs_vide_ajax(liste_champs,
-                                                        liste_validation)
-    liste_validation = sous_validation_champs_invalide_ajax(liste_champs,
-                                                            liste_validation)
+    liste_validation = sous_validation_champs_vide_ajax(
+        liste_champs, liste_validation)
+    liste_validation = sous_validation_champs_invalide_ajax(
+        liste_champs, liste_validation)
 
     return liste_validation
 
 
+# Cette fonction est commune pour les taches A4 et A5
 def sous_validation_champs_vide_ajax(liste_champs, liste_validation):
     if liste_champs['date_debut'] == "":
         liste_validation['champ_debut_vide'] = True
@@ -554,6 +558,7 @@ def sous_validation_champs_vide_ajax(liste_champs, liste_validation):
     return liste_validation
 
 
+# Cette fonction est commune pour les taches A4 et A5
 def sous_validation_champs_invalide_ajax(liste_champs, liste_validation):
     match_date = re.compile(PATTERN_DATE).match
     if not liste_validation['champ_debut_vide']:
@@ -645,6 +650,8 @@ def situation_erreur(liste_validation):
     return liste_validation
 
 
+# Cette fonction sera utilisé par pas mal de taches pour vérifier si on poursuit
+# la route ou si on l'a met en erreur avec un un code 400
 def situation_erreur_interval(liste_validation):
     for cle, valeur in liste_validation.items():
         if valeur:

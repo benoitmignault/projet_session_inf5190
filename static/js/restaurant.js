@@ -241,6 +241,7 @@ function recherche(){
     });
 }
 
+// Cette fonction sera utilisée pour la tache A5 ou A6.
 function recherche_rapide(){
     $(form_interval).submit(function (e) {
         e.preventDefault();
@@ -823,6 +824,7 @@ function ajustement_style_champs_rech_rapide(liste_validation){
     }
 }
 
+// Cette fonction est l'appel Ajax pour A5.
 function appel_ajax_interval(){
     var ajax = new XMLHttpRequest();
     ajax.onreadystatechange = function() {
@@ -845,10 +847,11 @@ function appel_ajax_interval(){
     var date_debut_encode = encodeURIComponent(champ_date_debut.value);
     var date_fin_encode = encodeURIComponent(champ_date_fin.value);
     var param = `?du=${date_debut_encode}&au=${date_fin_encode}`;
-    ajax.open("GET", "/api/nombre_amende_etablissement/interval"+param, true);
+    ajax.open("POST", "/api/liste_des_contrevenants/interval" + param, true);
     ajax.send();
 }
 
+// Cette fonction est l'appel Ajax pour A6.
 function appel_ajax_interval_etablissement(){
     var ajax = new XMLHttpRequest();
     ajax.onreadystatechange = function() {
@@ -864,7 +867,7 @@ function appel_ajax_interval_etablissement(){
     };
     var nom_encode = encodeURIComponent(champ_liste_resto.value);
     var param = `?choix=${nom_encode}`;
-    ajax.open("GET", "/api/liste_amendes_etablissement/etablissement" + param, true);
+    ajax.open("GET", "/api/liste_des_contrevenants/etablissement" + param, true);
     ajax.send();
 }
 
@@ -1064,6 +1067,7 @@ function appel_ajax_plainte_succes_mais_erreur(){
     form_nouvelle_plainte.style.border = "2px solid red";
 }
 
+// Cette fonction sera pour afficher le résultat des établissements et leur nombre amandes respectifs.
 // J'ai découvert comment faire des string avec des variables
 // https://stackoverflow.com/questions/19105009/how-to-insert-variables-in-javascript-strings/44510325
 function creation_bloc_html_interval(liste){

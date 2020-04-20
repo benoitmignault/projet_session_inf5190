@@ -138,24 +138,30 @@ def mise_jour_contrevenants():
 
 
 # Cette fonction est pour la route A4 et A5
-@app.route('/api/nombre_amende_etablissement/interval', methods=["GET"])
+@app.route('/api/liste_des_contrevenants/interval', methods=["GET", "POST"])
 def recherche_contrevenants_interval():
+    conn_db = get_db()
     liste_champs_interval = initial_champ_interval()
     liste_validation_interval = initial_champ_interval_validation()
-    liste_champs_interval = remplissage_champs_interval(liste_champs_interval,
-                                                        request.args["du"],
-                                                        request.args["au"])
+    liste_champs_interval = remplissage_champs_interval(
+        liste_champs_interval, request.args["du"], request.args["au"])
     liste_validation_interval = validation_champs_interval(
         liste_champs_interval, liste_validation_interval)
     liste_validation_interval = situation_erreur_interval(
         liste_validation_interval)
-
     if not liste_validation_interval['situation_erreur']:
-        conn_db = get_db()
-        ensemble_trouve = conn_db.nombre_contravention_interval(
-            liste_champs_interval['date_debut'],
-            liste_champs_interval['date_fin'])
-        return jsonify(ensemble_trouve)
+        if request.method == "GET":
+            ensemble_trouve = conn_db.liste_contravention_interval(
+                liste_champs_interval['date_debut'],
+                liste_champs_interval['date_fin'])
+
+            return jsonify(ensemble_trouve)
+
+        else:
+            ensemble_trouve = conn_db.nombre_contravention_interval(
+                liste_champs_interval['date_debut'],
+                liste_champs_interval['date_fin'])
+            return jsonify(ensemble_trouve)
 
     else:
         titre = "Erreur Système - 400"
@@ -165,7 +171,7 @@ def recherche_contrevenants_interval():
 
 
 # Cette fonction était pour la tache A6
-@app.route('/api/liste_amendes_etablissement/etablissement', methods=["GET"])
+@app.route('/api/liste_des_contrevenants/etablissement', methods=["GET"])
 def recherche_liste_contravention_par_etablissement():
     if request.args["choix"] != "":
         conn_db = get_db()
@@ -182,7 +188,7 @@ def recherche_liste_contravention_par_etablissement():
 
 
 # Cette fonction était pour la tache C1
-@app.route('/api/nombre_amende_etablissement/json', methods=["GET"])
+@app.route('/api/liste_des_contrevenants/json', methods=["GET"])
 def recherche_contrevenants_json():
     conn_db = get_db()
     ensemble_trouve = conn_db.nombre_contravention()
@@ -191,7 +197,7 @@ def recherche_contrevenants_json():
 
 
 # Cette fonction était pour la tache C2
-@app.route('/api/nombre_amende_etablissement/xml', methods=["GET"])
+@app.route('/api/liste_des_contrevenants/xml', methods=["GET"])
 def recherche_contrevenants_xml():
     conn_db = get_db()
     ensemble_trouve = conn_db.nombre_contravention()
@@ -201,7 +207,7 @@ def recherche_contrevenants_xml():
 
 
 # Cette fonction était pour la tache C3
-@app.route('/api/nombre_amende_etablissement/csv', methods=["GET"])
+@app.route('/api/liste_des_contrevenants/csv', methods=["GET"])
 def recherche_contrevenants_csv():
     conn_db = get_db()
     ensemble_trouve = conn_db.nombre_contravention()
@@ -372,6 +378,7 @@ def profil_connecter():
                                etablissement_dispo=etablissement_dispo)
 
 
+# Cette fonction est pour la tache E2
 @app.route('/connecter/gestion_photo', methods=["POST"])
 @authentification_requise
 def ajouter_photo():
@@ -419,6 +426,7 @@ def ajouter_photo():
         return "", 404
 
 
+# Cette fonction est pour la tache E2
 @app.route('/api/connecter/supprimer_photo', methods=["DELETE"])
 @authentification_requise
 def supprimer_photo():
@@ -437,7 +445,9 @@ def supprimer_photo():
         return "", 200
 
 
+# Cette fonction est pour la tache E2
 @app.route('/image/<id_photo>.<type_photo>')
+@authentification_requise
 def faire_afficher_photo(id_photo, type_photo):
     conn_db = get_db()
     binary_data = conn_db.recuperer_photo(id_photo)
@@ -454,7 +464,7 @@ def faire_afficher_photo(id_photo, type_photo):
     return response
 
 
-# todo créer un jsonschema pour vérifier le json qu'on saisir
+# Cette fonction est pour la tache E2
 @app.route('/api/connecter/ajouter_etablissement', methods=["POST"])
 @schema.validate(ajouter_plusieurs_etablissement)
 @authentification_requise
@@ -475,6 +485,7 @@ def ajouter_etablissement():
                     "etablissement_dispo": etablissement_dispo}), 200
 
 
+# Cette fonction est pour la tache E2
 @app.route('/api/connecter/retirer_etablissement', methods=["DELETE"])
 @schema.validate(supprimer_etablissement)
 @authentification_requise
@@ -495,6 +506,7 @@ def retirer_etablissement():
         return jsonify(etablissement_dispo), 200
 
 
+# Cette fonction est pour la tache E2
 @app.route('/deconnection')
 @authentification_requise
 def deconnection_profil():
@@ -505,10 +517,12 @@ def deconnection_profil():
     return redirect(url_for('.home'))
 
 
+# Cette fonction est pour la tache E2
 def is_authenticated(session):
     return "id" in session
 
 
+# Cette fonction est pour la tache E2
 def personne_non_autorisee():
     return Response("Vous tentez d''accéder à une page web sécurité !<br>"
                     "Veuillez vous authentifiez avec ce lien :<br> "
@@ -522,5 +536,3 @@ mise_jour_contrevenants()
 # Cette fonction était pour la tache A1
 if __name__ == "__main__":
     importation_donnees()
-
-# Ajustement de tous mes champs etablissement pour des listes !!!!!!!!!!!!
