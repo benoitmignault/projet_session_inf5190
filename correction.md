@@ -23,7 +23,7 @@
     Ce service peut être utiliser via la route suivante :
         En utilisant deux paramètres obligatoires soit «du» et «au».     
     
-* http://127.0.0.1:5000/api/liste_amendes_etablissement/interval?du=2015-09-30&au=2015-10-05
+* http://127.0.0.1:5000/api/liste_des_contrevenants/interval?du=2015-09-30&au=2015-10-05
 
 #### A5 - Une interface web pour utiliser le service REST fait en A4.
     Le service rest sera utilisé via un appel ajax avec la méthode Post inclu dans la route.
