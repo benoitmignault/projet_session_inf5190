@@ -57,6 +57,7 @@ def home():
 
     if session.get('titre'):
         titre = session['titre']
+
     else:
         titre = "Recherche de contrevenant"
 
@@ -105,8 +106,8 @@ def recherche_restaurant():
         session['liste_champs'] = liste_champs
         session['titre'] = "Problème avec la recherche !"
         session['liste_validation'] = liste_validation
-        return redirect(url_for('.home'))
 
+        return redirect(url_for('.home'))
     else:
         session['titre'] = "Recherche réussi !"
         session['ensemble_trouve'] = ensemble_trouve
@@ -278,7 +279,7 @@ def api_creation_profil():
 
     else:
         return jsonify({"Impossible de créer le profil":
-                            "Courriel est déjà présent !"}), 404
+                        "Courriel est déjà présent !"}), 404
 
 
 # Cette fonction est pour la tache E2

@@ -1,8 +1,13 @@
 {% extends "layout.html" %}
 {% block content %}
+<p class="desktop" id="hautPageDesktop"></p>
 <h1>Voici le résultat de votre recherche des restaurants en problèmes</h1>
 <div class="container">
-    <p class="desktop" id="hautPageDesktop"></p>
+    <div class='zone_admin'>
+        <div class="admin">
+            <a class="bouton" href="/">Page D'accueil</a>
+        </div>
+    </div>
     {% if nb_restaurant_trouve > 1 %}
     <h2>Section des <span>{{nb_restaurant_trouve}}</span>
         restaurants ayant reçu des amendes pour infraction</h2>
@@ -13,21 +18,16 @@
     <div class='zone_recherche_resto recherche'>
         <table class="tabeau_resto">
             <tbody>
-                {% for cle, valeur in un_ensemble.items() %}
-                <tr>
-                    <td class="cle">{{cle}} :</td>
-                    <td class="valeur">{{valeur}}</td>
-                </tr>
-                {% endfor %}
+            {% for cle, valeur in un_ensemble.items() %}
+            <tr>
+                <td class="cle">{{cle}} :</td>
+                <td class="valeur">{{valeur}}</td>
+            </tr>
+            {% endfor %}
             </tbody>
         </table>
     </div>
     {% endfor %}
-    <div class='zone_admin'>
-        <div class="admin">
-            <a class="bouton" href="/">Page D'accueil</a>
-        </div>
-    </div>
     <!-- https://publicdomainvectors.org/fr/gratuitement-des-vecteurs/Orange-fl%C3%A8che-pointant-vers-le-haut-de-dessin-vectoriel/9499.html -->
     <div class="return">
         <a class="desktop" href="#hautPageDesktop">
