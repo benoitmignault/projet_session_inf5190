@@ -90,16 +90,16 @@ class Database:
     # Cette fonction est pour la taches A4
     def liste_contravention_interval(self, date_debut, date_fin):
         cursor = self.get_connection().cursor()
-        select = "select categorie, no_civique, nom_rue, " \
-                 "ville, description, date_infraction, date_jugement," \
-                 "montant_amende, etablissement "
+        select = "select proprietaire, categorie, etablissement, no_civique, " \
+                 "nom_rue, ville, description, date_infraction, " \
+                 "date_jugement, montant_amende "
         fromm = "from mauvais_restaurants "
         where = "where date_infraction BETWEEN ? AND ? "
         order = "order by date_infraction "
         sql = select + fromm + where + order
         cursor.execute(sql, (date_debut, date_fin))
         result = cursor.fetchall()
-        ensemble_trouve = recuperation_liste_contravention(result)
+        ensemble_trouve = recuperation_resultat(result)
 
         return ensemble_trouve
 
@@ -135,16 +135,16 @@ class Database:
     # Cette fonction est pour la taches A6
     def liste_contravention_etablissement(self, nom):
         cursor = self.get_connection().cursor()
-        select = "select categorie, no_civique, nom_rue, " \
-                 "ville, description, date_infraction, date_jugement," \
-                 "montant_amende, etablissement "
+        select = "select proprietaire, categorie, etablissement, no_civique, " \
+                 "nom_rue, ville, description, date_infraction, " \
+                 "date_jugement, montant_amende "
         fromm = "from mauvais_restaurants "
         where = "where etablissement = ? "
         order = "order by date_infraction "
         sql = select + fromm + where + order
         cursor.execute(sql, (nom,))
         result = cursor.fetchall()
-        ensemble_trouve = recuperation_liste_contravention(result)
+        ensemble_trouve = recuperation_resultat(result)
 
         return ensemble_trouve
 
@@ -427,8 +427,8 @@ def remplissage_condition_sql(liste_champs):
 # les critères de recherches.
 def creation_requete_sql(liste_critere, nb_critere):
     select = "select proprietaire, categorie, etablissement, no_civique, " \
-             "nom_rue, ville, description, date_infraction," \
-             "date_jugement, montant_amende, id_resto "
+             "nom_rue, ville, description, date_infraction, " \
+             "date_jugement, montant_amende "
     fromm = "from mauvais_restaurants "
     where = "where "
     nb_critere_enconstruction = 1
@@ -494,7 +494,7 @@ def execution_requete_dynamique(nb_critere, liste_critere, sql, cursor):
     return result
 
 
-# Cette fonction sera pour les taches A2 et A4
+# Cette fonction sera pour les taches A2 et A4, A5, A6
 def recuperation_resultat(result):
     ensemble_trouve = []
     if result is not None:
@@ -509,7 +509,7 @@ def recuperation_resultat(result):
                              'Description': un_resto_trouve[6],
                              "Date d'infraction": un_resto_trouve[7],
                              'Date de jugement': un_resto_trouve[8],
-                             "Montant de l'amende": un_resto_trouve[9]}
+                             "Montant": un_resto_trouve[9]}
             ensemble_trouve.append(sous_ensemble)
 
     return ensemble_trouve
@@ -545,25 +545,6 @@ def recuperation_liste_etablissement(result):
         for un_etablissement in result:
             sous_ensemble = {'nom': un_etablissement[0],
                              'id_surveillance': un_etablissement[1]}
-            ensemble_trouve.append(sous_ensemble)
-
-    return ensemble_trouve
-
-
-# Cette fonction sera utiliser pour la tache A4 et A6
-def recuperation_liste_contravention(result):
-    ensemble_trouve = []
-    if result is not None:
-        for contravention in result:
-            sous_ensemble = {'etablissement': contravention[8],
-                             'Catégorie': contravention[0],
-                             'Adresse':
-                                 contravention[1] + " " + contravention[2],
-                             'Ville': contravention[3],
-                             'Description': contravention[4],
-                             "Date d'infraction": contravention[5],
-                             'Date de jugement': contravention[6],
-                             "Montant": contravention[7]}
             ensemble_trouve.append(sous_ensemble)
 
     return ensemble_trouve
