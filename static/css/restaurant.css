@@ -273,6 +273,12 @@ Fin de l'ajout du recentrage de attribut legend
     color:green;
     font-weight: bold;
 }
+
+.container > .zone_recherche_resto > .aucun {
+    margin: 0px;
+    width: 100%;
+}
+
 .container > .zone_recherche_resto > .admin_modif{
     margin-top: 15px;
 }
@@ -341,6 +347,12 @@ Fin de l'ajout du recentrage de attribut legend
 .container > .zone_recherche_resto > .tabeau_resto > .ligne > div,
 .container > .zone_recherche_resto > div > .tabeau_resto > .ligne > div{
     padding: 5px;
+}
+
+.container > .zone_recherche_resto > div > .tabeau_resto > .ligne > .colonne50{
+    color: darkgreen;
+    width: 50%;
+    text-align: center;
 }
 
 .container > .zone_recherche_resto > .tabeau_resto > .ligne > .colonne75,

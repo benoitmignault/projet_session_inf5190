@@ -237,6 +237,7 @@ function initialiser_tous_champs(type_champs){
 function effacer_messages_erreurs(message){
     if (message){
         message.innerHTML = "";
+        message.style.marginTop = "0px";
     }
 }
 
@@ -313,6 +314,8 @@ function demande_nouveau_profil(){
             // Il se pourrait que la requête précédente était invalide
             initialiser_tous_champs("#nouveau_profil");
             appel_ajax_nouveau_profil();
+        } else {
+            message_erreur_profil.style.marginTop = "15px";
         }
     });
 }
@@ -956,7 +959,7 @@ function appel_ajax_nouveau_profil(){
         if (ajax.readyState === XMLHttpRequest.DONE) {
             if (ajax.status === 201) {
                 var liste = JSON.parse(ajax.responseText);
-                message_erreur_profil.innerHTML = creation_bloc_html(liste);
+                result_profil.innerHTML = creation_bloc_html(liste);
             } else{
                 message_erreur = "";
                 if (ajax.status === 404)  {
@@ -1166,14 +1169,14 @@ function creation_bloc_html_etablissement(listes){
 // Cette fonction sera utiliser pour afficher des informations relatives aux retour des appels AJAX
 function creation_bloc_html(listes){
     var result_liste = "";
-    result_liste += "<table class=\"tabeau_resto\"><tbody>";
+    result_liste += "<div class=\"tabeau_resto\">";
     for (var key in listes) {
-        result_liste += "<tr>";
-        result_liste += `<td class='plainte_cle'>${key} :</td>`;
-        result_liste += `<td class='plainte_valeur'>${listes[key]}</td>`;
-        result_liste += "<tr>";
+        result_liste += "<div class=\"ligne\">";
+        result_liste += `<div class='colonne50'>${key}</div>`;
+        result_liste += `<div class='colonne50'>${listes[key]}</div>`;
+        result_liste += "</div>";
     }
-    result_liste += "</tbody></table>";
+    result_liste += "</div>";
 
     return result_liste;
 }
