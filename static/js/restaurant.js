@@ -133,12 +133,12 @@ function initial_recherche_interval_validation(){
 }
 
 // Cette fonction sera pour la tache A2
-// Récupérer comment désecltionner mardi de la job
 function reset_recherche(){
     $(btn_reset_recher).click(function() {
         champ_nom_proprio.defaultValue = "";
         champ_nom_rue.defaultValue = "";
-        champ_nom_resto.options.selectedIndex = 0; // marche pas
+        champ_nom_resto.options[0].setAttribute("class", "selected");
+        champ_nom_resto.options[champ_nom_resto.selectedIndex].removeAttribute("selected");
         effacer_messages_erreurs(message_erreur_recher);
         initialiser_tous_champs("#etablissement, #proprietaire, #nom_rue, #recherche");
     });
@@ -149,6 +149,8 @@ function reset_recherche_interval(){
     $(btn_reset_interval).click(function() {
         champ_date_debut.defaultValue = "";
         champ_date_fin.defaultValue = "";
+        champ_liste_resto.options[0].setAttribute("class", "selected");
+        champ_liste_resto.options[champ_liste_resto.selectedIndex].removeAttribute("selected");
         result_interval.innerHTML = "";
         result_interval_etablissement.innerHTML = "";
         effacer_messages_erreurs(message_erreur_interval);
@@ -159,7 +161,8 @@ function reset_recherche_interval(){
 // Cette fonction sera pour la tache D1
 function reset_demande_plainte(){
     $(btn_reset_plainte).click(function() {
-        champ_etablissement.defaultValue = "";
+        champ_etablissement.options[0].setAttribute("class", "selected");
+        champ_etablissement.options[champ_etablissement.selectedIndex].removeAttribute("selected");
         champ_no_civique.defaultValue = "";
         champ_nom_rue_plainte.defaultValue = "";
         champ_nom_ville.defaultValue = "";
