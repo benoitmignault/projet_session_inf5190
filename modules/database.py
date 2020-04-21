@@ -563,7 +563,7 @@ def recuperation_liste_contravention(result):
                              'Description': contravention[4],
                              "Date d'infraction": contravention[5],
                              'Date de jugement': contravention[6],
-                             "Montant de l'amende": contravention[7]}
+                             "Montant": contravention[7]}
             ensemble_trouve.append(sous_ensemble)
 
     return ensemble_trouve
