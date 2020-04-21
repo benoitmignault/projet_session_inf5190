@@ -68,7 +68,7 @@
                         <div class="colonne10"></div>
                     </div>
                     {% for un_etablissement in etablissement %}
-                    <div class="ligne {un_etablissement['id_surveillance']}}">
+                    <div class="ligne {{un_etablissement['id_surveillance']}}">
                         <div class="colonne90">{{un_etablissement["nom"]}}</div>
                         <div class="colonne10">
                             <input class="bouton_supp" name="retrait"
