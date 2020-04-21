@@ -1148,7 +1148,7 @@ function creation_bloc_html_etablissement(listes){
         for (const [cle, valeur] of une_amande) {
             result_liste += "<div class=\"ligne\">";
             result_liste += `<div class='colonne25'>${cle}</div>`;
-            if (cle == "Montant de l'amende"){
+            if (cle == "Montant"){
                 result_liste += `<div class='colonne75'>${valeur} $</div>`;
             } else if (cle == "Description"){
                 result_liste += `<div class='colonne75 justify'>${valeur}</div>`;

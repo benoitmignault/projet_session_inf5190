@@ -302,6 +302,8 @@ Fin de l'ajout du recentrage de attribut legend
     border: 2px solid black;
 }
 
+.container > .zone_recherche_resto > .tabeau_resto,
+.container > .zone_recherche_resto > .tabeau_resto > .ligne,
 .container > .zone_recherche_resto > div > .tabeau_resto,
 .container > .zone_recherche_resto > div > .tabeau_resto > .ligne{
     width: 100%;
@@ -310,6 +312,8 @@ Fin de l'ajout du recentrage de attribut legend
     flex-wrap: wrap;
 }
 
+.container > .zone_recherche_resto > .tabeau_resto,
+.container > .zone_recherche_resto > .tabeau_resto > .ligne,
 .container > .zone_recherche_resto > div > .tabeau_resto,
 .container > .zone_recherche_resto > div > .tabeau_resto > .ligne{
     -webkit-flex-direction: row;
@@ -318,27 +322,33 @@ Fin de l'ajout du recentrage de attribut legend
     align-items : stretch;
 }
 
+.container > .zone_recherche_resto > .tabeau_resto > .ligne,
 .container > .zone_recherche_resto > div > .tabeau_resto > .ligne{
     border-bottom: 1px solid black;
 }
 
+.container > .zone_recherche_resto > .tabeau_resto > .ligne:first-of-type,
 .container > .zone_recherche_resto > div > .tabeau_resto > .ligne:first-of-type{
     font-weight: bold;
     border-bottom: 2px solid black;
 }
 
+.container > .zone_recherche_resto > .tabeau_resto > .ligne:last-of-type,
 .container > .zone_recherche_resto > div > .tabeau_resto > .ligne:last-of-type{
     border-bottom: none;
 }
 
+.container > .zone_recherche_resto > .tabeau_resto > .ligne > div,
 .container > .zone_recherche_resto > div > .tabeau_resto > .ligne > div{
     padding: 5px;
 }
 
+.container > .zone_recherche_resto > .tabeau_resto > .ligne > .colonne75,
 .container > .zone_recherche_resto > div > .tabeau_resto > .ligne > .colonne75{
     width: 75%;
 }
 
+.container > .zone_recherche_resto > .tabeau_resto > .ligne > .justify,
 .container > .zone_recherche_resto > div > .tabeau_resto > .ligne > .justify{
     text-align: justify;
     padding: 10px;
@@ -353,6 +363,7 @@ Fin de l'ajout du recentrage de attribut legend
     width: 20%;
 }
 
+.container > .zone_recherche_resto > .tabeau_resto > .ligne > .colonne25,
 .container > .zone_recherche_resto > div > .tabeau_resto > .ligne > .colonne25{
     width: 25%;
     border-right: 1px solid black;

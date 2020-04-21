@@ -16,17 +16,25 @@
     <h2>Section du seul restaurants ayant une amende pour infraction</h2>
     {% endif %}
     {% for un_ensemble in ensemble_trouve %}
-    <div class='zone_recherche_resto recherche'>
-        <table class="tabeau_resto">
-            <tbody>
+    <div class='zone_recherche_resto'>
+        <div class="tabeau_resto">
+            <div class="ligne">
+                <div class="colonne25">Type</div>
+                <div class="colonne75">Information</div>
+            </div>
             {% for cle, valeur in un_ensemble.items() %}
-            <tr>
-                <td class="cle">{{cle}} :</td>
-                <td class="valeur">{{valeur}}</td>
-            </tr>
+            <div class="ligne">
+                <div class="colonne25">{{cle}}</div>
+                {% if cle == "Montant" %}
+                <div class="colonne75">{{valeur}} $</div>
+                {% elif cle == "Description" %}
+                <div class="colonne75 justify">{{valeur}}</div>
+                {% else %}
+                <div class="colonne75">{{valeur}}</div>
+                {% endif %}
+            </div>
             {% endfor %}
-            </tbody>
-        </table>
+        </div>
     </div>
     {% endfor %}
     <!-- https://publicdomainvectors.org/fr/gratuitement-des-vecteurs/Orange-fl%C3%A8che-pointant-vers-le-haut-de-dessin-vectoriel/9499.html -->
