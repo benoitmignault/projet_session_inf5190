@@ -240,7 +240,7 @@ function initialiser_tous_champs(type_champs){
 function effacer_messages_erreurs(message){
     if (message){
         message.innerHTML = "";
-        message.style.marginTop = "0px";
+        //message.style.marginTop = "0px";
     }
 }
 
@@ -919,6 +919,7 @@ function appel_ajax_interval_etablissement(){
             }
         }
     };
+    console.log(champ_liste_resto.value);
     var nom_encode = encodeURIComponent(champ_liste_resto.value);
     var param = `?choix=${nom_encode}`;
     ajax.open("GET", "/api/liste_des_contrevenants/etablissement" + param, true);

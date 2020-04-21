@@ -62,28 +62,22 @@
             <fieldset>
                 <input type="hidden" name="id_personne" id="id_personne_supp"
                        value="{{liste_infos['id_personne']}}">
-                <!-- Création de la branche pour la section tableau à refaire dans cette page -->
-                <table class="tableau_profil">
-                    <thead>
-                    <tr>
-                        <th>Nom de l'établissement</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
+                <div class="tabeau_resto">
+                    <div class="ligne">
+                        <div class="colonne90">Nom de l'établissement</div>
+                        <div class="colonne10"></div>
+                    </div>
                     {% for un_etablissement in etablissement %}
-                    <tr class="{{un_etablissement['id_surveillance']}}">
-                        <td>{{un_etablissement["nom"]}}</td>
-                        <td class="supp">
-                            <input class="bouton_supp"
-                                   name="retrait"
+                    <div class="ligne {un_etablissement['id_surveillance']}}">
+                        <div class="colonne90">{{un_etablissement["nom"]}}</div>
+                        <div class="colonne10">
+                            <input class="bouton_supp" name="retrait"
                                    id="{{un_etablissement['id_surveillance']}}"
                                    type="submit" value="">
-                        </td>
-                    </tr>
+                        </div>
+                    </div>
                     {% endfor %}
-                    </tbody>
-                </table>
+                </div>
             </fieldset>
         </form>
         <fieldset class="fieldset2">
