@@ -433,18 +433,9 @@ Fin de l'ajout du recentrage de attribut legend
 
 
 .container > .zone_recherche_resto > #result_profil > .tabeau_resto .plainte_cle,
-.container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_cle,
-.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .cle{
+.container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_cle{
     font-weight: bold;
     text-align: right;
-}
-.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .cle{
-    width: 25%;
-}
-
-.container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto .valeur{
-    text-align: justify;
-    width: 75%;
 }
 
 .container > .zone_recherche_resto > #result_profil > .tabeau_resto .plainte_cle,
@@ -461,11 +452,6 @@ Fin de l'ajout du recentrage de attribut legend
     -webkit-flex-direction: column;
     flex-direction: column;
     width: 100%;
-}
-
-.container > .zone_recherche_resto > form > .troisBTN {
-    -webkit-flex-direction: row;
-    flex-direction: row;
 }
 
 .container > .zone_recherche_resto > form > .modif {
@@ -583,9 +569,15 @@ Fin de l'ajout du recentrage de attribut legend
 /* CSS modifié du fichier select2.min.css fourni via
     https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/
 */
-
-.container > .zone_recherche_resto > #recherche > .modif > .information > div > span > .selection > .select2-selection--single,
 .container > .zone_recherche_resto > fieldset > #ajout_etablissement > .modif > .information > div > span > .selection > .select2-selection--multiple,
 .container > .zone_recherche_resto > #nouveau_profil > .modif > .information > div > span > .selection > .select2-selection--multiple{
     border-radius: 10px;
+}
+
+.container > .zone_recherche_resto > #nouveau_profil > .modif > .information > div > .select2,
+.container > .zone_recherche_resto > #nouveau_profil > .modif > .information > div > .select2 > .selection > .select2-selection--multiple,
+.container > .zone_recherche_resto > #nouveau_profil > .modif > .information > div > span > .selection > .select2-selection--multiple > .select2-selection__rendered,
+.container > .zone_recherche_resto > #nouveau_profil > .modif > .information > div > span > .selection > .select2-selection--multiple > .select2-selection__rendered > .select2-search,
+.container > .zone_recherche_resto > #nouveau_profil > .modif > .information > div > span > .selection > .select2-selection--multiple > .select2-selection__rendered > .select2-search > .select2-search__field{
+    width: 100%!important;
 }
