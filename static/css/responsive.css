@@ -55,6 +55,7 @@
         line-height: 1.5;
     }
 
+    .container > .zone_recherche_resto > form > div > fieldset > div > div > input[type=number],
     .container > .zone_recherche_resto > form > div > div > div > input[type=text],
     .container > .zone_recherche_resto > form > div > div > div > select,
     .container > .zone_admin > .admin > .bouton,
@@ -72,7 +73,10 @@
     .container > .zone_admin > .admin > .bouton:first-of-type{
         margin-bottom: 15px;
     }
-
+    .container > .zone_recherche_resto > .aucun {
+        margin: 0px;
+    }
+    .container > .zone_recherche_resto > form > div > fieldset > div > div > input[type=number],
     .container > .zone_recherche_resto > form > div > fieldset > div > div > input[type=text],
     .container > .zone_recherche_resto > form > div > fieldset > div > div > select,
     .container > .zone_recherche_resto > form > div > div > div > input[type=text],
