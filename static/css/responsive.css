@@ -81,5 +81,9 @@
         margin-right: 0px;
     }
 
+    .container > .zone_recherche_resto > .tabeau_resto > .ligne > div,
+    .container > .zone_recherche_resto > div > .tabeau_resto > .ligne > div{
+        word-break: break-all;
+    }
 
 }
