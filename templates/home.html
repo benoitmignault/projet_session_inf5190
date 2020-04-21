@@ -29,8 +29,8 @@
                         <label for="date_debut">Date début :</label>
                         <div>
                             <input id="date_debut" name="du"
-                                   placeholder="exemple de date valide » AAAA-MM-JJ"
-                                   title="Saisir une date au format ISO 8601"
+                                   placeholder="exemple : AAAA-MM-JJ"
+                                   title="Saisir une date au format ISO 8601 » AAAA-MM-JJ"
                                    type="text" value="">
                         </div>
                     </div>
@@ -38,8 +38,8 @@
                         <label for="date_fin">Date fin :</label>
                         <div>
                             <input id="date_fin" name="au"
-                                   placeholder="exemple de date valide » AAAA-MM-JJ"
-                                   title="Saisir une date au format ISO 8601"
+                                   placeholder="exemple : AAAA-MM-JJ"
+                                   title="Saisir une date au format ISO 8601 » AAAA-MM-JJ"
                                    type="text" value="">
                         </div>
                     </div>
@@ -70,9 +70,9 @@
                            type='reset' value="Effacer...">
                 </div>
             </div>
-            <!-- Section des messages erreurs -->
-            <ul class="aucun" id="message_erreur_interval"></ul>
         </form>
+        <!-- Section des messages erreurs -->
+        <ul class="aucun" id="message_erreur_interval"></ul>
         <!-- Section pour le retour Ajax A5 -->
         <p>Résultat 1 - Une liste des établissements avec leur nombre
             amendes</p>
@@ -90,13 +90,10 @@
         {% endif %}
         <form action="/recherche_restaurant" class="{{champ}}" id="recherche"
               method="post">
-            <ul>
-                <li>Veuillez saisir au moins un des trois critères suivants</li>
-                <li>Les accents sont importants</li>
-                <li>Si vous n'etes pas sur d'un critère, la recherche va
-                    s'arranger
-                </li>
-            </ul>
+            <p>Veuillez saisir au moins un des trois critères suivants</p>
+            <p>Les accents sont importants</p>
+            <p>Si vous n'etes pas sur d'un critère, la recherche va
+                s'arranger</p>
             <div class="modif">
                 {% set champ = '' %}
                 {% if liste_validation['champs_vides'] %}
@@ -162,12 +159,12 @@
                            value="Effacer...">
                 </div>
             </div>
-            <ul class="aucun" id="message_erreur_recher">
-                {% for message in liste_champs['messages'] %}
-                <li>{{message}}</li>
-                {% endfor %}
-            </ul>
         </form>
+        <ul class="aucun" id="message_erreur_recher">
+            {% for message in liste_champs['messages'] %}
+            <li>{{message}}</li>
+            {% endfor %}
+        </ul>
     </div>
     <!-- https://publicdomainvectors.org/fr/gratuitement-des-vecteurs/Orange-fl%C3%A8che-pointant-vers-le-haut-de-dessin-vectoriel/9499.html -->
     <div class="return">

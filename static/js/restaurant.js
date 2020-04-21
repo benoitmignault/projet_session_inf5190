@@ -1121,17 +1121,17 @@ function appel_ajax_erreur(section_result, formulaire, section_msg_erreur, msg_e
 // https://stackoverflow.com/questions/19105009/how-to-insert-variables-in-javascript-strings/44510325
 function creation_bloc_html_interval(liste){
     // Le bloc HTML pour le résultat de la liste des établissements ave leur nombre de contrevantions
-    var result_interval = "<table class=\"tabeau_resto\">";
-    result_interval += "<thead><tr><th class=\"nom\">Établissement</th>";
-    result_interval += "<th class=\"quantite\">Nombre</th></tr></thead><tbody>";
+    var result_interval = "<div class=\"tabeau_resto\"><div class=\"ligne\">";
+    result_interval += "<div class=\"colonne80\">Établissement</div>";
+    result_interval += "<div class=\"colonne20\">Nombre</div></div>";
     for(var i = 0; i < liste.length; i++) {
-        result_interval += "<tr>";
+        result_interval += "<div class=\"ligne\">";
         var resto = liste[i];
-        result_interval += `<td class='nom'>${resto.etablissement}</td>`;
-        result_interval += `<td class='quantite'>${resto.nombre}</td>`;
-        result_interval += "<tr>";
+        result_interval += `<div class='colonne80'>${resto.etablissement}</div>`;
+        result_interval += `<div class='colonne20'>${resto.nombre}</div>`;
+        result_interval += "</div>";
     }
-    result_interval += "</tbody></table>";
+    result_interval += "</div>";
 
     return result_interval;
 }
@@ -1141,19 +1141,23 @@ function creation_bloc_html_interval(liste){
 function creation_bloc_html_etablissement(listes){
     var result_liste = "";
     for(var i = 0; i < listes.length; i++) {
-        result_liste += "<table class=\"tabeau_resto\"><tbody>";
+        result_liste += "<div class=\"tabeau_resto\"><div class=\"ligne\">";
+        result_liste += "<div class=\"colonne25\">Type</div>";
+        result_liste += "<div class=\"colonne75\">Information</div></div>";
         const une_amande = Object.entries(listes[i]);
         for (const [cle, valeur] of une_amande) {
-            result_liste += "<tr>";
-            result_liste += `<td class='cle'>${cle} :</td>`;
+            result_liste += "<div class=\"ligne\">";
+            result_liste += `<div class='colonne25'>${cle}</div>`;
             if (cle == "Montant de l'amende"){
-                result_liste += `<td class='valeur'>${valeur} $</td>`;
+                result_liste += `<div class='colonne75'>${valeur} $</div>`;
+            } else if (cle == "Description"){
+                result_liste += `<div class='colonne75 justify'>${valeur}</div>`;
             } else {
-                result_liste += `<td class='valeur'>${valeur}</td>`;
+                result_liste += `<div class='colonne75'>${valeur}</div>`;
             }
-            result_liste += "<tr>";
+            result_liste += "</div>";
         }
-        result_liste += "</tbody></table>";
+        result_liste += "</div>";
     }
 
     return result_liste;
