@@ -96,6 +96,7 @@ def mise_jour_bd():
             liste_champs_xml["date_infraction"],
             liste_champs_xml["date_jugement"], liste_champs_xml["montant"])
         if len(ensemble_existant) == 0:
+            """
             connection.insertion_contrevenant(
                 liste_champs_xml["proprietaire"], liste_champs_xml["categorie"],
                 liste_champs_xml["etablissement"], liste_champs_xml["no_civ"],
@@ -104,6 +105,7 @@ def mise_jour_bd():
                 liste_champs_xml["date_infraction"],
                 liste_champs_xml["date_jugement"], liste_champs_xml["montant"])
             liste_envoi.append(liste_champs_xml)
+            """
             liste_nom_contrevenant.append(liste_champs_xml["proprietaire"])
 
     if len(liste_envoi) > 0:
