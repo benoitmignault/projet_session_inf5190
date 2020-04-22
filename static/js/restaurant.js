@@ -53,7 +53,7 @@ const champ_courriel_connection = document.querySelector('#courriel_conn');
 const champ_password_connection = document.querySelector('#password_conn');
 
 // Variable commune pour les deux appels ajax de la section des établissements + photo
-const tableau_etablissement = document.querySelector('.tableau_profil');
+const tableau_etablissement = document.querySelector('.tabeau_resto');
 const list_etablissement_dispo = document.querySelector('#ajout_resto_profil');
 const champ_id_personne = document.querySelector('#id_personne');
 
@@ -240,7 +240,7 @@ function initialiser_tous_champs(type_champs){
 function effacer_messages_erreurs(message){
     if (message){
         message.innerHTML = "";
-        message.style.marginTop = "0px";
+        //message.style.marginTop = "0px";
     }
 }
 
@@ -919,6 +919,7 @@ function appel_ajax_interval_etablissement(){
             }
         }
     };
+    console.log(champ_liste_resto.value);
     var nom_encode = encodeURIComponent(champ_liste_resto.value);
     var param = `?choix=${nom_encode}`;
     ajax.open("GET", "/api/liste_des_contrevenants/etablissement" + param, true);
@@ -1083,7 +1084,9 @@ function refaire_etablissement_disponible(liste){
 
 // Cette fonction servira à refaire la liste des établissements après l'appel AJAX
 function refaire_tableau_etablissement(liste){
-    $(tableau_etablissement).find("tr:gt(0)").remove();
+    // On détruit toutes les lignes sauf la première
+    var toutes_lignes = document.querySelectorAll('.ligne');
+    $(toutes_lignes).not(':first').remove();
     for(var i = 0; i < liste.length; i++) {
         const un_etablissement = Object.entries(liste[i]);
         var id_surveillance = 0;
@@ -1095,14 +1098,13 @@ function refaire_tableau_etablissement(liste){
                 etablissement = valeur;
             }
         }
-        var nouvelle_ligne = "<tr class=\""+id_surveillance+"\">";
-        var colonne1 = "<td>"+etablissement+"</td>";
-        var colonne2 = "<td class=\"supp\"><input class=\"bouton_supp\" name=\"retrait\" ";
-        colonne2 += "type=\"submit\" value=\"\" id=\""+id_surveillance+"\" </td>";
-        var fin_ligne = "</tr>";
+        var nouvelle_ligne = "<div class=\"ligne "+id_surveillance+"\">";
+        var colonne1 = "<div class=\"colonne90\">"+etablissement+"</div>";
+        var colonne2 = "<div class=\"colonne10\"><input class=\"bouton_supp\" name=\"retrait\" ";
+        colonne2 += "type=\"submit\" value=\"\" id=\""+id_surveillance+"\" </div>";
+        var fin_ligne = "</div>";
         var ligne = nouvelle_ligne + colonne1 + colonne2 + fin_ligne;
-
-        $('.tableau_profil > tbody:last-child').append(ligne);
+        $('.tabeau_resto:last-child').append(ligne);
     }
 }
 

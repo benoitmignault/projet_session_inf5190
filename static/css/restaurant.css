@@ -274,11 +274,6 @@ Fin de l'ajout du recentrage de attribut legend
     font-weight: bold;
 }
 
-.container > .zone_recherche_resto > .aucun {
-    margin: 0px;
-    width: 100%;
-}
-
 .container > .zone_recherche_resto > .admin_modif{
     margin-top: 15px;
 }
@@ -302,12 +297,15 @@ Fin de l'ajout du recentrage de attribut legend
 .container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto,
 .container > .zone_recherche_resto > #result_interval > .tabeau_resto,
 .container > .zone_recherche_resto > form,
+.container > .zone_recherche_resto > form > fieldset > .tabeau_resto,
 .container > .zone_recherche_resto > .tabeau_resto{
     width: 100%;
     border-radius: 10px;
     border: 2px solid black;
 }
 
+.container > .zone_recherche_resto > form > fieldset > .tabeau_resto,
+.container > .zone_recherche_resto > form > fieldset > .tabeau_resto > .ligne,
 .container > .zone_recherche_resto > .tabeau_resto,
 .container > .zone_recherche_resto > .tabeau_resto > .ligne,
 .container > .zone_recherche_resto > div > .tabeau_resto,
@@ -318,6 +316,8 @@ Fin de l'ajout du recentrage de attribut legend
     flex-wrap: wrap;
 }
 
+.container > .zone_recherche_resto > form > fieldset > .tabeau_resto,
+.container > .zone_recherche_resto > form > fieldset > .tabeau_resto > .ligne,
 .container > .zone_recherche_resto > .tabeau_resto,
 .container > .zone_recherche_resto > .tabeau_resto > .ligne,
 .container > .zone_recherche_resto > div > .tabeau_resto,
@@ -328,22 +328,26 @@ Fin de l'ajout du recentrage de attribut legend
     align-items : stretch;
 }
 
+.container > .zone_recherche_resto > form > fieldset > .tabeau_resto > .ligne,
 .container > .zone_recherche_resto > .tabeau_resto > .ligne,
 .container > .zone_recherche_resto > div > .tabeau_resto > .ligne{
     border-bottom: 1px solid black;
 }
 
+.container > .zone_recherche_resto > form > fieldset > .tabeau_resto > .ligne:first-of-type,
 .container > .zone_recherche_resto > .tabeau_resto > .ligne:first-of-type,
 .container > .zone_recherche_resto > div > .tabeau_resto > .ligne:first-of-type{
     font-weight: bold;
     border-bottom: 2px solid black;
 }
 
+.container > .zone_recherche_resto > form > fieldset > .tabeau_resto > .ligne:last-of-type,
 .container > .zone_recherche_resto > .tabeau_resto > .ligne:last-of-type,
 .container > .zone_recherche_resto > div > .tabeau_resto > .ligne:last-of-type{
     border-bottom: none;
 }
 
+.container > .zone_recherche_resto > form > fieldset > .tabeau_resto > .ligne > div,
 .container > .zone_recherche_resto > .tabeau_resto > .ligne > div,
 .container > .zone_recherche_resto > div > .tabeau_resto > .ligne > div{
     padding: 5px;
@@ -355,9 +359,19 @@ Fin de l'ajout du recentrage de attribut legend
     text-align: center;
 }
 
+.container > .zone_recherche_resto > div > .tabeau_resto > .ligne > .colonne50:first-of-type{
+    border-right: 1px solid black;
+}
+
+
 .container > .zone_recherche_resto > .tabeau_resto > .ligne > .colonne75,
 .container > .zone_recherche_resto > div > .tabeau_resto > .ligne > .colonne75{
     width: 75%;
+}
+
+.container > .zone_recherche_resto > form > fieldset > .tabeau_resto > .ligne > .colonne90{
+    width: 90%;
+    border-right: 1px solid black;
 }
 
 .container > .zone_recherche_resto > .tabeau_resto > .ligne > .justify,
@@ -375,43 +389,18 @@ Fin de l'ajout du recentrage de attribut legend
     width: 20%;
 }
 
+.container > .zone_recherche_resto > form > fieldset > .tabeau_resto > .ligne > .colonne10{
+    width: 10%;
+}
+
+
 .container > .zone_recherche_resto > .tabeau_resto > .ligne > .colonne25,
 .container > .zone_recherche_resto > div > .tabeau_resto > .ligne > .colonne25{
     width: 25%;
     border-right: 1px solid black;
 }
 
-
-
-
-
-
-
-.container > .zone_recherche_resto > #retrait_etablissement{
-    border: initial;
-}
-
-.container > .zone_recherche_resto > form > fieldset > .tableau_profil{
-    width: 50%;
-    border-spacing: 0;
-}
-
-
-.container > .zone_recherche_resto > form > fieldset >.tableau_profil td,
-.container > .zone_recherche_resto > form > fieldset >.tableau_profil th{
-    border: 1px solid black;
-    padding: 5px;
-}
-
-.container > .zone_recherche_resto > form > fieldset >.tableau_profil td{
-    text-align: center;
-}
-
-.container > .zone_recherche_resto > form > fieldset >.tableau_profil .supp{
-    width: 10%;
-}
-
-.container > .zone_recherche_resto > form > fieldset >.tableau_profil .supp .bouton_supp{
+.container > .zone_recherche_resto > form > fieldset > .tabeau_resto > .ligne > .colonne10 > .bouton_supp{
     padding: 0;
     background-image: url("/img/delete.png");
     border: 0;
@@ -420,42 +409,22 @@ Fin de l'ajout du recentrage de attribut legend
     width: 25px;
     height: 25px;
     background-size: 100%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.container > .zone_recherche_resto > form > fieldset >.tableau_profil .bouton_supp:hover {
+.container > .zone_recherche_resto > form > fieldset > .tabeau_resto > .ligne > .colonne10 > .bouton_supp:hover {
     cursor: pointer;
+}
+
+.container > .zone_recherche_resto > #retrait_etablissement{
+    border: initial;
 }
 
 .container > .zone_recherche_resto > #result_profil > .tabeau_resto,
 .container > .zone_recherche_resto > #result_plainte > .tabeau_resto,
 .container > .zone_recherche_resto > #result_interval_etablissement > .tabeau_resto{
     margin-bottom: 15px;
-}
-
-
-.container > .zone_recherche_resto > .tabeau_resto td{
-    padding: 5px;
-}
-
-    border-bottom: 1px solid black;
-}
-
-
-
-
-
-.container > .zone_recherche_resto > #result_profil > .tabeau_resto .plainte_cle,
-.container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_cle{
-    font-weight: bold;
-    text-align: right;
-}
-
-.container > .zone_recherche_resto > #result_profil > .tabeau_resto .plainte_cle,
-.container > .zone_recherche_resto > #result_profil > .tabeau_resto .plainte_valeur,
-.container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_cle,
-.container > .zone_recherche_resto > #result_plainte > .tabeau_resto .plainte_valeur{
-    width: 50%;
-    color: #006400;
 }
 
 .container > .zone_recherche_resto > form > div {
@@ -586,6 +555,11 @@ Fin de l'ajout du recentrage de attribut legend
     border-radius: 10px;
 }
 
+.container > .zone_recherche_resto > .fieldset2 > #ajout_etablissement > .modif > .information > div > .select2,
+.container > .zone_recherche_resto > .fieldset2 > #ajout_etablissement > .modif > .information > div > .select2 > .selection > .select2-selection--multiple,
+.container > .zone_recherche_resto > .fieldset2 > #ajout_etablissement > .modif > .information > div > span > .selection > .select2-selection--multiple > .select2-selection__rendered,
+.container > .zone_recherche_resto > .fieldset2 > #ajout_etablissement > .modif > .information > div > span > .selection > .select2-selection--multiple > .select2-selection__rendered > .select2-search,
+.container > .zone_recherche_resto > .fieldset2 > #ajout_etablissement > .modif > .information > div > span > .selection > .select2-selection--multiple > .select2-selection__rendered > .select2-search > .select2-search__field,
 .container > .zone_recherche_resto > #nouveau_profil > .modif > .information > div > .select2,
 .container > .zone_recherche_resto > #nouveau_profil > .modif > .information > div > .select2 > .selection > .select2-selection--multiple,
 .container > .zone_recherche_resto > #nouveau_profil > .modif > .information > div > span > .selection > .select2-selection--multiple > .select2-selection__rendered,
