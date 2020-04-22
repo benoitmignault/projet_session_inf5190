@@ -85,6 +85,7 @@ class Database:
                              description, date_infraction, date_jugement,
                              montant, etablissement))
         result = cursor.fetchall()
+        print(result)
         return result
 
     # Cette fonction est pour la taches A4
@@ -223,7 +224,7 @@ class Database:
                                salt, liste_etablissement):
         connection = self.get_connection()
         insert_bd = "INSERT INTO profil_utilisateur " \
-                    "(nom, prenom, courriel, password_hasher, salt) " \
+                    "(nom, prenom, courriel, hash, salt) " \
                     "VALUES (?, ?, ?, ?, ?)"
         connection.execute(insert_bd,
                            (nom, prenom, courriel, password_hasher, salt))
@@ -258,7 +259,7 @@ class Database:
     # Cette fonction est pour la tache E2
     def recuperation_info_connexion(self, courriel):
         cursor = self.get_connection().cursor()
-        select = "SELECT salt, password_hasher "
+        select = "SELECT salt, hash "
         fromm = "FROM profil_utilisateur "
         where = "WHERE courriel = ? "
         sql = select + fromm + where

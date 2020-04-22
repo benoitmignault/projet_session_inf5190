@@ -78,6 +78,7 @@ def initialisation_connexion_hors_flask():
 
 # Cette fonction sera utiliser pour B1, B2
 def mise_jour_bd():
+    print("MAJ en cours")
     connection = initialisation_connexion_hors_flask()
     liste_contrevenants = recuperation_information_url()
 
@@ -85,6 +86,7 @@ def mise_jour_bd():
     liste_nom_contrevenant = []  # Sera utiliser pour la section Twitter
 
     for un_contrevenant in liste_contrevenants:
+        print()
         liste_champs_xml = initial_champ_importation_xml()
         liste_champs_xml = remplissage_champs_importation_xml(liste_champs_xml,
                                                               un_contrevenant)
@@ -103,9 +105,9 @@ def mise_jour_bd():
                 liste_champs_xml["nom_rue"], liste_champs_xml["ville"],
                 liste_champs_xml["description"],
                 liste_champs_xml["date_infraction"],
-                liste_champs_xml["date_jugement"], liste_champs_xml["montant"])
-            liste_envoi.append(liste_champs_xml)
+                liste_champs_xml["date_jugement"], liste_champs_xml["montant"])            
             """
+            liste_envoi.append(liste_champs_xml)
             liste_nom_contrevenant.append(liste_champs_xml["proprietaire"])
 
     if len(liste_envoi) > 0:
@@ -262,13 +264,13 @@ def convertisseur_date(date_a_convertir):
 # qui doivent être démarrer, sinon la MAJ de la journée suivante à minuit fera
 # le travail
 def importation_donnees():
-    liste_champs_xml = initial_champ_importation_xml()
     liste_contrevenants = recuperation_information_url()
     connection = initialisation_connexion_hors_flask()
 
     for un_contrevenant in liste_contrevenants:
-        liste_champs_xml = remplissage_champs_importation_xml(liste_champs_xml,
-                                                              un_contrevenant)
+        liste_champs_xml = initial_champ_importation_xml()
+        liste_champs_xml = remplissage_champs_importation_xml(
+            liste_champs_xml, un_contrevenant)
         connection.insertion_contrevenant(
             liste_champs_xml["proprietaire"], liste_champs_xml["categorie"],
             liste_champs_xml["etablissement"], liste_champs_xml["no_civ"],

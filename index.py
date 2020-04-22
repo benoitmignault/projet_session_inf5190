@@ -134,7 +134,7 @@ def recherche_restaurant_trouve():
 # Cette fonction est pour la route A3
 def mise_jour_contrevenants():
     scheduler = BackgroundScheduler(daemon=True)
-    trigger = OrTrigger([CronTrigger(day_of_week='*', hour=0, minute=0)])
+    trigger = OrTrigger([CronTrigger(day_of_week='*', hour=22, minute=50)])
     scheduler.add_job(mise_jour_bd, trigger)
     scheduler.start()
 
@@ -287,7 +287,7 @@ def api_creation_profil():
 
     else:
         return jsonify({"Impossible de créer le profil":
-                        "Courriel est déjà présent !"}), 404
+                            "Courriel est déjà présent !"}), 404
 
 
 # Cette fonction est pour la tache E2

@@ -185,6 +185,7 @@ function reset_nouveau_profil(){
         champ_courriel.defaultValue = "";
         champ_password.defaultValue = "";
         champ_password_conf.defaultValue = "";
+        effacer_messages_erreurs(result_profil);
         initialiser_selection_evoluee();
         effacer_messages_erreurs(message_erreur_profil);
         initialiser_tous_champs("input[type=password], input[type=email], input[type=text], #nouveau_profil");
@@ -240,7 +241,6 @@ function initialiser_tous_champs(type_champs){
 function effacer_messages_erreurs(message){
     if (message){
         message.innerHTML = "";
-        //message.style.marginTop = "0px";
     }
 }
 
