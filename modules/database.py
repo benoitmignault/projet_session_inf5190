@@ -223,7 +223,7 @@ class Database:
                                salt, liste_etablissement):
         connection = self.get_connection()
         insert_bd = "INSERT INTO profil_utilisateur " \
-                    "(nom, prenom, courriel, password_hasher, salt) " \
+                    "(nom, prenom, courriel, hash, salt) " \
                     "VALUES (?, ?, ?, ?, ?)"
         connection.execute(insert_bd,
                            (nom, prenom, courriel, password_hasher, salt))
@@ -258,7 +258,7 @@ class Database:
     # Cette fonction est pour la tache E2
     def recuperation_info_connexion(self, courriel):
         cursor = self.get_connection().cursor()
-        select = "SELECT salt, password_hasher "
+        select = "SELECT salt, hash "
         fromm = "FROM profil_utilisateur "
         where = "WHERE courriel = ? "
         sql = select + fromm + where
@@ -398,6 +398,18 @@ class Database:
         sql = update + sett + where
         connection.execute(sql, (id_personne,))
         connection.commit()
+
+    def etablissement_surveiller_par_usager(self, nom_etablissement):
+        cursor = self.get_connection().cursor()
+        select = "select p.courriel "
+        fromm = "from etablissement_surveiller e inner join " \
+                "profil_utilisateur p on e.id_personne = p.id_personne "
+        where = "where e.etablissement = ? "
+        sql = select + fromm + where
+        cursor.execute(sql, (nom_etablissement,))
+        result = cursor.fetchall()
+        liste_courriels = recuperation_liste_courriel(result)
+        return liste_courriels
 
 
 # La préparation des critères en vue d'utiliser l'opérateur like aura
@@ -548,3 +560,13 @@ def recuperation_liste_etablissement(result):
             ensemble_trouve.append(sous_ensemble)
 
     return ensemble_trouve
+
+
+# Cette fonction sera pour E3
+def recuperation_liste_courriel(result):
+    liste_courriels = []
+    if result is not None:
+        for un_etablissement in result:
+            liste_courriels.append(un_etablissement[0])
+
+    return liste_courriels

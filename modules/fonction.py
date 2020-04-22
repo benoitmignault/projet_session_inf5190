@@ -78,10 +78,11 @@ def initialisation_connexion_hors_flask():
 
 # Cette fonction sera utiliser pour B1, B2
 def mise_jour_bd():
+    print("MAJ en cours")
     connection = initialisation_connexion_hors_flask()
     liste_contrevenants = recuperation_information_url()
 
-    liste_envoi = []  # Sera utiliser pour l'envoi de courriel
+    contrevenants = []  # Sera utiliser pour l'envoi de courriel
     liste_nom_contrevenant = []  # Sera utiliser pour la section Twitter
 
     for un_contrevenant in liste_contrevenants:
@@ -96,18 +97,21 @@ def mise_jour_bd():
             liste_champs_xml["date_infraction"],
             liste_champs_xml["date_jugement"], liste_champs_xml["montant"])
         if len(ensemble_existant) == 0:
+            """
             connection.insertion_contrevenant(
                 liste_champs_xml["proprietaire"], liste_champs_xml["categorie"],
                 liste_champs_xml["etablissement"], liste_champs_xml["no_civ"],
                 liste_champs_xml["nom_rue"], liste_champs_xml["ville"],
                 liste_champs_xml["description"],
                 liste_champs_xml["date_infraction"],
-                liste_champs_xml["date_jugement"], liste_champs_xml["montant"])
-            liste_envoi.append(liste_champs_xml)
+                liste_champs_xml["date_jugement"], liste_champs_xml["montant"])            
+            """
+            contrevenants.append(liste_champs_xml)
             liste_nom_contrevenant.append(liste_champs_xml["proprietaire"])
 
-    if len(liste_envoi) > 0:
-        creation_courriel(liste_envoi)
+    if len(contrevenants) > 0:
+        preparation_courriel_general(contrevenants)
+        preparation_courriel_specialise(connection, contrevenants)
         conn_auth = connexion_twitter()
         creation_tweet(conn_auth, liste_nom_contrevenant)
 
@@ -260,13 +264,13 @@ def convertisseur_date(date_a_convertir):
 # qui doivent être démarrer, sinon la MAJ de la journée suivante à minuit fera
 # le travail
 def importation_donnees():
-    liste_champs_xml = initial_champ_importation_xml()
     liste_contrevenants = recuperation_information_url()
     connection = initialisation_connexion_hors_flask()
 
     for un_contrevenant in liste_contrevenants:
-        liste_champs_xml = remplissage_champs_importation_xml(liste_champs_xml,
-                                                              un_contrevenant)
+        liste_champs_xml = initial_champ_importation_xml()
+        liste_champs_xml = remplissage_champs_importation_xml(
+            liste_champs_xml, un_contrevenant)
         connection.insertion_contrevenant(
             liste_champs_xml["proprietaire"], liste_champs_xml["categorie"],
             liste_champs_xml["etablissement"], liste_champs_xml["no_civ"],
@@ -337,6 +341,7 @@ def initial_champ_recherche_validation():
                         "aucun_restaurant_trouve": False}
 
     return liste_validation
+
 
 # Cette fonction sera pour la tache A4 et A5
 def initial_champ_interval_validation():
@@ -435,45 +440,97 @@ def remplissage_champ_ajout_etablissement(request, liste_champs):
 
 # Cette fonction sera pour la tache B1 en fonction du courriel qui se
 # trouve dans le fichier YAML
-def creation_courriel(liste_envoi):
-    string_courriel = recuperation_courriel_yaml()
+def preparation_courriel_general(contrevenants):
+    destinataire = recuperation_courriel_yaml()
+    sujet = "Voici les nouveaux contrevenants depuis la dernière mise a jour"
+    contenu_courriel = creation_html_courriel_intro_general()
+    contenu_courriel += creation_html_courriel_commun_corp(contrevenants)
+    creation_courriel(sujet, destinataire, contenu_courriel)
 
+
+# Cette fonction sera pour la tache E3
+def preparation_courriel_specialise(conn, contrevenants):
+    for un_etablissement in contrevenants:
+        print(un_etablissement)
+        liste_courriels_suivis = conn.etablissement_surveiller_par_usager(
+            un_etablissement['etablissement'])
+        if len(liste_courriels_suivis) > 0:
+            sujet = "Voici une nouvelle contravention pour l'établissement " \
+                    "depuis la dernière mise à jour"
+            for un_courriel in liste_courriels_suivis:
+                # Je dois recréer une liste formatté pour être synchro avec la
+                # liste de la fonction commune aux envois de courriels
+                liste_etablissement = [un_etablissement]
+                information_profil = conn.recuperation_profil(un_courriel)
+                contenu_courriel = creation_html_courriel_intro_personnalise(
+                    information_profil[0], information_profil[1])
+                contenu_courriel += creation_html_courriel_commun_corp(
+                    liste_etablissement)
+                creation_courriel(sujet, un_courriel, contenu_courriel)
+
+
+# Cette fonction sera commune aux taches B1 et E3
+def creation_courriel(sujet, destinataire, contenu_courriel):
     message = MIMEMultipart("alternative")
-    message["Subject"] = "Voici les nouveaux contrevenants depuis " \
-                         "la derniere mise a jour !"
+    message["Subject"] = sujet
     message["From"] = SOURCE_ADRESSE
-    message["To"] = string_courriel
-    msg_corps = creation_html_courriel(liste_envoi)
-    message.attach(MIMEText(msg_corps, "html"))
+    message["To"] = destinataire
+    message.attach(MIMEText(contenu_courriel, "html"))
+    message = message.as_string().encode('utf-8')
+    envoie_courriel(destinataire, message)
+
+
+# Cette fonction sera commune aux taches B1 et E3
+def envoie_courriel(destinataire, message):
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.ehlo()
     server.starttls()
     server.login(SOURCE_ADRESSE, MOT_DE_PASSE)
-    message = message.as_string().encode('utf-8')
-    server.sendmail(SOURCE_ADRESSE, string_courriel, message)
+    server.sendmail(SOURCE_ADRESSE, destinataire, message)
     server.quit()
 
 
+# Cette fonction sera pour la tache E3
+def creation_html_courriel_intro_personnalise(prenom, nom):
+    msg_corps = """<html><head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    </head><body>
+    <h2>Bonjour {} {},</h2>
+    <p>Voici la nouvelle infraction de votre établissement en surveillance :</p>
+    """
+    msg_corps = msg_corps.format(prenom, nom)
+
+    return msg_corps
+
+
 # Cette fonction sera pour la tache B1
-def creation_html_courriel(liste_envoi):
+def creation_html_courriel_intro_general():
     msg_corps = """<html><head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta charset="utf-8">
         </head><body>
         <h2>Bonjour,</h2>
-        <p>Voici la liste des nouveaux contrevenants depuis notre derniere 
+        <p>Voici la liste des nouveaux contrevenants depuis la derniere 
         mise a jour pour la ville de Montreal</p>
-        <table style="border-collapse: collapse; border: 2px solid black; 
-        width: 100%"><thead>
-        <tr>
-        <th>Propriétaire</th><th>Catégorie</th><th>Établissement</th> 
-        <th>No Civique</th><th>Rue</th><th>Ville & Code Postal</th>
-        <th>Description</th><th>Date de l'infraction</th>
-        <th>Date du jugement</th><th>Montant</th>
-        </tr>
-        </thead><tbody>    
     """
-    for un_etablissement in liste_envoi:
+
+    return msg_corps
+
+
+# Cette fonction sera pour la tache B1 et E3
+def creation_html_courriel_commun_corp(contrevenants):
+    msg_corps = """<table style="border-collapse: collapse; border: 2px solid black; 
+            width: 100%"><thead>
+            <tr>
+            <th>Propriétaire</th><th>Catégorie</th><th>Établissement</th> 
+            <th>No Civique</th><th>Rue</th><th>Ville & Code Postal</th>
+            <th>Description</th><th>Date de l'infraction</th>
+            <th>Date du jugement</th><th>Montant</th>
+            </tr>
+            </thead><tbody>    
+        """
+    for un_etablissement in contrevenants:
         msg_corps += "<tr>"
         for cle, valeur in un_etablissement.items():
             msg_corps += "<td style=\"border: 1px solid black; padding: 5px; "
@@ -487,7 +544,7 @@ def creation_html_courriel(liste_envoi):
         msg_corps += "</tr>"
 
     msg_corps += "</tbody></table>"
-    msg_corps += "<p>Bonne journee</p>"
+    msg_corps += "<p>Bonne journée</p>"
     msg_corps += "</body></html>"
 
     return msg_corps

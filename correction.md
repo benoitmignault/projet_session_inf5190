@@ -2,6 +2,11 @@
 
 ### Cette documentation a pour but d'expliquer ce que contient ce projet de session.
 
+### Il est possible d'utiliser les services REST en dehors du site web
+    Pour ce faire, il faut installer un utilitaire dans votre fureteur.
+    
+    Exemple pour Chrome : Yet Another REST Client 
+
 #### A1 - Importation des données XML de la ville de Montréal
     Importation des données initiales se font manuellement. 
     On exécute simplement le projet comme un simple projet python 
@@ -17,6 +22,7 @@
 #### A3 - Une mise à jour des nouveaux contrevenants sera effectuées à chaque jour à 00:00.
     Cette tache possède une fonction dans le fichier index.py 
     qui se nommme mise_jour_contrevenants et qui sera appelée à la fin d'index.py.
+    Cette fonction appellera la fonction mise_jour_bd du fichier fonction.py  
 
 #### A4 - Un service REST permettant d'avoir la liste des contrevenants pendant un interval de temps.
     Nous devons utiliser la méthode GET avec la route
@@ -167,4 +173,11 @@ En utilisant son courriel et mot de passe
 
 * Une fois connecter, l'utilisateur va pouvoir gérer sa photo de profil (format jpg et png) et sa liste des établissements à surveiller
  
+#### E3 - Cette tache est la suite de la tache B1
+    Elle consistera à envoyer un courriel à l'utilisateur qui aurait décidé 
+    de suivre l'établissement qui vient de recevoir une contravention.
     
+    Cette gestion est possible grâce à la page de gestion de ses établissements 
+    à surveiller.    
+    
+    Le processus est automatique à chaque jour à minuit (00:00)
