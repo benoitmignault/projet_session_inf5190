@@ -36,6 +36,8 @@
         margin-right: 0px;
     }
 
+    .container > .zone_recherche_resto > fieldset > #ajout_etablissement > .modif > .trois_bouton,
+    .container > .zone_recherche_resto > fieldset > #nouvelle_photo > .modif > .trois_bouton,
     .container > .zone_admin > .admin{
         display: -webkit-flex;
         display: flex;
@@ -43,8 +45,29 @@
         align-items: center;
     }
 
+    .container > .zone_recherche_resto > fieldset > #ajout_etablissement > .modif > .trois_bouton > .bouton,
+    .container > .zone_recherche_resto > fieldset > #nouvelle_photo > .modif > .trois_bouton > .bouton{
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .container > .zone_recherche_resto > fieldset > #ajout_etablissement > .modif > .trois_bouton > .bouton:last-of-type,
+    .container > .zone_recherche_resto > fieldset > #nouvelle_photo > .modif > .trois_bouton > .bouton:last-of-type{
+        margin-bottom: 0px;
+    }
+
+    .container > .zone_recherche_resto > fieldset > #ajout_etablissement > .modif > .trois_bouton,
+    .container > .zone_recherche_resto > fieldset > #nouvelle_photo > .modif > .trois_bouton,
     .container > .zone_admin > .admin{
         flex-wrap: wrap;
+    }
+
+    .container > .zone_recherche_resto > form > fieldset > .tabeau_resto > .ligne > div{
+        padding: 0px;
+    }
+
+    .container > .zone_recherche_resto > form > fieldset > .tabeau_resto > .ligne > .colonne90{
+        padding: 5px;
     }
 
     .container > .zone_recherche_resto > form > ul{
@@ -94,6 +117,14 @@
     .container > .zone_recherche_resto > .tabeau_resto > .ligne > div,
     .container > .zone_recherche_resto > div > .tabeau_resto > .ligne > div{
         word-break: break-all;
+    }
+
+    .container > .zone_recherche_resto > div > .tabeau_resto > .ligne > div:first-of-type{
+        width: 85%;
+    }
+
+    .container > .zone_recherche_resto > div > .tabeau_resto > .ligne > div:last-of-type{
+        width: 15%;
     }
 
 }
