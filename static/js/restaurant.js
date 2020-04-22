@@ -53,7 +53,7 @@ const champ_courriel_connection = document.querySelector('#courriel_conn');
 const champ_password_connection = document.querySelector('#password_conn');
 
 // Variable commune pour les deux appels ajax de la section des établissements + photo
-const tableau_etablissement = document.querySelector('.tableau_profil');
+const tableau_etablissement = document.querySelector('.tabeau_resto');
 const list_etablissement_dispo = document.querySelector('#ajout_resto_profil');
 const champ_id_personne = document.querySelector('#id_personne');
 
@@ -133,12 +133,12 @@ function initial_recherche_interval_validation(){
 }
 
 // Cette fonction sera pour la tache A2
-// Récupérer comment désecltionner mardi de la job
 function reset_recherche(){
     $(btn_reset_recher).click(function() {
         champ_nom_proprio.defaultValue = "";
         champ_nom_rue.defaultValue = "";
-        champ_nom_resto.options.selectedIndex = 0; // marche pas
+        champ_nom_resto.options[0].setAttribute("class", "selected");
+        champ_nom_resto.options[champ_nom_resto.selectedIndex].removeAttribute("selected");
         effacer_messages_erreurs(message_erreur_recher);
         initialiser_tous_champs("#etablissement, #proprietaire, #nom_rue, #recherche");
     });
@@ -149,6 +149,8 @@ function reset_recherche_interval(){
     $(btn_reset_interval).click(function() {
         champ_date_debut.defaultValue = "";
         champ_date_fin.defaultValue = "";
+        champ_liste_resto.options[0].setAttribute("class", "selected");
+        champ_liste_resto.options[champ_liste_resto.selectedIndex].removeAttribute("selected");
         result_interval.innerHTML = "";
         result_interval_etablissement.innerHTML = "";
         effacer_messages_erreurs(message_erreur_interval);
@@ -159,7 +161,8 @@ function reset_recherche_interval(){
 // Cette fonction sera pour la tache D1
 function reset_demande_plainte(){
     $(btn_reset_plainte).click(function() {
-        champ_etablissement.defaultValue = "";
+        champ_etablissement.options[0].setAttribute("class", "selected");
+        champ_etablissement.options[champ_etablissement.selectedIndex].removeAttribute("selected");
         champ_no_civique.defaultValue = "";
         champ_nom_rue_plainte.defaultValue = "";
         champ_nom_ville.defaultValue = "";
@@ -237,6 +240,7 @@ function initialiser_tous_champs(type_champs){
 function effacer_messages_erreurs(message){
     if (message){
         message.innerHTML = "";
+        //message.style.marginTop = "0px";
     }
 }
 
@@ -313,6 +317,8 @@ function demande_nouveau_profil(){
             // Il se pourrait que la requête précédente était invalide
             initialiser_tous_champs("#nouveau_profil");
             appel_ajax_nouveau_profil();
+        } else {
+            message_erreur_profil.style.marginTop = "15px";
         }
     });
 }
@@ -913,6 +919,7 @@ function appel_ajax_interval_etablissement(){
             }
         }
     };
+    console.log(champ_liste_resto.value);
     var nom_encode = encodeURIComponent(champ_liste_resto.value);
     var param = `?choix=${nom_encode}`;
     ajax.open("GET", "/api/liste_des_contrevenants/etablissement" + param, true);
@@ -956,7 +963,7 @@ function appel_ajax_nouveau_profil(){
         if (ajax.readyState === XMLHttpRequest.DONE) {
             if (ajax.status === 201) {
                 var liste = JSON.parse(ajax.responseText);
-                message_erreur_profil.innerHTML = creation_bloc_html(liste);
+                result_profil.innerHTML = creation_bloc_html(liste);
             } else{
                 message_erreur = "";
                 if (ajax.status === 404)  {
@@ -1077,7 +1084,9 @@ function refaire_etablissement_disponible(liste){
 
 // Cette fonction servira à refaire la liste des établissements après l'appel AJAX
 function refaire_tableau_etablissement(liste){
-    $(tableau_etablissement).find("tr:gt(0)").remove();
+    // On détruit toutes les lignes sauf la première
+    var toutes_lignes = document.querySelectorAll('.ligne');
+    $(toutes_lignes).not(':first').remove();
     for(var i = 0; i < liste.length; i++) {
         const un_etablissement = Object.entries(liste[i]);
         var id_surveillance = 0;
@@ -1089,14 +1098,13 @@ function refaire_tableau_etablissement(liste){
                 etablissement = valeur;
             }
         }
-        var nouvelle_ligne = "<tr class=\""+id_surveillance+"\">";
-        var colonne1 = "<td>"+etablissement+"</td>";
-        var colonne2 = "<td class=\"supp\"><input class=\"bouton_supp\" name=\"retrait\" ";
-        colonne2 += "type=\"submit\" value=\"\" id=\""+id_surveillance+"\" </td>";
-        var fin_ligne = "</tr>";
+        var nouvelle_ligne = "<div class=\"ligne "+id_surveillance+"\">";
+        var colonne1 = "<div class=\"colonne90\">"+etablissement+"</div>";
+        var colonne2 = "<div class=\"colonne10\"><input class=\"bouton_supp\" name=\"retrait\" ";
+        colonne2 += "type=\"submit\" value=\"\" id=\""+id_surveillance+"\" </div>";
+        var fin_ligne = "</div>";
         var ligne = nouvelle_ligne + colonne1 + colonne2 + fin_ligne;
-
-        $('.tableau_profil > tbody:last-child').append(ligne);
+        $('.tabeau_resto:last-child').append(ligne);
     }
 }
 
@@ -1121,17 +1129,17 @@ function appel_ajax_erreur(section_result, formulaire, section_msg_erreur, msg_e
 // https://stackoverflow.com/questions/19105009/how-to-insert-variables-in-javascript-strings/44510325
 function creation_bloc_html_interval(liste){
     // Le bloc HTML pour le résultat de la liste des établissements ave leur nombre de contrevantions
-    var result_interval = "<table class=\"tabeau_resto\">";
-    result_interval += "<thead><tr><th class=\"nom\">Établissement</th>";
-    result_interval += "<th class=\"quantite\">Nombre</th></tr></thead><tbody>";
+    var result_interval = "<div class=\"tabeau_resto\"><div class=\"ligne\">";
+    result_interval += "<div class=\"colonne80\">Établissement</div>";
+    result_interval += "<div class=\"colonne20\">Nombre</div></div>";
     for(var i = 0; i < liste.length; i++) {
-        result_interval += "<tr>";
+        result_interval += "<div class=\"ligne\">";
         var resto = liste[i];
-        result_interval += `<td class='nom'>${resto.etablissement}</td>`;
-        result_interval += `<td class='quantite'>${resto.nombre}</td>`;
-        result_interval += "<tr>";
+        result_interval += `<div class='colonne80'>${resto.etablissement}</div>`;
+        result_interval += `<div class='colonne20'>${resto.nombre}</div>`;
+        result_interval += "</div>";
     }
-    result_interval += "</tbody></table>";
+    result_interval += "</div>";
 
     return result_interval;
 }
@@ -1141,19 +1149,23 @@ function creation_bloc_html_interval(liste){
 function creation_bloc_html_etablissement(listes){
     var result_liste = "";
     for(var i = 0; i < listes.length; i++) {
-        result_liste += "<table class=\"tabeau_resto\"><tbody>";
+        result_liste += "<div class=\"tabeau_resto\"><div class=\"ligne\">";
+        result_liste += "<div class=\"colonne25\">Type</div>";
+        result_liste += "<div class=\"colonne75\">Information</div></div>";
         const une_amande = Object.entries(listes[i]);
         for (const [cle, valeur] of une_amande) {
-            result_liste += "<tr>";
-            result_liste += `<td class='cle'>${cle} :</td>`;
-            if (cle == "Montant de l'amende"){
-                result_liste += `<td class='valeur'>${valeur} $</td>`;
+            result_liste += "<div class=\"ligne\">";
+            result_liste += `<div class='colonne25'>${cle}</div>`;
+            if (cle == "Montant"){
+                result_liste += `<div class='colonne75'>${valeur} $</div>`;
+            } else if (cle == "Description"){
+                result_liste += `<div class='colonne75 justify'>${valeur}</div>`;
             } else {
-                result_liste += `<td class='valeur'>${valeur}</td>`;
+                result_liste += `<div class='colonne75'>${valeur}</div>`;
             }
-            result_liste += "<tr>";
+            result_liste += "</div>";
         }
-        result_liste += "</tbody></table>";
+        result_liste += "</div>";
     }
 
     return result_liste;
@@ -1162,14 +1174,14 @@ function creation_bloc_html_etablissement(listes){
 // Cette fonction sera utiliser pour afficher des informations relatives aux retour des appels AJAX
 function creation_bloc_html(listes){
     var result_liste = "";
-    result_liste += "<table class=\"tabeau_resto\"><tbody>";
+    result_liste += "<div class=\"tabeau_resto\">";
     for (var key in listes) {
-        result_liste += "<tr>";
-        result_liste += `<td class='plainte_cle'>${key} :</td>`;
-        result_liste += `<td class='plainte_valeur'>${listes[key]}</td>`;
-        result_liste += "<tr>";
+        result_liste += "<div class=\"ligne\">";
+        result_liste += `<div class='colonne50'>${key}</div>`;
+        result_liste += `<div class='colonne50'>${listes[key]}</div>`;
+        result_liste += "</div>";
     }
-    result_liste += "</tbody></table>";
+    result_liste += "</div>";
 
     return result_liste;
 }

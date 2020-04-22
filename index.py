@@ -78,6 +78,7 @@ def home():
                            liste_champs=liste_champs)
 
 
+# Cette fonction est pour la route A2
 @app.route('/recherche_restaurant', methods=["POST"])
 def recherche_restaurant():
     liste_champs = initial_champ_recherche()
@@ -115,6 +116,7 @@ def recherche_restaurant():
         return redirect(url_for('.recherche_restaurant_trouve'))
 
 
+# Cette fonction est pour la route A2 pour afficher le résultat
 @app.route('/recherche_restaurant_trouve', methods=["GET"])
 def recherche_restaurant_trouve():
     # On récupère ici les informations sauvegardées dans la session en cours.
@@ -536,3 +538,5 @@ mise_jour_contrevenants()
 # Cette fonction était pour la tache A1
 if __name__ == "__main__":
     importation_donnees()
+
+# Création de cette branche pour transformer mes tableaus en DIV
