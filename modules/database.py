@@ -85,7 +85,6 @@ class Database:
                              description, date_infraction, date_jugement,
                              montant, etablissement))
         result = cursor.fetchall()
-        print(result)
         return result
 
     # Cette fonction est pour la taches A4
@@ -400,6 +399,18 @@ class Database:
         connection.execute(sql, (id_personne,))
         connection.commit()
 
+    def etablissement_surveiller_par_usager(self, nom_etablissement):
+        cursor = self.get_connection().cursor()
+        select = "select p.courriel "
+        fromm = "from etablissement_surveiller e inner join " \
+                "profil_utilisateur p on e.id_personne = p.id_personne "
+        where = "where e.etablissement = ? "
+        sql = select + fromm + where
+        cursor.execute(sql, (nom_etablissement,))
+        result = cursor.fetchall()
+        liste_courriels = recuperation_liste_courriel(result)
+        return liste_courriels
+
 
 # La préparation des critères en vue d'utiliser l'opérateur like aura
 # maintenant une longueur minimale de 2 charactères pour un critère
@@ -549,3 +560,13 @@ def recuperation_liste_etablissement(result):
             ensemble_trouve.append(sous_ensemble)
 
     return ensemble_trouve
+
+
+# Cette fonction sera pour E3
+def recuperation_liste_courriel(result):
+    liste_courriels = []
+    if result is not None:
+        for un_etablissement in result:
+            liste_courriels.append(un_etablissement[0])
+
+    return liste_courriels

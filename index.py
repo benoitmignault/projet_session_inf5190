@@ -131,12 +131,12 @@ def recherche_restaurant_trouve():
                            nb_restaurant_trouve=nb_restaurant_trouve)
 
 
-# Cette fonction est pour la route A3
+# Cette fonction est pour la route A3 et pour B1, B2, E3
 def mise_jour_contrevenants():
     scheduler = BackgroundScheduler(daemon=True)
-    trigger = OrTrigger([CronTrigger(day_of_week='*', hour=22, minute=50)])
-    scheduler.add_job(mise_jour_bd, trigger)
+    trigger = OrTrigger([CronTrigger(day_of_week='*', hour=17, minute=19)])
     scheduler.start()
+    scheduler.add_job(mise_jour_bd, trigger)
 
 
 # Cette fonction est pour la route A4 et A5
@@ -287,7 +287,7 @@ def api_creation_profil():
 
     else:
         return jsonify({"Impossible de créer le profil":
-                            "Courriel est déjà présent !"}), 404
+                        "Courriel est déjà présent !"}), 404
 
 
 # Cette fonction est pour la tache E2
@@ -496,6 +496,7 @@ def retirer_etablissement():
     data = request.get_json()
     id_surveillance = conn_db.verification_etablissement_surveiller(
         data['id_surveillance'])
+    print(id_surveillance)
 
     if id_surveillance is None:
         return "", 404
