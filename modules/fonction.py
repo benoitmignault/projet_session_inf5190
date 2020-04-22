@@ -518,6 +518,7 @@ def creation_html_courriel_intro_general():
     return msg_corps
 
 
+# Cette fonction sera pour la tache B1 et E3
 def creation_html_courriel_commun_corp(contrevenants):
     msg_corps = """<table style="border-collapse: collapse; border: 2px solid black; 
             width: 100%"><thead>
