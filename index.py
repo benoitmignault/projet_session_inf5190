@@ -549,6 +549,8 @@ def desabonner():
                                   "le désabonnement est dépassé !</p>"}), 404
 
         else:
+            conn_db.supprimer_abonnement_etablissement(
+                data['lien_desabonnement'])
             return "", 200
 
 

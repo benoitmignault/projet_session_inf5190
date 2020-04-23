@@ -438,6 +438,13 @@ class Database:
         else:
             return result[0], result[1]
 
+    def supprimer_abonnement_etablissement(self, lien_desabonnement):
+        sql = "DELETE from etablissement_surveiller " \
+              "where lien_desabonnement = ?"
+        connection = self.get_connection()
+        connection.execute(sql, (lien_desabonnement,))
+        connection.commit()
+
 
 # La préparation des critères en vue d'utiliser l'opérateur like aura
 # maintenant une longueur minimale de 2 charactères pour un critère
