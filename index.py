@@ -134,7 +134,7 @@ def recherche_restaurant_trouve():
 # Cette fonction est pour la route A3 et pour B1, B2, E3
 def mise_jour_contrevenants():
     scheduler = BackgroundScheduler(daemon=True)
-    trigger = OrTrigger([CronTrigger(day_of_week='*', hour=23, minute=0)])
+    trigger = OrTrigger([CronTrigger(day_of_week='*', hour=0, minute=0)])
     scheduler.start()
     scheduler.add_job(mise_jour_bd, trigger)
 
@@ -520,18 +520,11 @@ def desabonnement(lien):
                                erreur_404=erreur_404), 404
 
     else:
-        if info_desabonnement[1] < int(datetime.now().strftime("%Y%m%d%H%M%S")):
-            erreur_400 = True
-            titre = "Erreur - Requête"
-            return render_template("erreur_400.html", titre=titre,
-                                   erreur_400=erreur_400), 400
+        titre = "Page de désabonnement"
 
-        else:
-            titre = "Page de désabonnement"
-
-            return render_template("desabonnement_etablissement.html",
-                                   titre=titre, lien=lien,
-                                   etablissement=info_desabonnement[0])
+        return render_template("desabonnement_etablissement.html",
+                               titre=titre, lien=lien,
+                               etablissement=info_desabonnement[0])
 
 
 # Cette fonction est pour la tache E4
@@ -548,15 +541,9 @@ def desabonner():
                 "n'existe pas !</p>"}), 404
 
     else:
-        if info_desabonnement[1] < int(datetime.now().strftime("%Y%m%d%H%M%S")):
-            return jsonify({
-                "message_erreur": "<p>Attention ! Le temps accordé pour "
-                                  "le désabonnement est dépassé !</p>"}), 404
-
-        else:
-            conn_db.supprimer_abonnement_etablissement(
-                data['lien_desabonnement'])
-            return "", 200
+        conn_db.supprimer_abonnement_etablissement(
+            data['lien_desabonnement'])
+        return "", 200
 
 
 # Cette fonction est pour la tache E2

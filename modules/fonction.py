@@ -78,7 +78,6 @@ def initialisation_connexion_hors_flask():
 
 # Cette fonction sera utiliser pour B1, B2
 def mise_jour_bd():
-    print("MAJ en cours")
     connection = initialisation_connexion_hors_flask()
     liste_contrevenants = recuperation_information_url()
 
@@ -97,15 +96,13 @@ def mise_jour_bd():
             liste_champs_xml["date_infraction"],
             liste_champs_xml["date_jugement"], liste_champs_xml["montant"])
         if len(ensemble_existant) == 0:
-            """
             connection.insertion_contrevenant(
                 liste_champs_xml["proprietaire"], liste_champs_xml["categorie"],
                 liste_champs_xml["etablissement"], liste_champs_xml["no_civ"],
                 liste_champs_xml["nom_rue"], liste_champs_xml["ville"],
                 liste_champs_xml["description"],
                 liste_champs_xml["date_infraction"],
-                liste_champs_xml["date_jugement"], liste_champs_xml["montant"])            
-            """
+                liste_champs_xml["date_jugement"], liste_champs_xml["montant"])
             contrevenants.append(liste_champs_xml)
             liste_nom_contrevenant.append(liste_champs_xml["proprietaire"])
 
@@ -474,14 +471,15 @@ def preparation_courriel_specialise(conn, contrevenants):
 
 # Cette fonction sera pour la tache E4
 # Si une nouvelle mise à jour est fait entre temps, l'utilisateur recevra
-# un nouveau lien avec une nouvelle période de temps alloué au désabonnement
+# un nouveau lien
 def generation_lien_desabonnement(etablissement, id_personne, conn):
-    lien = uuid.uuid4().hex
-    lien_securise = hashlib.sha512(str(lien).encode("utf-8")).hexdigest()
-    temps_activation = datetime.now() + timedelta(hours=6)
-    temps_numerique = int(temps_activation.strftime("%Y%m%d%H%M%S"))
-    conn.ajout_desabonnement_potentiel(
-        id_personne, etablissement, lien_securise, temps_numerique)
+    lien_securise = conn.verifier_lien_desabonnement_existe(id_personne,
+                                                            etablissement)
+    if lien_securise is None:
+        lien = uuid.uuid4().hex
+        lien_securise = hashlib.sha512(str(lien).encode("utf-8")).hexdigest()
+        conn.ajout_desabonnement_potentiel(
+            id_personne, etablissement, lien_securise)
 
     return lien_securise
 

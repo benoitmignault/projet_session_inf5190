@@ -399,7 +399,7 @@ class Database:
         connection.execute(sql, (id_personne,))
         connection.commit()
 
-    # Cette fonction est pour la tache E$
+    # Cette fonction est pour la tache E4
     def etablissement_surveiller_par_usager(self, nom_etablissement):
         cursor = self.get_connection().cursor()
         select = "select p.courriel "
@@ -414,20 +414,19 @@ class Database:
 
     # Cette fonction sera pour la tache E4
     def ajout_desabonnement_potentiel(self, id_personne, etablissement,
-                                      lien_securise, temps_activation):
+                                      lien_securise):
         connection = self.get_connection()
         update = "UPDATE etablissement_surveiller "
-        sett = "set lien_desabonnement = ? , temps_activation_lien = ? "
+        sett = "set lien_desabonnement = ? "
         where = "where id_personne = ? and etablissement = ? "
         sql = update + sett + where
-        connection.execute(sql, (lien_securise, temps_activation, id_personne,
-                                 etablissement))
+        connection.execute(sql, (lien_securise, id_personne, etablissement))
         connection.commit()
 
     # Cette fonction sera pour la tache E4
     def verif_lien_desabonnement(self, lien_desabonnement):
         cursor = self.get_connection().cursor()
-        select = "SELECT etablissement, temps_activation_lien "
+        select = "SELECT etablissement "
         fromm = "FROM etablissement_surveiller "
         where = "WHERE lien_desabonnement = ? "
         sql = select + fromm + where
@@ -436,8 +435,24 @@ class Database:
         if result is None:
             return None
         else:
-            return result[0], result[1]
+            return result[0]
 
+    # Cette fonction sera pour la tache E4
+    def verifier_lien_desabonnement_existe(self, id_personne, etablissement):
+        cursor = self.get_connection().cursor()
+        select = "select lien_desabonnement "
+        fromm = "from etablissement_surveiller "
+        where = "where id_personne = ? and etablissement = ? " \
+                "and lien_desabonnement is not null"
+        sql = select + fromm + where
+        cursor.execute(sql, (id_personne, etablissement))
+        result = cursor.fetchone()
+        if result is None:
+            return None
+        else:
+            return result[0]
+
+    # Cette fonction sera pour la tache E4
     def supprimer_abonnement_etablissement(self, lien_desabonnement):
         sql = "DELETE from etablissement_surveiller " \
               "where lien_desabonnement = ?"
