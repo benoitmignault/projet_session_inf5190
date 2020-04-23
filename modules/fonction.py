@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from io import BytesIO, StringIO
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import hashlib
 import uuid
@@ -78,7 +78,6 @@ def initialisation_connexion_hors_flask():
 
 # Cette fonction sera utiliser pour B1, B2
 def mise_jour_bd():
-    print("MAJ en cours")
     connection = initialisation_connexion_hors_flask()
     liste_contrevenants = recuperation_information_url()
 
@@ -97,15 +96,13 @@ def mise_jour_bd():
             liste_champs_xml["date_infraction"],
             liste_champs_xml["date_jugement"], liste_champs_xml["montant"])
         if len(ensemble_existant) == 0:
-            """
             connection.insertion_contrevenant(
                 liste_champs_xml["proprietaire"], liste_champs_xml["categorie"],
                 liste_champs_xml["etablissement"], liste_champs_xml["no_civ"],
                 liste_champs_xml["nom_rue"], liste_champs_xml["ville"],
                 liste_champs_xml["description"],
                 liste_champs_xml["date_infraction"],
-                liste_champs_xml["date_jugement"], liste_champs_xml["montant"])            
-            """
+                liste_champs_xml["date_jugement"], liste_champs_xml["montant"])
             contrevenants.append(liste_champs_xml)
             liste_nom_contrevenant.append(liste_champs_xml["proprietaire"])
 
@@ -451,7 +448,6 @@ def preparation_courriel_general(contrevenants):
 # Cette fonction sera pour la tache E3
 def preparation_courriel_specialise(conn, contrevenants):
     for un_etablissement in contrevenants:
-        print(un_etablissement)
         liste_courriels_suivis = conn.etablissement_surveiller_par_usager(
             un_etablissement['etablissement'])
         if len(liste_courriels_suivis) > 0:
@@ -462,11 +458,30 @@ def preparation_courriel_specialise(conn, contrevenants):
                 # liste de la fonction commune aux envois de courriels
                 liste_etablissement = [un_etablissement]
                 information_profil = conn.recuperation_profil(un_courriel)
+                lien_securise = generation_lien_desabonnement(
+                    un_etablissement['etablissement'], information_profil[3],
+                    conn)
                 contenu_courriel = creation_html_courriel_intro_personnalise(
-                    information_profil[0], information_profil[1])
+                    information_profil[0], information_profil[1], lien_securise,
+                    un_etablissement['etablissement'])
                 contenu_courriel += creation_html_courriel_commun_corp(
                     liste_etablissement)
                 creation_courriel(sujet, un_courriel, contenu_courriel)
+
+
+# Cette fonction sera pour la tache E4
+# Si une nouvelle mise à jour est fait entre temps, l'utilisateur recevra
+# un nouveau lien
+def generation_lien_desabonnement(etablissement, id_personne, conn):
+    lien_securise = conn.verifier_lien_desabonnement_existe(id_personne,
+                                                            etablissement)
+    if lien_securise is None:
+        lien = uuid.uuid4().hex
+        lien_securise = hashlib.sha512(str(lien).encode("utf-8")).hexdigest()
+        conn.ajout_desabonnement_potentiel(
+            id_personne, etablissement, lien_securise)
+
+    return lien_securise
 
 
 # Cette fonction sera commune aux taches B1 et E3
@@ -491,15 +506,20 @@ def envoie_courriel(destinataire, message):
 
 
 # Cette fonction sera pour la tache E3
-def creation_html_courriel_intro_personnalise(prenom, nom):
+def creation_html_courriel_intro_personnalise(prenom, nom, lien_securise,
+                                              etablissement):
     msg_corps = """<html><head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8">
     </head><body>
     <h2>Bonjour {} {},</h2>
     <p>Voici la nouvelle infraction de votre établissement en surveillance :</p>
+    <p>{}</p>
+    <p><a target="_blank" 
+    href="http://127.0.0.1:5000/connecter/desabonnement/{}">
+    Lien pour vous désabonnez</a></p>
     """
-    msg_corps = msg_corps.format(prenom, nom)
+    msg_corps = msg_corps.format(prenom, nom, etablissement, lien_securise)
 
     return msg_corps
 

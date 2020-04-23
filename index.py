@@ -134,7 +134,7 @@ def recherche_restaurant_trouve():
 # Cette fonction est pour la route A3 et pour B1, B2, E3
 def mise_jour_contrevenants():
     scheduler = BackgroundScheduler(daemon=True)
-    trigger = OrTrigger([CronTrigger(day_of_week='*', hour=17, minute=19)])
+    trigger = OrTrigger([CronTrigger(day_of_week='*', hour=0, minute=0)])
     scheduler.start()
     scheduler.add_job(mise_jour_bd, trigger)
 
@@ -287,7 +287,7 @@ def api_creation_profil():
 
     else:
         return jsonify({"Impossible de créer le profil":
-                        "Courriel est déjà présent !"}), 404
+                            "Courriel est déjà présent !"}), 404
 
 
 # Cette fonction est pour la tache E2
@@ -496,7 +496,6 @@ def retirer_etablissement():
     data = request.get_json()
     id_surveillance = conn_db.verification_etablissement_surveiller(
         data['id_surveillance'])
-    print(id_surveillance)
 
     if id_surveillance is None:
         return "", 404
@@ -507,6 +506,44 @@ def retirer_etablissement():
             data['id_personne'])
 
         return jsonify(etablissement_dispo), 200
+
+
+# Cette fonction est pour la tache E4
+@app.route('/connecter/desabonnement/<lien>', methods=["GET"])
+def desabonnement(lien):
+    conn_db = get_db()
+    info_desabonnement = conn_db.verif_lien_desabonnement(lien)
+    if info_desabonnement is None:
+        erreur_404 = True
+        titre = "Page inexistante"
+        return render_template("erreur_404.html", titre=titre,
+                               erreur_404=erreur_404), 404
+
+    else:
+        titre = "Page de désabonnement"
+
+        return render_template("desabonnement_etablissement.html",
+                               titre=titre, lien=lien,
+                               etablissement=info_desabonnement[0])
+
+
+# Cette fonction est pour la tache E4
+@app.route('/api/connecter/desabonnement', methods=["DELETE"])
+def desabonner():
+    conn_db = get_db()
+    data = request.get_json()
+    info_desabonnement = conn_db.verif_lien_desabonnement(
+        data['lien_desabonnement'])
+    if info_desabonnement is None:
+        return jsonify({
+            "message_erreur":
+                "<p>Attention ! Le lien pour se désabonner "
+                "n'existe pas !</p>"}), 404
+
+    else:
+        conn_db.supprimer_abonnement_etablissement(
+            data['lien_desabonnement'])
+        return "", 200
 
 
 # Cette fonction est pour la tache E2

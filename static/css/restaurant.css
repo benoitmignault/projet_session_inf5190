@@ -48,6 +48,7 @@ h2 {
     margin-bottom: 5px;
 }
 
+.container_erreur,
 .container {
     display: -webkit-flex;
     display: flex;
@@ -252,6 +253,7 @@ Fin de l'ajout du recentrage de attribut legend
     background-color: white;
 }
 
+.container > .aucun,
 .container > .zone_recherche_resto > .aucun,
 .container > .zone_recherche_resto > form > .aucun,
 .aucun{
