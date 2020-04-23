@@ -509,6 +509,15 @@ def retirer_etablissement():
         return jsonify(etablissement_dispo), 200
 
 
+# Cette fonction est pour la tache E4
+@app.route('/connecter/desabonnement/<lien>', methods=["GET"])
+def desabonnement():
+    # Vérifier si le lien est valide
+    # Si il existe toujorus
+    # Si le temps n'est pas dépassé
+    pass
+
+
 # Cette fonction est pour la tache E2
 @app.route('/deconnection')
 @authentification_requise

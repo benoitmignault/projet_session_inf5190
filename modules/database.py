@@ -411,6 +411,17 @@ class Database:
         liste_courriels = recuperation_liste_courriel(result)
         return liste_courriels
 
+    def ajout_desabonnement_potentiel(self, id_personne, etablissement,
+                                      lien_securise, temps_activation):
+        connection = self.get_connection()
+        update = "UPDATE etablissement_surveiller "
+        sett = "set lien_desabonnement = ? , temps_activation_lien = ? "
+        where = "where id_personne = ? and etablissement = ? "
+        sql = update + sett + where
+        connection.execute(sql, (lien_securise, temps_activation, id_personne,
+                                 etablissement))
+        connection.commit()
+
 
 # Création de la branche E4 !
 
