@@ -50,5 +50,7 @@ create table etablissement_surveiller (
   id_surveillance integer primary key AUTOINCREMENT,
 	id_personne integer not null,
 	etablissement varchar(65) not null,
+  lien_desabonnement	varchar (128) unique,
+	temps_activation_lien	integer,
   UNIQUE(id_personne, etablissement)
 );
