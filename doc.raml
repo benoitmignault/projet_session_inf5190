@@ -350,3 +350,17 @@ baseUri: http://127.0.0.1:5000/
          application/json:
         responses:
           200:
+
+    /desabonnement:
+      delete:
+        description: Supprimer un abonnement sur un établissement en particulier
+        queryParameters:
+          lien_desabonnement:
+            type: string
+            description: Identifiant pour retrouver la combinaison établissement/utilisateur
+            example: 3fb4bf248645c4048e2166a26c0ea87ceb535b18de7112ba678db440f7686b225d9a171ecd25f0472394f9c3610b5fe327ef63f258faadc4008b9ee1ca09f487
+            required: true
+        body:
+         application/json:
+        responses:
+          200:
