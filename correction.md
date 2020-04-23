@@ -181,3 +181,17 @@ En utilisant son courriel et mot de passe
     à surveiller.    
     
     Le processus est automatique à chaque jour à minuit (00:00)
+
+#### E4 - Envoi un courriel comme en E3 mais avec un lien pour se désabonner
+    L'utilisateur aura 6 heures au moment de la réception du courriel pour se désabonner.
+    
+    Le lien mènera vers une page web :
+    
+    Voici un exemple :    
+* http://127.0.0.1:5000//connecter/desabonnement/3fb4bf248645c4048e2166a26c0ea87ceb535b18de7112ba678db440f7686b225d9a171ecd25f0472394f9c3610b5fe327ef63f258faadc4008b9ee1ca09f487
+    
+    Au moment de vouloir supprimer l'abonnement, nous vérifions encore une fois 
+    si le lien est valide et si le temps est encore disponible.
+    
+    Un service REST avec la méthode «Delete» sera invoquer pour détruire le suivi de l'abonnement.
+    Via la route : /api/connecter/desabonnement
