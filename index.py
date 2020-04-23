@@ -134,7 +134,7 @@ def recherche_restaurant_trouve():
 # Cette fonction est pour la route A3 et pour B1, B2, E3
 def mise_jour_contrevenants():
     scheduler = BackgroundScheduler(daemon=True)
-    trigger = OrTrigger([CronTrigger(day_of_week='*', hour=22, minute=58)])
+    trigger = OrTrigger([CronTrigger(day_of_week='*', hour=23, minute=0)])
     scheduler.start()
     scheduler.add_job(mise_jour_bd, trigger)
 

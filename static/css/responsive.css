@@ -27,6 +27,10 @@
         padding: 0px;
     }
 
+    .container > #result_desabonnement > .aucun{
+        padding: 15px;
+    }
+
     .container > .zone_admin,
     .container > .zone_admin > .admin:last-of-type{
         margin-bottom: 0px;
@@ -36,6 +40,7 @@
         margin-right: 0px;
     }
 
+    .container > .zone_recherche_resto > fieldset > #retirer_abonnement > .modif > .trois_bouton,
     .container > .zone_recherche_resto > fieldset > #ajout_etablissement > .modif > .trois_bouton,
     .container > .zone_recherche_resto > fieldset > #nouvelle_photo > .modif > .trois_bouton,
     .container > .zone_admin > .admin{
@@ -45,17 +50,20 @@
         align-items: center;
     }
 
+    .container > .zone_recherche_resto > fieldset > #retirer_abonnement > .modif > .trois_bouton > .bouton,
     .container > .zone_recherche_resto > fieldset > #ajout_etablissement > .modif > .trois_bouton > .bouton,
     .container > .zone_recherche_resto > fieldset > #nouvelle_photo > .modif > .trois_bouton > .bouton{
         width: 100%;
         margin-bottom: 15px;
     }
 
+    .container > .zone_recherche_resto > fieldset > #retirer_abonnement > .modif > .trois_bouton > .bouton:last-of-type,
     .container > .zone_recherche_resto > fieldset > #ajout_etablissement > .modif > .trois_bouton > .bouton:last-of-type,
     .container > .zone_recherche_resto > fieldset > #nouvelle_photo > .modif > .trois_bouton > .bouton:last-of-type{
         margin-bottom: 0px;
     }
 
+    .container > .zone_recherche_resto > fieldset > #retirer_abonnement > .modif > .trois_bouton,
     .container > .zone_recherche_resto > fieldset > #ajout_etablissement > .modif > .trois_bouton,
     .container > .zone_recherche_resto > fieldset > #nouvelle_photo > .modif > .trois_bouton,
     .container > .zone_admin > .admin{
