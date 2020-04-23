@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Bienvenue sur la page de désabonnement &rarr; <span class='userDisplay'>{{etablissement}}</span>
+    &larr;</h1>
+<div class="container">
+    <div class='zone_admin'>
+        <div class="admin">
+            <a class="bouton" href="/">Page D'accueil</a>
+        </div>
+    </div>
+    <div class='zone_recherche_resto'>
+        <fieldset>
+            <legend class="legendCenter">Simplement appuyer sur le bouton
+            </legend>
+            <form method="post" action="/api/connecter/retirer_etablissement"
+                  id="retirer_abonnement">
+                <input type="hidden" name="lien" id="lien_desabonnement"
+                       value="{{lien}}">
+                <div class="modif">
+                    <div class="trois_bouton">
+                        <input id="lien" class="bouton" type='submit'
+                               value="Désabonnement...">
+                    </div>
+                </div>
+            </form>
+        </fieldset>
+    </div>
+    <div id="result_desabonnement"></div>
+</div>
+{% endblock content %}>

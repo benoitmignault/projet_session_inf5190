@@ -399,6 +399,7 @@ class Database:
         connection.execute(sql, (id_personne,))
         connection.commit()
 
+    # Cette fonction est pour la tache E$
     def etablissement_surveiller_par_usager(self, nom_etablissement):
         cursor = self.get_connection().cursor()
         select = "select p.courriel "
@@ -411,6 +412,7 @@ class Database:
         liste_courriels = recuperation_liste_courriel(result)
         return liste_courriels
 
+    # Cette fonction sera pour la tache E4
     def ajout_desabonnement_potentiel(self, id_personne, etablissement,
                                       lien_securise, temps_activation):
         connection = self.get_connection()
@@ -422,8 +424,20 @@ class Database:
                                  etablissement))
         connection.commit()
 
+    # Cette fonction sera pour la tache E4
+    def verif_lien_desabonnement(self, lien_desabonnement):
+        cursor = self.get_connection().cursor()
+        select = "SELECT etablissement, temps_activation_lien "
+        fromm = "FROM etablissement_surveiller "
+        where = "WHERE lien_desabonnement = ? "
+        sql = select + fromm + where
+        cursor.execute(sql, (lien_desabonnement,))
+        result = cursor.fetchone()
+        if result is None:
+            return None
+        else:
+            return result[0], result[1]
 
-# Création de la branche E4 !
 
 # La préparation des critères en vue d'utiliser l'opérateur like aura
 # maintenant une longueur minimale de 2 charactères pour un critère

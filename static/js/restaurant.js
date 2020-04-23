@@ -74,6 +74,12 @@ const champ_btn_supprimer_photo = document.querySelector('#supprimer');
 const champ_id_photo = document.querySelector('#id_photo');
 const section_photo_profil = document.querySelector('.unePassionPhoto');
 
+// Variable pour le désabonnement d'un établissement
+const form_retirer_abonnement = document.querySelector('#retirer_abonnement');
+const champ_lien_desabonnement = document.querySelector('#lien_desabonnement');
+const result_desabonnement = document.querySelector('#result_desabonnement');
+const section_formulaire = document.querySelector('.zone_recherche_resto');
+
 const pattern_date = new RegExp("^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$");
 const pattern_code = new RegExp("^[A-Z][0-9][A-Z][ ]{1}[0-9][A-Z][0-9]$");
 const pattern_proprio = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,98}[a-z0-9A-Z.)]$");
@@ -360,6 +366,15 @@ function ajout_etablissements_profil(){
         }
     });
 }
+
+// Cette fonction sera pour la tache E4 pour retirer l'abonnement
+function ajout_etablissements_profil(){
+    $(form_retirer_abonnement).submit(function (e) {
+        e.preventDefault();
+        appel_ajax_retirer_abonnement();
+    });
+}
+
 
 // Cette fonction sera pour la tache E2 à des fins de validations et d'appel Ajax pour la gestion de la photo de profil
 function ajout_modif_retrait_photo_profil(){
@@ -1071,6 +1086,36 @@ function appel_ajax_supprimer_photo_profil(){
     ajax.send(data_json);
 }
 
+const form_retirer_abonnement = document.querySelector('#retirer_abonnement');
+const champ_lien_desabonnement = document.querySelector('#lien_desabonnement');
+const result_desabonnement = document.querySelector('#result_desabonnement');
+const section_formulaire = document.querySelector('.zone_recherche_resto');
+
+// Cette fonction est l'appel Ajax pour E4
+function appel_ajax_retirer_abonnement(){
+    var ajax = new XMLHttpRequest();
+    ajax.onreadystatechange = function() {
+        if (ajax.readyState === XMLHttpRequest.DONE) {
+            if (ajax.status === 200) {
+                $(section_formulaire).remove();
+                result_desabonnement.innerHTML = "<p class=\"aucun\">Vous etes maintenant désabonné de l'établissement mentionné en rouge dans le haut de la page !</p>";
+            } else if (ajax.status === 404) {
+                 var info = JSON.parse(ajax.responseText);
+                 result_desabonnement.innerHTML = info["message_erreur"];
+            }
+        }
+    };
+    var data = {"lien_desabonnement": champ_lien_desabonnement.value };
+
+    var data_json = JSON.stringify(data);
+    ajax.open("DELETE", "/api/connecter/desabonnement", true);
+    ajax.setRequestHeader("Content-Type", "application/json");
+    ajax.send(data_json);
+}
+
+
+
+
 // Cette fonction servira à refaire la lsite des établissements après l'appel AJAX
 function refaire_etablissement_disponible(liste){
     // On supprime toutes les vieilles options
@@ -1204,6 +1249,7 @@ document.addEventListener('DOMContentLoaded', function () {
     ajout_etablissements_profil();
     retrait_etablissement_profil();
     ajout_modif_retrait_photo_profil();
+    ajout_etablissements_profil();
     reset_recherche();
     reset_recherche_interval();
     reset_demande_plainte();

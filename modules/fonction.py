@@ -451,7 +451,6 @@ def preparation_courriel_general(contrevenants):
 # Cette fonction sera pour la tache E3
 def preparation_courriel_specialise(conn, contrevenants):
     for un_etablissement in contrevenants:
-        print(un_etablissement)
         liste_courriels_suivis = conn.etablissement_surveiller_par_usager(
             un_etablissement['etablissement'])
         if len(liste_courriels_suivis) > 0:
@@ -480,8 +479,9 @@ def generation_lien_desabonnement(etablissement, id_personne, conn):
     lien = uuid.uuid4().hex
     lien_securise = hashlib.sha512(str(lien).encode("utf-8")).hexdigest()
     temps_activation = datetime.now() + timedelta(hours=6)
+    temps_numerique = int(temps_activation.strftime("%Y%m%d%H%M%S"))
     conn.ajout_desabonnement_potentiel(
-        id_personne, etablissement, lien_securise, temps_activation)
+        id_personne, etablissement, lien_securise, temps_numerique)
 
     return lien_securise
 
