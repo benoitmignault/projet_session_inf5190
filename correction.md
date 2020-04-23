@@ -183,7 +183,9 @@ En utilisant son courriel et mot de passe
     Le processus est automatique à chaque jour à minuit (00:00)
 
 #### E4 - Envoi un courriel comme en E3 mais avec un lien pour se désabonner
-    L'utilisateur aura 6 heures au moment de la réception du courriel pour se désabonner.
+    La mécanique va comme suite :
+    Tant que l'utilisateur ne sera pas désaboner de l'établissement, 
+    le lien va demeurer le même même si il y a plusieurs contravention pour ce même établissement.
     
     Le lien mènera vers une page web :
     
