@@ -19,8 +19,14 @@
 
 /* Pour des écrans petits du genre un Iphone / Samsung */
 @media screen and (max-width:400px) {
+    .container_erreur > .zone_404 > .admin,
+    .container_erreur,
     h1{
         width: 100%;
+    }
+
+    .container_erreur{
+        background-color: initial;
     }
 
     .container{
@@ -40,6 +46,7 @@
         margin-right: 0px;
     }
 
+    .container_erreur > .zone_404 > .admin,
     .container > .zone_recherche_resto > fieldset > #retirer_abonnement > .modif > .trois_bouton,
     .container > .zone_recherche_resto > fieldset > #ajout_etablissement > .modif > .trois_bouton,
     .container > .zone_recherche_resto > fieldset > #nouvelle_photo > .modif > .trois_bouton,
@@ -50,6 +57,7 @@
         align-items: center;
     }
 
+    .container_erreur > .zone_404 > .admin > .bouton_404,
     .container > .zone_recherche_resto > fieldset > #retirer_abonnement > .modif > .trois_bouton > .bouton,
     .container > .zone_recherche_resto > fieldset > #ajout_etablissement > .modif > .trois_bouton > .bouton,
     .container > .zone_recherche_resto > fieldset > #nouvelle_photo > .modif > .trois_bouton > .bouton{
@@ -57,12 +65,14 @@
         margin-bottom: 15px;
     }
 
+    .container_erreur > .zone_404 > .admin > .bouton_404:last-of-type,
     .container > .zone_recherche_resto > fieldset > #retirer_abonnement > .modif > .trois_bouton > .bouton:last-of-type,
     .container > .zone_recherche_resto > fieldset > #ajout_etablissement > .modif > .trois_bouton > .bouton:last-of-type,
     .container > .zone_recherche_resto > fieldset > #nouvelle_photo > .modif > .trois_bouton > .bouton:last-of-type{
         margin-bottom: 0px;
     }
 
+    .container_erreur > .zone_404 > .admin,
     .container > .zone_recherche_resto > fieldset > #retirer_abonnement > .modif > .trois_bouton,
     .container > .zone_recherche_resto > fieldset > #ajout_etablissement > .modif > .trois_bouton,
     .container > .zone_recherche_resto > fieldset > #nouvelle_photo > .modif > .trois_bouton,
@@ -86,6 +96,7 @@
         line-height: 1.5;
     }
 
+    .erreur_400,
     .container > .zone_recherche_resto > form > div > div > div > input[type=password],
     .container > .zone_recherche_resto > form > div > div > div > input[type=email],
     .container > .zone_recherche_resto > form > div > fieldset > div > div > input[type=password],
@@ -133,6 +144,10 @@
 
     .container > .zone_recherche_resto > div > .tabeau_resto > .ligne > div:last-of-type{
         width: 15%;
+    }
+
+    .erreur_400 > .pic_400 {
+        max-width: 100%;
     }
 
 }

@@ -48,6 +48,7 @@ h2 {
     margin-bottom: 5px;
 }
 
+.container_erreur,
 .container {
     display: -webkit-flex;
     display: flex;
