@@ -134,7 +134,7 @@ def recherche_restaurant_trouve():
 # Cette fonction est pour la route A3 et pour B1, B2, E3
 def mise_jour_contrevenants():
     scheduler = BackgroundScheduler(daemon=True)
-    trigger = OrTrigger([CronTrigger(day_of_week='*', hour=22, minute=12)])
+    trigger = OrTrigger([CronTrigger(day_of_week='*', hour=22, minute=58)])
     scheduler.start()
     scheduler.add_job(mise_jour_bd, trigger)
 
@@ -514,12 +514,17 @@ def desabonnement(lien):
     conn_db = get_db()
     info_desabonnement = conn_db.verif_lien_desabonnement(lien)
     if info_desabonnement is None:
-        return "", 404
+        erreur_404 = True
+        titre = "Page inexistante"
+        return render_template("erreur_404.html", titre=titre,
+                               erreur_404=erreur_404), 404
 
     else:
-        print(info_desabonnement[1])
         if info_desabonnement[1] < int(datetime.now().strftime("%Y%m%d%H%M%S")):
-            return "", 400
+            erreur_400 = True
+            titre = "Erreur - Requête"
+            return render_template("erreur_400.html", titre=titre,
+                                   erreur_400=erreur_400), 400
 
         else:
             titre = "Page de désabonnement"

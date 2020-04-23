@@ -1108,9 +1108,6 @@ function appel_ajax_retirer_abonnement(){
     ajax.send(data_json);
 }
 
-
-
-
 // Cette fonction servira à refaire la lsite des établissements après l'appel AJAX
 function refaire_etablissement_disponible(liste){
     // On supprime toutes les vieilles options
