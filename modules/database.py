@@ -412,6 +412,8 @@ class Database:
         return liste_courriels
 
 
+# Création de la branche E4 !
+
 # La préparation des critères en vue d'utiliser l'opérateur like aura
 # maintenant une longueur minimale de 2 charactères pour un critère
 # qui aurait été non utiliser par l'Utilisateur
