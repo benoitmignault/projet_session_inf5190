@@ -368,7 +368,7 @@ function ajout_etablissements_profil(){
 }
 
 // Cette fonction sera pour la tache E4 pour retirer l'abonnement
-function ajout_etablissements_profil(){
+function retrait_abonnement_etablissement(){
     $(form_retirer_abonnement).submit(function (e) {
         e.preventDefault();
         appel_ajax_retirer_abonnement();
@@ -1086,11 +1086,6 @@ function appel_ajax_supprimer_photo_profil(){
     ajax.send(data_json);
 }
 
-const form_retirer_abonnement = document.querySelector('#retirer_abonnement');
-const champ_lien_desabonnement = document.querySelector('#lien_desabonnement');
-const result_desabonnement = document.querySelector('#result_desabonnement');
-const section_formulaire = document.querySelector('.zone_recherche_resto');
-
 // Cette fonction est l'appel Ajax pour E4
 function appel_ajax_retirer_abonnement(){
     var ajax = new XMLHttpRequest();
@@ -1249,7 +1244,7 @@ document.addEventListener('DOMContentLoaded', function () {
     ajout_etablissements_profil();
     retrait_etablissement_profil();
     ajout_modif_retrait_photo_profil();
-    ajout_etablissements_profil();
+    retrait_abonnement_etablissement();
     reset_recherche();
     reset_recherche_interval();
     reset_demande_plainte();
