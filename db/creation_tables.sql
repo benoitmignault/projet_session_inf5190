@@ -12,6 +12,27 @@ create table mauvais_restaurants (
 	montant_amende integer not null
 );
 
+create table mauvais_restaurants_modif (
+	id_resto integer primary key,
+	proprietaire varchar(100) not null,
+	categorie varchar(50) not null,
+	etablissement varchar(65) not null,
+	no_civique varchar(10) not null,
+	nom_rue varchar(35) not null,
+	ville varchar(40) not null,
+	description varchar(800) not null,
+	date_infraction varchar(10) not null,
+	date_jugement varchar(10) not null,
+	montant_amende integer not null
+);
+
+create table mauvais_restaurants_supp (
+	id_resto integer primary key,
+  etablissement varchar(65) not null
+);
+
+
+
 create table departement_plaintes (
 	id_plainte integer primary key AUTOINCREMENT,	
 	etablissement varchar(65) not null,
