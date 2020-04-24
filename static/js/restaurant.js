@@ -904,7 +904,7 @@ function appel_ajax_interval(){
             if (ajax.status === 200) {
                 var liste = JSON.parse(ajax.responseText);
                 if (liste.length > 0){
-                    var resultat = creation_bloc_html_interval(liste);
+                    var resultat = creation_bloc_html_interval(liste, date_debut_encode, date_fin_encode);
                     result_interval.innerHTML = resultat;
                 } else {
                     appel_ajax_erreur(result_interval, form_interval, message_erreur_interval, "<li>L'interval de date ne contenait aucune donnée !</li>");
@@ -1164,17 +1164,24 @@ function appel_ajax_erreur(section_result, formulaire, section_msg_erreur, msg_e
 // Cette fonction sera pour afficher le résultat des établissements et leur nombre amandes respectifs.
 // J'ai découvert comment faire des string avec des variables
 // https://stackoverflow.com/questions/19105009/how-to-insert-variables-in-javascript-strings/44510325
-function creation_bloc_html_interval(liste){
+function creation_bloc_html_interval(liste, date_debut, date_fin){
     // Le bloc HTML pour le résultat de la liste des établissements ave leur nombre de contrevantions
     var result_interval = "<div class=\"tabeau_resto\"><div class=\"ligne\">";
-    result_interval += "<div class=\"colonne80\">Établissement</div>";
-    result_interval += "<div class=\"colonne20\">Nombre</div></div>";
+    result_interval += "<div class=\"colonne65\">Établissement</div>";
+    result_interval += "<div class=\"colonne15\">Nombre</div>";
+    result_interval += "<div class=\"colonne20\">Consultation</div></div>";
     for(var i = 0; i < liste.length; i++) {
         result_interval += "<div class=\"ligne\">";
         var resto = liste[i];
-        result_interval += `<div class='colonne80'>${resto.etablissement}</div>`;
-        result_interval += `<div class='colonne20'>${resto.nombre}</div>`;
-        result_interval += "</div>";
+        result_interval += `<div class='colonne65'>${resto.etablissement}</div>`;
+        result_interval += `<div class='colonne15'>${resto.nombre}</div>`;
+        // La fonction encodeURIComponent peut ne pas casser les espaces...
+        var etablissement = encodeURIComponent(resto.etablissement);
+        var param = `?du=${date_debut}&au=${date_fin}&etablissement=`;
+        var lien = "/liste_des_contrevenants/interval" + param + etablissement;
+        console.log(lien);
+        result_interval += `<div class='colonne20'><a class='bouton' href=`;
+        result_interval += lien + ">Liste</a></div></div>";
     }
     result_interval += "</div>";
 

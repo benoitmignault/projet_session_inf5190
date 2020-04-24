@@ -570,7 +570,15 @@ def personne_non_autorisee():
                     , 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 
-# Création de la branche D3
+# Cette fonction était pour la tache D3
+@app.route('/liste_des_contrevenants/interval', methods=["GET"])
+def liste_contravention_par_etablissement():
+    print( request.args["du"])
+    print(request.args["au"])
+    print(request.args["etablissement"])
+
+    return "", 200
+
 
 # La fonction sera exécuté à chaque jour à minuit, automatiquement
 mise_jour_contrevenants()

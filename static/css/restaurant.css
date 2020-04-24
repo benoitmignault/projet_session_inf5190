@@ -365,6 +365,10 @@ Fin de l'ajout du recentrage de attribut legend
     border-right: 1px solid black;
 }
 
+.container > .zone_recherche_resto > div > .tabeau_resto > .ligne > .colonne65{
+    width: 65%;
+}
+
 
 .container > .zone_recherche_resto > .tabeau_resto > .ligne > .colonne75,
 .container > .zone_recherche_resto > div > .tabeau_resto > .ligne > .colonne75{
@@ -389,6 +393,10 @@ Fin de l'ajout du recentrage de attribut legend
 
 .container > .zone_recherche_resto > div > .tabeau_resto > .ligne > .colonne20{
     width: 20%;
+}
+
+.container > .zone_recherche_resto > div > .tabeau_resto > .ligne > .colonne15{
+    width: 15%;
 }
 
 .container > .zone_recherche_resto > form > fieldset > .tabeau_resto > .ligne > .colonne10{
@@ -494,6 +502,8 @@ Fin de l'ajout du recentrage de attribut legend
     border: 2px solid red;
 }
 
+
+.container > .zone_recherche_resto > div > .tabeau_resto > .ligne > .colonne20 > .bouton,
 .container > .zone_recherche_resto > fieldset > form > .modif > .trois_bouton > .bouton,
 .container > .zone_recherche_resto > form > .modif > .trois_bouton > .bouton,
 .container > .zone_recherche_resto > .admin_modif > .bouton,
@@ -522,6 +532,7 @@ Fin de l'ajout du recentrage de attribut legend
     margin-right: 0px;
 }
 
+.container > .zone_recherche_resto > div > .tabeau_resto > .ligne > .colonne20 > .bouton:hover,
 .container > .zone_recherche_resto > fieldset > form > .modif > .trois_bouton > .bouton:hover,
 .container > .zone_recherche_resto > form > .modif > .trois_bouton > .bouton:hover,
 .container > .zone_recherche_resto > .admin_modif > .bouton:hover,
