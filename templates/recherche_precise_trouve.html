@@ -1,8 +1,8 @@
 {% extends "layout.html" %}
 {% block content %}
 <p class="desktop" id="hautPageDesktop"></p>
-<h1>Voici la liste des infractions pour &rarr; <span class='userDisplay'>{{etablissement}}</span>
-    &larr;</h1>
+<h1>Voici la liste des infractions pour <span class='userDisplay'>{{etablissement}}</span>
+</h1>
 <div class="container">
     <div class='zone_admin'>
         <div class="admin">
@@ -17,7 +17,9 @@
     {% endif %}
     {% for un_ensemble in ensemble_ajuster %}
     <div class='zone_recherche_resto'>
-        <form method="post">
+        <form id="{{un_ensemble['id_resto']}}">
+            <input type="hidden" name="id_resto" class="id_resto"
+                   value="{{un_ensemble['id_resto']}}">
             <div class="modif">
                 <div class="information">
                     <label for="no_civ{{un_ensemble['id_resto']}}">
@@ -27,7 +29,7 @@
                                value="{{un_ensemble['no_civic']}}"
                                placeholder="12345" name="no_civ"
                                title="Charactères numériques seulement"
-                               type="number" maxlength="5">
+                               type="number" class="no_civ">
                     </div>
                 </div>
                 <div class="information">
@@ -38,18 +40,19 @@
                                name="nom_rue" type="text"
                                title="Charactères alphanumériques, les espaces,
                                    l'apostrophe et le tiret sont permis"
-                               placeholder="Rue Onrario"
+                               placeholder="Rue Onrario" class="nom_rue"
                                value="{{un_ensemble['nom_rue']}}">
                     </div>
                 </div>
                 <div class="information">
-                    <label for="categorie{{un_ensemble['id_resto']}}">Catégorie :</label>
+                    <label for="categorie{{un_ensemble['id_resto']}}">Catégorie
+                        :</label>
                     <div>
                         <input id="categorie{{un_ensemble['id_resto']}}"
                                name="categorie" type="text"
                                title="Charactères alphanumériques, les espaces,
                                    l'apostrophe et le tiret sont permis"
-                               placeholder="Restaurant"
+                               placeholder="Restaurant" class="categorie"
                                value="{{un_ensemble['categorie']}}">
                     </div>
                 </div>
@@ -58,7 +61,7 @@
                         d'infraction :</label>
                     <div>
                         <input id="date_infraction{{un_ensemble['id_resto']}}"
-                               name="date_infraction"
+                               name="date_infraction" class="date_infraction"
                                placeholder="AAAA-MM-DD"
                                title="Le format de date doit respecter la norme ISO-86001"
                                type="text"
@@ -70,7 +73,7 @@
                         de jugement :</label>
                     <div>
                         <input id="date_jugement{{un_ensemble['id_resto']}}"
-                               name="date_jugement"
+                               name="date_jugement" class="date_jugement"
                                placeholder="AAAA-MM-DD"
                                title="Le format de date doit respecter la norme ISO-86001"
                                type="text"
@@ -83,6 +86,7 @@
                     <div>
                         <textarea id="description{{un_ensemble['id_resto']}}"
                                   name="description" rows="6" cols="50"
+                                  class="description"
                                   title="Charactères alphanumériques, les espaces,
                                    l'apostrophe et le tiret sont permis">{{un_ensemble['description']}}</textarea>
                     </div>
@@ -93,9 +97,10 @@
                     <div>
                         <input id="montant{{un_ensemble['id_resto']}}"
                                value="{{un_ensemble['montant']}}"
+                               class="montant"
                                placeholder="1234567" name="montant"
                                title="Charactères numériques seulement"
-                               type="number" maxlength="7">
+                               type="number">
                     </div>
                 </div>
                 <div class="information">
@@ -107,6 +112,7 @@
                                title="Charactères alphanumériques, les espaces,
                                    l'apostrophe et le tiret sont permis"
                                placeholder="123456 QUEBEC INC"
+                               class="proprietaire"
                                value="{{un_ensemble['proprietaire']}}">
                     </div>
                 </div>
@@ -115,7 +121,7 @@
                         le code postal)</label>
                     <div>
                         <input id="ville{{un_ensemble['id_resto']}}"
-                               name="ville" type="text"
+                               name="ville" type="text" class="ville"
                                title="Charactères alphanumériques, les espaces,
                                    l'apostrophe et le tiret sont permis"
                                placeholder="Montréal H1V1L5"
@@ -130,7 +136,7 @@
                                name="etablissement" type="text"
                                title="Charactères alphanumériques, les espaces,
                                    l'apostrophe et le tiret sont permis"
-                               placeholder="Montréal H1V1L5"
+                               placeholder="Resto Patate" class="etablissement"
                                value="{{un_ensemble['etablissement']}}">
                     </div>
                 </div>
@@ -144,7 +150,7 @@
                 </div>
             </div>
         </form>
-        <ul class="aucun" id="message_erreur_precis{{un_ensemble['id_resto']}}"></ul>
+        <ul id="message_erreur_precis{{un_ensemble['id_resto']}}" class="aucun"></ul>
         <p>Résultat - Par rapport à l'action prise sur l'infraction ci-haut</p>
         <!-- Section pour le retour Ajax D1 -->
         <div id="result_precis{{un_ensemble['id_resto']}}"></div>

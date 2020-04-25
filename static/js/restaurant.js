@@ -80,6 +80,11 @@ const champ_lien_desabonnement = document.querySelector('#lien_desabonnement');
 const result_desabonnement = document.querySelector('#result_desabonnement');
 const section_formulaire = document.querySelector('.zone_recherche_resto');
 
+// Variable pour modifier ou supprimer une contrevention
+const form_modif_supp_contrevention = document.querySelector('.modification');
+
+const pattern_categorie = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,48}[a-z0-9A-Z.)]$");
+const pattern_resto = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,63}[a-z0-9A-Z.)]$");
 const pattern_date = new RegExp("^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])$");
 const pattern_code = new RegExp("^[A-Z][0-9][A-Z][ ]{1}[0-9][A-Z][0-9]$");
 const pattern_proprio = new RegExp("^[a-z1-9A-Z][a-z0-9- 'A-Z@_!#$%^&*()<>?/\\|}{~:]{3,98}[a-z0-9A-Z.)]$");
@@ -134,6 +139,31 @@ function initial_recherche_interval_validation(){
     var liste_validation = {"champ_debut_inv": false, "aucun_choix": false,
         "champ_fin_inv": false, "champ_debut_vide": false, "champ_fin_vide": false,
         "champ_liste_resto_vide": false, "les_deux_choix": false, "champs_date_vides": false};
+
+    return liste_validation;
+}
+
+// Cette fonction sera pour D3 pour stocker l'information du formulaire sélectionner
+function initial_champ_interval_precis(){
+    // Ori veut dire valeur original
+    // modif veut dire valeur modifier
+    var liste_champs = {"id_resto": 0, "no_civ_modif": "", "nom_rue_modif": "", "categorie_modif": "",
+        "date_infraction_modif": "", "date_jugement_modif": "", "description_modif": "",
+        "montant_modif": "", "proprietaire_modif": "", "ville_modif": "", "etablissement_modif": "",
+        "no_civ_ori": "", "nom_rue_ori": "", "categorie_ori": "",
+        "date_infraction_ori": "", "date_jugement_ori": "", "description_ori": "",
+        "montant_ori": "", "proprietaire_ori": "", "ville_ori": "", "etablissement_ori": ""};
+
+    return liste_champs;
+
+}
+
+// Cette fonction sera pour D3 pour stocker les validations des champs
+function initial_champ_interval_precis_validation(){
+    var liste_validation = {"date_infraction_inv": false, "date_jugement_inv": false,
+        "nom_rue_inv": false, "categorie_inv": false, "description_inv": false,
+        "proprietaire_inv": false, "etablissement_inv": false, "ville_inv": false,
+        "aucun_modif": false};
 
     return liste_validation;
 }
@@ -397,6 +427,95 @@ function ajout_modif_retrait_photo_profil(){
     }
     });
 }
+
+// Cette fonction sera pour la tache D3 et sélectionnera le formulaire qui a été submit
+function modification_supprimer_contrevenant(){
+    $("form").submit(function(e){
+        e.preventDefault();
+        var id_formulaire = $(this).attr('id');
+        var formulaire = $('#'+id_formulaire);
+        var liste_champs = initial_champ_interval_precis();
+        var liste_validation = initial_champ_interval_precis_validation();
+        liste_champs = remplissage_champs_precis(liste_champs, formulaire);
+
+        var result_precis = $('#message_erreur_precis'+id_formulaire);
+        var message_erreur_precis = $('#result_precis'+id_formulaire);
+
+        console.log(liste_champs);
+        console.log(liste_validation);
+        result_precis.innerHTML = "<li>TESTTTTTTTTTT</li>";
+        message_erreur_precis.innerHTML = "TESTTTTTTTTTT";
+    })
+
+}
+
+// Cette fonctionsera le remplissage en fonctions des champs
+function remplissage_champs_precis(liste_champs, liste_inputs){
+    liste_champs["id_resto"] = liste_inputs.find('.id_resto').val();
+    liste_champs["no_civ_modif"] = liste_inputs.find('.no_civ').val();
+    liste_champs["no_civ_ori"] = liste_inputs.find('.no_civ').prop("defaultValue");
+    liste_champs["nom_rue_modif"] = liste_inputs.find('.nom_rue').val();
+    liste_champs["nom_rue_ori"] = liste_inputs.find('.nom_rue').prop("defaultValue");
+    liste_champs["categorie_modif"] = liste_inputs.find('.categorie').val();
+    liste_champs["categorie_ori"] = liste_inputs.find('.categorie').prop("defaultValue");
+    liste_champs["date_infraction_modif"] = liste_inputs.find('.date_infraction').val();
+    liste_champs["date_infraction_ori"] = liste_inputs.find('.date_infraction').prop("defaultValue");
+    liste_champs["date_jugement_modif"] = liste_inputs.find('.date_jugement').val();
+    liste_champs["date_jugement_ori"] = liste_inputs.find('.date_jugement').prop("defaultValue");
+    liste_champs["description_modif"] = liste_inputs.find('.description').val();
+    liste_champs["description_ori"] = liste_inputs.find('.description').prop("defaultValue");
+    liste_champs["montant_modif"] = liste_inputs.find('.montant').val();
+    liste_champs["montant_ori"] = liste_inputs.find('.montant').prop("defaultValue");
+    liste_champs["proprietaire_modif"] = liste_inputs.find('.proprietaire').val();
+    liste_champs["proprietaire_ori"] = liste_inputs.find('.proprietaire').prop("defaultValue");
+    liste_champs["ville_modif"] = liste_inputs.find('.ville').val();
+    liste_champs["ville_ori"] = liste_inputs.find('.ville').prop("defaultValue");
+    liste_champs["etablissement_modif"] = liste_inputs.find('.etablissement').val();
+    liste_champs["etablissement_ori"] = liste_inputs.find('.etablissement').prop("defaultValue");
+
+    return liste_champs;
+}
+
+// Cette fonction vérifier comment l'information a été saisie
+function validation_champs_precis(liste_champs, liste_validation){
+    if ( (liste_champs["no_civ_modif"] == liste_champs["no_civ_ori"]) &&
+         (liste_champs["nom_rue_modif"] == liste_champs["nom_rue_ori"]) &&
+         (liste_champs["categorie_modif"] == liste_champs["categorie_ori"]) &&
+         (liste_champs["date_infraction_modif"] == liste_champs["date_infraction_ori"]) &&
+         (liste_champs["date_jugement_modif"] == liste_champs["date_jugement_ori"]) &&
+         (liste_champs["description_modif"] == liste_champs["description_ori"]) &&
+         (liste_champs["montant_modif"] == liste_champs["montant_ori"]) &&
+         (liste_champs["proprietaire_modif"] == liste_champs["proprietaire_ori"]) &&
+         (liste_champs["ville_modif"] == liste_champs["ville_ori"]) &&
+         (liste_champs["etablissement_modif"] == liste_champs["etablissement_ori"])
+        ){
+        liste_validation['aucun_modif'] = true;
+    }
+
+    if (!liste_validation['aucun_modif']){
+        if (!(pattern_rue.test(liste_champs["nom_rue_modif"]))) {
+            liste_validation['nom_rue_inv'] = true;
+        }
+        if (!(pattern_categorie.test(liste_champs["categorie_modif"]))) {
+            liste_validation['categorie_inv'] = true;
+        }
+        if (!(pattern_date.test(liste_champs["date_infraction_modif"]))) {
+            liste_validation['date_infraction_inv'] = true;
+        }
+        if (!(pattern_date.test(liste_champs["date_jugement_modif"]))) {
+            liste_validation['date_jugement_inv'] = true;
+        }
+        if (!(pattern_proprio.test(liste_champs["proprietaire_modif"]))) {
+            liste_validation['proprietaire_inv'] = true;
+        }
+        if (!(pattern_resto.test(liste_champs["etablissement_modif"]))) {
+            liste_validation['etablissement_inv'] = true;
+        }
+    }
+
+    return liste_validation;
+}
+
 
 // Cette fonction sera pour la tache E2 à des fins de validations pour vérifier l'état des boutons
 function validation_bouton_section_photo(){
@@ -1108,7 +1227,24 @@ function appel_ajax_retirer_abonnement(){
     ajax.send(data_json);
 }
 
-// Cette fonction servira à refaire la lsite des établissements après l'appel AJAX
+// Cette fonction sera pour la tache D3
+// Cette fonction sera l'appel ajax pour modifier l'information sur une contrevention
+function appel_ajax_modification_contravention(){
+
+
+}
+
+// Cette fonction sera pour la tache D3
+// Cette fonction sera l'appel ajax pour supprimer l'information sur une contrevention
+function appel_ajax_suppression_contravention(){
+
+
+}
+
+
+
+
+// Cette fonction servira à refaire la liste des établissements après l'appel AJAX
 function refaire_etablissement_disponible(liste){
     // On supprime toutes les vieilles options
     $(list_etablissement_dispo).empty();
@@ -1249,6 +1385,7 @@ document.addEventListener('DOMContentLoaded', function () {
     retrait_etablissement_profil();
     ajout_modif_retrait_photo_profil();
     retrait_abonnement_etablissement();
+    modification_supprimer_contrevenant();
     reset_recherche();
     reset_recherche_interval();
     reset_demande_plainte();
