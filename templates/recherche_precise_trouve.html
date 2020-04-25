@@ -1,0 +1,159 @@
+{% extends "layout.html" %}
+{% block content %}
+<p class="desktop" id="hautPageDesktop"></p>
+<h1>Voici la liste des infractions pour &rarr; <span class='userDisplay'>{{etablissement}}</span>
+    &larr;</h1>
+<div class="container">
+    <div class='zone_admin'>
+        <div class="admin">
+            <a class="bouton" href="/deconnection">Déconnexion</a>
+        </div>
+    </div>
+    {% if nombre > 1 %}
+    <h2>Section des <span>{{nombre}}</span>infractions que l'établissement a
+        reçu</h2>
+    {% else %}
+    <h2>Section de la seule infraction que l'établissement a reçu</h2>
+    {% endif %}
+    {% for un_ensemble in ensemble_ajuster %}
+    <div class='zone_recherche_resto'>
+        <form method="post">
+            <div class="modif">
+                <div class="information">
+                    <label for="no_civ{{un_ensemble['id_resto']}}">
+                        Numéro civique :</label>
+                    <div>
+                        <input id="no_civ{{un_ensemble['id_resto']}}"
+                               value="{{un_ensemble['no_civic']}}"
+                               placeholder="12345" name="no_civ"
+                               title="Charactères numériques seulement"
+                               type="number" maxlength="5">
+                    </div>
+                </div>
+                <div class="information">
+                    <label for="nom_rue{{un_ensemble['id_resto']}}">Nom de la
+                        rue :</label>
+                    <div>
+                        <input id="nom_rue{{un_ensemble['id_resto']}}"
+                               name="nom_rue" type="text"
+                               title="Charactères alphanumériques, les espaces,
+                                   l'apostrophe et le tiret sont permis"
+                               placeholder="Rue Onrario"
+                               value="{{un_ensemble['nom_rue']}}">
+                    </div>
+                </div>
+                <div class="information">
+                    <label for="categorie{{un_ensemble['id_resto']}}">Catégorie :</label>
+                    <div>
+                        <input id="categorie{{un_ensemble['id_resto']}}"
+                               name="categorie" type="text"
+                               title="Charactères alphanumériques, les espaces,
+                                   l'apostrophe et le tiret sont permis"
+                               placeholder="Restaurant"
+                               value="{{un_ensemble['categorie']}}">
+                    </div>
+                </div>
+                <div class="information">
+                    <label for="date_infraction{{un_ensemble['id_resto']}}">Date
+                        d'infraction :</label>
+                    <div>
+                        <input id="date_infraction{{un_ensemble['id_resto']}}"
+                               name="date_infraction"
+                               placeholder="AAAA-MM-DD"
+                               title="Le format de date doit respecter la norme ISO-86001"
+                               type="text"
+                               value="{{un_ensemble['date_infraction']}}">
+                    </div>
+                </div>
+                <div class="information">
+                    <label for="date_jugement{{un_ensemble['id_resto']}}">Date
+                        de jugement :</label>
+                    <div>
+                        <input id="date_jugement{{un_ensemble['id_resto']}}"
+                               name="date_jugement"
+                               placeholder="AAAA-MM-DD"
+                               title="Le format de date doit respecter la norme ISO-86001"
+                               type="text"
+                               value="{{un_ensemble['date_jugement']}}">
+                    </div>
+                </div>
+                <div class="information">
+                    <label for="description{{un_ensemble['id_resto']}}">Description
+                        :</label>
+                    <div>
+                        <textarea id="description{{un_ensemble['id_resto']}}"
+                                  name="description" rows="6" cols="50"
+                                  title="Charactères alphanumériques, les espaces,
+                                   l'apostrophe et le tiret sont permis">{{un_ensemble['description']}}</textarea>
+                    </div>
+                </div>
+                <div class="information">
+                    <label for="montant{{un_ensemble['id_resto']}}">
+                        Montant :</label>
+                    <div>
+                        <input id="montant{{un_ensemble['id_resto']}}"
+                               value="{{un_ensemble['montant']}}"
+                               placeholder="1234567" name="montant"
+                               title="Charactères numériques seulement"
+                               type="number" maxlength="7">
+                    </div>
+                </div>
+                <div class="information">
+                    <label for="proprietaire{{un_ensemble['id_resto']}}">Propriétaire
+                        :</label>
+                    <div>
+                        <input id="proprietaire{{un_ensemble['id_resto']}}"
+                               name="proprietaire" type="text"
+                               title="Charactères alphanumériques, les espaces,
+                                   l'apostrophe et le tiret sont permis"
+                               placeholder="123456 QUEBEC INC"
+                               value="{{un_ensemble['proprietaire']}}">
+                    </div>
+                </div>
+                <div class="information">
+                    <label for="ville{{un_ensemble['id_resto']}}">Ville : (Inclu
+                        le code postal)</label>
+                    <div>
+                        <input id="ville{{un_ensemble['id_resto']}}"
+                               name="ville" type="text"
+                               title="Charactères alphanumériques, les espaces,
+                                   l'apostrophe et le tiret sont permis"
+                               placeholder="Montréal H1V1L5"
+                               value="{{un_ensemble['ville']}}">
+                    </div>
+                </div>
+                <div class="information">
+                    <label for="etablissement{{un_ensemble['id_resto']}}">Établissement
+                        :</label>
+                    <div>
+                        <input id="etablissement{{un_ensemble['id_resto']}}"
+                               name="etablissement" type="text"
+                               title="Charactères alphanumériques, les espaces,
+                                   l'apostrophe et le tiret sont permis"
+                               placeholder="Montréal H1V1L5"
+                               value="{{un_ensemble['etablissement']}}">
+                    </div>
+                </div>
+                <div class="trois_bouton">
+                    <input class="bouton"
+                           name="modifier{{un_ensemble['id_resto']}}"
+                           type='submit' value="Modifier...">
+                    <input class="bouton"
+                           name="retirer{{un_ensemble['id_resto']}}"
+                           type='submit' value="Retirer...">
+                </div>
+            </div>
+        </form>
+        <ul class="aucun" id="message_erreur_precis{{un_ensemble['id_resto']}}"></ul>
+        <p>Résultat - Par rapport à l'action prise sur l'infraction ci-haut</p>
+        <!-- Section pour le retour Ajax D1 -->
+        <div id="result_precis{{un_ensemble['id_resto']}}"></div>
+    </div>
+    {% endfor %}
+    <!-- https://publicdomainvectors.org/fr/gratuitement-des-vecteurs/Orange-fl%C3%A8che-pointant-vers-le-haut-de-dessin-vectoriel/9499.html -->
+    <div class="return">
+        <a class="desktop" href="#hautPageDesktop">
+            <img alt="Retour vers le haut" src="/img/fleche_haut.svg"></a>
+    </div>
+</div>
+{% endblock content %}

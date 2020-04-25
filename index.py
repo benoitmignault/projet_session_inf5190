@@ -592,9 +592,14 @@ def liste_contravention_par_etablissement():
             liste_champs_precis["etablissement"])
         ensemble_ajuster = conn_db.verification_ensemble_modifier(
             ensemble_trouve)
-        print(ensemble_ajuster)
+        nombre = len(ensemble_ajuster)
+        titre = "Résultat - précis !"
 
-        return "", 200
+        return render_template("recherche_precise_trouve.html", titre=titre,
+                               ensemble_ajuster=ensemble_ajuster,
+                               etablissement=
+                               liste_champs_precis["etablissement"],
+                               nombre=nombre)
 
     else:
         return abort(404)

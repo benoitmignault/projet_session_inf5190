@@ -92,7 +92,7 @@ class Database:
         cursor = self.get_connection().cursor()
         select = "select proprietaire, categorie, etablissement, no_civique, " \
                  "nom_rue, ville, description, date_infraction, " \
-                 "date_jugement, montant_amende, id_resto "
+                 "date_jugement, montant_amende "
         fromm = "from mauvais_restaurants "
         where = "where date_infraction BETWEEN ? AND ? "
         order = "order by date_infraction "
@@ -137,7 +137,7 @@ class Database:
         cursor = self.get_connection().cursor()
         select = "select proprietaire, categorie, etablissement, no_civique, " \
                  "nom_rue, ville, description, date_infraction, " \
-                 "date_jugement, montant_amende, id_resto "
+                 "date_jugement, montant_amende "
         fromm = "from mauvais_restaurants "
         where = "where etablissement = ? "
         order = "order by date_infraction "
@@ -472,7 +472,7 @@ class Database:
         sql = select + fromm + where + order
         cursor.execute(sql, (date_debut, date_fin, etablissement))
         result = cursor.fetchall()
-        ensemble_trouve = recuperation_resultat(result)
+        ensemble_trouve = recuperation_resultat_precis(result)
 
         return ensemble_trouve
 
@@ -484,7 +484,6 @@ class Database:
     def verification_ensemble_modifier(self, ensemble):
         ensemble_ajuster = []
         for un_ensemble in ensemble:
-            print(un_ensemble["id_resto"])
             cursor = self.get_connection().cursor()
             select = "select id_resto "
             fromm = "from mauvais_restaurants_supp "
@@ -494,9 +493,9 @@ class Database:
             result = cursor.fetchone()
             if result is None:
                 select2 = "select proprietaire, categorie, etablissement, " \
-                         "no_civique, nom_rue, ville, description, " \
-                         "date_infraction, date_jugement, montant_amende, " \
-                         "id_resto "
+                          "no_civique, nom_rue, ville, description, " \
+                          "date_infraction, date_jugement, montant_amende, " \
+                          "id_resto "
                 fromm2 = "from mauvais_restaurants_modif "
                 where2 = "where id_resto = ? "
                 sql2 = select2 + fromm2 + where2
@@ -506,7 +505,7 @@ class Database:
                     ensemble_ajuster.append(un_ensemble)
 
                 else:
-                    un_ensemble_modifier = creation_sous_ensemble(result)
+                    un_ensemble_modifier = creation_sous_ensemble_precis(result)
                     ensemble_ajuster.append(un_ensemble_modifier)
 
         return ensemble_ajuster
@@ -606,12 +605,23 @@ def execution_requete_dynamique(nb_critere, liste_critere, sql, cursor):
     return result
 
 
-# Cette fonction sera pour les taches A2, A4, A5, A6 et D3
+# Cette fonction sera pour les taches A2, A4, A5, A6
 def recuperation_resultat(result):
     ensemble_trouve = []
     if result is not None:
         for un_resto_trouve in result:
             sous_ensemble = creation_sous_ensemble(un_resto_trouve)
+            ensemble_trouve.append(sous_ensemble)
+
+    return ensemble_trouve
+
+
+# Cette fonction sera pour les taches D3
+def recuperation_resultat_precis(result):
+    ensemble_trouve = []
+    if result is not None:
+        for un_resto_trouve in result:
+            sous_ensemble = creation_sous_ensemble_precis(un_resto_trouve)
             ensemble_trouve.append(sous_ensemble)
 
     return ensemble_trouve
@@ -662,19 +672,34 @@ def recuperation_liste_courriel(result):
     return liste_courriels
 
 
-# Cette fonction sera commune pour plusieurs fonction de la classe Database
+# Cette fonction sera commune pour plusieurs taches
 def creation_sous_ensemble(un_resto_trouve):
     sous_ensemble = {'Propriétaire': un_resto_trouve[0],
                      'Catégorie': un_resto_trouve[1],
                      'Établissement': un_resto_trouve[2],
-                     'Adresse':
-                         un_resto_trouve[3] + " " +
-                         un_resto_trouve[4],
+                     'Adresse': un_resto_trouve[3] + " " + un_resto_trouve[4],
                      'Ville': un_resto_trouve[5],
                      'Description': un_resto_trouve[6],
                      "Date d'infraction": un_resto_trouve[7],
                      'Date de jugement': un_resto_trouve[8],
-                     "Montant": un_resto_trouve[9],
+                     "Montant": un_resto_trouve[9]}
+
+    return sous_ensemble
+
+
+# Cette fonction sera pour D3
+# Les clés seront comme des variables
+def creation_sous_ensemble_precis(un_resto_trouve):
+    sous_ensemble = {'proprietaire': un_resto_trouve[0],
+                     'categorie': un_resto_trouve[1],
+                     'etablissement': un_resto_trouve[2],
+                     'no_civic': un_resto_trouve[3],
+                     'nom_rue': un_resto_trouve[4],
+                     'ville': un_resto_trouve[5],
+                     'description': un_resto_trouve[6],
+                     "date_infraction": un_resto_trouve[7],
+                     'date_jugement': un_resto_trouve[8],
+                     "montant": un_resto_trouve[9],
                      "id_resto": un_resto_trouve[10]}
 
     return sous_ensemble
