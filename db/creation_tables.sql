@@ -27,8 +27,7 @@ create table mauvais_restaurants_modif (
 );
 
 create table mauvais_restaurants_supp (
-	id_resto integer primary key,
-  etablissement varchar(65) not null
+	id_resto integer primary key
 );
 
 

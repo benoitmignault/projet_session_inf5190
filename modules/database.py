@@ -46,7 +46,7 @@ class Database:
 
         return ensemble_trouve
 
-    # Cette fonction sera utilisé pour l»'affichage des établissements
+    # Cette fonction sera utilisé pour l'affichage des établissements
     # trouvé à la recherche faite en A2
     def liste_restaurant_trouver(self, liste_champs):
         cursor = self.get_connection().cursor()
@@ -92,7 +92,7 @@ class Database:
         cursor = self.get_connection().cursor()
         select = "select proprietaire, categorie, etablissement, no_civique, " \
                  "nom_rue, ville, description, date_infraction, " \
-                 "date_jugement, montant_amende "
+                 "date_jugement, montant_amende, id_resto "
         fromm = "from mauvais_restaurants "
         where = "where date_infraction BETWEEN ? AND ? "
         order = "order by date_infraction "
@@ -137,7 +137,7 @@ class Database:
         cursor = self.get_connection().cursor()
         select = "select proprietaire, categorie, etablissement, no_civique, " \
                  "nom_rue, ville, description, date_infraction, " \
-                 "date_jugement, montant_amende "
+                 "date_jugement, montant_amende, id_resto "
         fromm = "from mauvais_restaurants "
         where = "where etablissement = ? "
         order = "order by date_infraction "
@@ -460,6 +460,57 @@ class Database:
         connection.execute(sql, (lien_desabonnement,))
         connection.commit()
 
+    # Cette fonction sera pour la tache D3
+    def recuperation_interval_precis(self, date_debut, date_fin, etablissement):
+        cursor = self.get_connection().cursor()
+        select = "select proprietaire, categorie, etablissement, no_civique, " \
+                 "nom_rue, ville, description, date_infraction, " \
+                 "date_jugement, montant_amende, id_resto "
+        fromm = "from mauvais_restaurants "
+        where = "where date_infraction BETWEEN ? AND ? AND etablissement = ? "
+        order = "order by date_infraction "
+        sql = select + fromm + where + order
+        cursor.execute(sql, (date_debut, date_fin, etablissement))
+        result = cursor.fetchall()
+        ensemble_trouve = recuperation_resultat(result)
+
+        return ensemble_trouve
+
+    # Cette fonction sera pour la tache D3
+    # On doit passer à travers toutes les infraction du restaurant
+    # On commence par vérifier si l'infraction a été supprimée
+    # Si oui, on passe direct à la prochaine infraction sans rien faire
+    # Si non, on vérifi si l'infraction aurait pu être modifier alors
+    def verification_ensemble_modifier(self, ensemble):
+        ensemble_ajuster = []
+        for un_ensemble in ensemble:
+            print(un_ensemble["id_resto"])
+            cursor = self.get_connection().cursor()
+            select = "select id_resto "
+            fromm = "from mauvais_restaurants_supp "
+            where = "where id_resto = ? "
+            sql = select + fromm + where
+            cursor.execute(sql, (un_ensemble["id_resto"],))
+            result = cursor.fetchone()
+            if result is None:
+                select2 = "select proprietaire, categorie, etablissement, " \
+                         "no_civique, nom_rue, ville, description, " \
+                         "date_infraction, date_jugement, montant_amende, " \
+                         "id_resto "
+                fromm2 = "from mauvais_restaurants_modif "
+                where2 = "where id_resto = ? "
+                sql2 = select2 + fromm2 + where2
+                cursor.execute(sql2, (un_ensemble["id_resto"],))
+                result = cursor.fetchone()
+                if result is None:
+                    ensemble_ajuster.append(un_ensemble)
+
+                else:
+                    un_ensemble_modifier = creation_sous_ensemble(result)
+                    ensemble_ajuster.append(un_ensemble_modifier)
+
+        return ensemble_ajuster
+
 
 # La préparation des critères en vue d'utiliser l'opérateur like aura
 # maintenant une longueur minimale de 2 charactères pour un critère
@@ -555,22 +606,12 @@ def execution_requete_dynamique(nb_critere, liste_critere, sql, cursor):
     return result
 
 
-# Cette fonction sera pour les taches A2 et A4, A5, A6
+# Cette fonction sera pour les taches A2, A4, A5, A6 et D3
 def recuperation_resultat(result):
     ensemble_trouve = []
     if result is not None:
         for un_resto_trouve in result:
-            sous_ensemble = {'Propriétaire': un_resto_trouve[0],
-                             'Catégorie': un_resto_trouve[1],
-                             'Établissement': un_resto_trouve[2],
-                             'Adresse':
-                                 un_resto_trouve[3] + " " +
-                                 un_resto_trouve[4],
-                             'Ville': un_resto_trouve[5],
-                             'Description': un_resto_trouve[6],
-                             "Date d'infraction": un_resto_trouve[7],
-                             'Date de jugement': un_resto_trouve[8],
-                             "Montant": un_resto_trouve[9]}
+            sous_ensemble = creation_sous_ensemble(un_resto_trouve)
             ensemble_trouve.append(sous_ensemble)
 
     return ensemble_trouve
@@ -619,3 +660,21 @@ def recuperation_liste_courriel(result):
             liste_courriels.append(un_etablissement[0])
 
     return liste_courriels
+
+
+# Cette fonction sera commune pour plusieurs fonction de la classe Database
+def creation_sous_ensemble(un_resto_trouve):
+    sous_ensemble = {'Propriétaire': un_resto_trouve[0],
+                     'Catégorie': un_resto_trouve[1],
+                     'Établissement': un_resto_trouve[2],
+                     'Adresse':
+                         un_resto_trouve[3] + " " +
+                         un_resto_trouve[4],
+                     'Ville': un_resto_trouve[5],
+                     'Description': un_resto_trouve[6],
+                     "Date d'infraction": un_resto_trouve[7],
+                     'Date de jugement': un_resto_trouve[8],
+                     "Montant": un_resto_trouve[9],
+                     "id_resto": un_resto_trouve[10]}
+
+    return sous_ensemble

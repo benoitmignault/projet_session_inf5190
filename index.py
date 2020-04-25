@@ -4,7 +4,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.combining import OrTrigger
 from apscheduler.triggers.cron import CronTrigger
 from flask import Flask, Response, jsonify, redirect, make_response
-from flask import render_template, request, session, url_for
+from flask import render_template, request, session, url_for, abort
 from flask_json_schema import JsonSchema
 from flask_json_schema import JsonValidationError
 
@@ -27,6 +27,14 @@ def not_found_404(e):
     titre = "Page inexistante"
     return render_template("erreur_404.html", titre=titre,
                            erreur_404=erreur_404), 404
+
+
+@app.errorhandler(400)
+def not_found_400(e):
+    titre = "Erreur Système - 400"
+    erreur_400 = True
+    return render_template('erreur_400.html', titre=titre,
+                           erreur_400=erreur_400), 400
 
 
 @app.errorhandler(JsonValidationError)
@@ -166,10 +174,7 @@ def recherche_contrevenants_interval():
             return jsonify(ensemble_trouve)
 
     else:
-        titre = "Erreur Système - 400"
-        erreur_400 = True
-        return render_template('erreur_400.html', titre=titre,
-                               erreur_400=erreur_400), 400
+        return abort(400)
 
 
 # Cette fonction était pour la tache A6
@@ -257,7 +262,7 @@ def suppression_plainte(id_plainte):
     no_plainte = conn_db.verification_existance_plainte(id_plainte)
 
     if no_plainte is None:
-        return "", 404
+        return abort(404)
     else:
         conn_db.suppression_plainte_existante(no_plainte)
         return {"La plainte a bien été supprimée": no_plainte}, 200
@@ -425,7 +430,7 @@ def ajouter_photo():
         return redirect(url_for('.profil_connecter'))
 
     else:
-        return "", 404
+        return abort(404)
 
 
 # Cette fonction est pour la tache E2
@@ -438,7 +443,7 @@ def supprimer_photo():
     id_photo = data["id_photo"]
 
     if id_personne == "" or id_photo == "":
-        return "", 404
+        return abort(404)
 
     else:
         conn_db.supprimer_photo_profil(id_photo)
@@ -498,7 +503,8 @@ def retirer_etablissement():
         data['id_surveillance'])
 
     if id_surveillance is None:
-        return "", 404
+        return abort(404)
+
     else:
         conn_db.supprimer_etablissement_profil(
             data['id_personne'], id_surveillance)
@@ -514,10 +520,8 @@ def desabonnement(lien):
     conn_db = get_db()
     info_desabonnement = conn_db.verif_lien_desabonnement(lien)
     if info_desabonnement is None:
-        erreur_404 = True
-        titre = "Page inexistante"
-        return render_template("erreur_404.html", titre=titre,
-                               erreur_404=erreur_404), 404
+
+        return abort(404)
 
     else:
         titre = "Page de désabonnement"
@@ -573,11 +577,27 @@ def personne_non_autorisee():
 # Cette fonction était pour la tache D3
 @app.route('/liste_des_contrevenants/interval', methods=["GET"])
 def liste_contravention_par_etablissement():
-    print( request.args["du"])
-    print(request.args["au"])
-    print(request.args["etablissement"])
+    liste_champs_precis = initial_champ_precis()
+    liste_champs_precis_valid = initial_champ_precis_validation()
+    liste_champs_precis = remplissage_champs_precis(
+        liste_champs_precis, request.args)
+    liste_champs_precis_valid = validation_champs_precis(
+        liste_champs_precis, liste_champs_precis_valid)
+    liste_champs_precis_valid = situation_erreur_interval(
+        liste_champs_precis_valid)
+    if not liste_champs_precis_valid['situation_erreur']:
+        conn_db = get_db()
+        ensemble_trouve = conn_db.recuperation_interval_precis(
+            liste_champs_precis["date_debut"], liste_champs_precis["date_fin"],
+            liste_champs_precis["etablissement"])
+        ensemble_ajuster = conn_db.verification_ensemble_modifier(
+            ensemble_trouve)
+        print(ensemble_ajuster)
 
-    return "", 200
+        return "", 200
+
+    else:
+        return abort(404)
 
 
 # La fonction sera exécuté à chaque jour à minuit, automatiquement

@@ -25,7 +25,7 @@ URL = 'http://donnees.ville.montreal.qc.ca/dataset/a5c1f0b9-261f-4247-99d8-' \
 
 PATTERN_PROPRIO = "^[1-9\\w+][\\w+0-9- .'@_!#$%^&*()<>?/\\|}{~:]{3,63}" \
                   "[0-9\\w+.)]$"
-PATTERN_NOM_RESTO = "^[1-9\\w+][\\w+0-9- .'@_!#$%^&*()<>?/\\|}{~:]{3,98}" \
+PATTERN_NOM_RESTO = "^[1-9\\w+][\\w+0-9- .'@_!#$%^&*()<>?/\\|}{~:]{3,63}" \
                     "[\\w+0-9.)]$"
 PATTERN_NOM_RUE = "^[\\w+1-9][\\w+0-9- ']{1,33}[\\w+0-9]$"
 
@@ -74,6 +74,13 @@ def initialisation_connexion_hors_flask():
     connection.get_connection()
 
     return connection
+
+
+# Cette fonction est pour la tache D3
+def initial_champ_precis():
+    liste_champs = {"date_debut": "", "date_fin": "", "etablissement": ""}
+
+    return liste_champs
 
 
 # Cette fonction sera utiliser pour B1, B2
@@ -234,6 +241,15 @@ def remplissage_champs_interval(liste_champs, date_debut, date_fin):
     return liste_champs
 
 
+# Cette fonction est pour la tache D3
+def remplissage_champs_precis(liste_champs, parametres):
+    liste_champs['date_debut'] = parametres["du"]
+    liste_champs['date_fin'] = parametres["au"]
+    liste_champs['etablissement'] = parametres["etablissement"]
+
+    return liste_champs
+
+
 # Cette fonction sera pour les taches A1, B1, B2
 # Les dates qui sont disponible sur le site de la ville de Montréal
 # ne sont pas sous le format ISO, donc il a fallu usé d'ingénieusité
@@ -345,6 +361,15 @@ def initial_champ_interval_validation():
     liste_validation = {"situation_erreur": False, "champ_debut_inv": False,
                         "champ_fin_inv": False, "champ_debut_vide": False,
                         "champ_fin_vide": False}
+
+    return liste_validation
+
+
+def initial_champ_precis_validation():
+    liste_validation = {"situation_erreur": False, "champ_debut_inv": False,
+                        "champ_fin_inv": False, "champ_debut_vide": False,
+                        "champ_fin_vide": False, "champ_resto_vide": False,
+                        "champ_resto_inv": False}
 
     return liste_validation
 
@@ -667,6 +692,23 @@ def validation_champs_interval(liste_champs, liste_validation):
         liste_champs, liste_validation)
     liste_validation = sous_validation_champs_invalide_ajax(
         liste_champs, liste_validation)
+
+    return liste_validation
+
+
+def validation_champs_precis(liste_champs, liste_validation):
+    liste_validation = validation_champs_interval(
+        liste_champs, liste_validation)
+
+    # Une simple validation direct pour l'établissement comme c'est le seul
+    # moment où l'établissement peut être saisir manuellement
+    if liste_champs['etablissement'] == "":
+        liste_validation['champ_resto_vide'] = True
+
+    else:
+        match_resto = re.compile(PATTERN_NOM_RESTO).match
+        if match_resto(liste_champs['etablissement']) is None:
+            liste_validation['champ_resto_inv'] = True
 
     return liste_validation
 
