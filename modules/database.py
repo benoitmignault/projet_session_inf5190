@@ -90,7 +90,7 @@ class Database:
     # Cette fonction est pour la taches A4
     def liste_contravention_interval(self, date_debut, date_fin):
         cursor = self.get_connection().cursor()
-        select = "select proprietaire, categorie, etablissement, no_civique, " \
+        select = "select proprietaire, categorie, etablissement, no_civique," \
                  "nom_rue, ville, description, date_infraction, " \
                  "date_jugement, montant_amende "
         fromm = "from mauvais_restaurants "
@@ -135,7 +135,7 @@ class Database:
     # Cette fonction est pour la taches A6
     def liste_contravention_etablissement(self, nom):
         cursor = self.get_connection().cursor()
-        select = "select proprietaire, categorie, etablissement, no_civique, " \
+        select = "select proprietaire, categorie, etablissement, no_civique," \
                  "nom_rue, ville, description, date_infraction, " \
                  "date_jugement, montant_amende "
         fromm = "from mauvais_restaurants "

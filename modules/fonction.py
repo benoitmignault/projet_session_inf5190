@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from io import BytesIO, StringIO
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import hashlib
 import uuid
@@ -97,7 +97,8 @@ def mise_jour_bd():
             liste_champs_xml["date_jugement"], liste_champs_xml["montant"])
         if len(ensemble_existant) == 0:
             connection.insertion_contrevenant(
-                liste_champs_xml["proprietaire"], liste_champs_xml["categorie"],
+                liste_champs_xml["proprietaire"],
+                liste_champs_xml["categorie"],
                 liste_champs_xml["etablissement"], liste_champs_xml["no_civ"],
                 liste_champs_xml["nom_rue"], liste_champs_xml["ville"],
                 liste_champs_xml["description"],
@@ -462,8 +463,8 @@ def preparation_courriel_specialise(conn, contrevenants):
                     un_etablissement['etablissement'], information_profil[3],
                     conn)
                 contenu_courriel = creation_html_courriel_intro_personnalise(
-                    information_profil[0], information_profil[1], lien_securise,
-                    un_etablissement['etablissement'])
+                    information_profil[0], information_profil[1],
+                    lien_securise, un_etablissement['etablissement'])
                 contenu_courriel += creation_html_courriel_commun_corp(
                     liste_etablissement)
                 creation_courriel(sujet, un_courriel, contenu_courriel)
@@ -513,9 +514,9 @@ def creation_html_courriel_intro_personnalise(prenom, nom, lien_securise,
     <meta charset="utf-8">
     </head><body>
     <h2>Bonjour {} {},</h2>
-    <p>Voici la nouvelle infraction de votre établissement en surveillance :</p>
-    <p>{}</p>
-    <p><a target="_blank" 
+    <p>Voici la nouvelle infraction de votre établissement
+     en surveillance :</p>
+    <p>{}</p><p><a target="_blank"
     href="http://127.0.0.1:5000/connecter/desabonnement/{}">
     Lien pour vous désabonnez</a></p>
     """
@@ -531,7 +532,7 @@ def creation_html_courriel_intro_general():
         <meta charset="utf-8">
         </head><body>
         <h2>Bonjour,</h2>
-        <p>Voici la liste des nouveaux contrevenants depuis la derniere 
+        <p>Voici la liste des nouveaux contrevenants depuis la derniere
         mise a jour pour la ville de Montreal</p>
     """
 
@@ -540,16 +541,16 @@ def creation_html_courriel_intro_general():
 
 # Cette fonction sera pour la tache B1 et E3
 def creation_html_courriel_commun_corp(contrevenants):
-    msg_corps = """<table style="border-collapse: collapse; border: 2px solid black; 
-            width: 100%"><thead>
-            <tr>
-            <th>Propriétaire</th><th>Catégorie</th><th>Établissement</th> 
-            <th>No Civique</th><th>Rue</th><th>Ville & Code Postal</th>
-            <th>Description</th><th>Date de l'infraction</th>
-            <th>Date du jugement</th><th>Montant</th>
-            </tr>
-            </thead><tbody>    
-        """
+    msg_corps = """<table style="border-collapse: collapse;
+        border: 2px solid black; width: 100%"><thead>
+        <tr>
+        <th>Propriétaire</th><th>Catégorie</th><th>Établissement</th>
+        <th>No Civique</th><th>Rue</th><th>Ville & Code Postal</th>
+        <th>Description</th><th>Date de l'infraction</th>
+        <th>Date du jugement</th><th>Montant</th>
+        </tr>
+        </thead><tbody>
+    """
     for un_etablissement in contrevenants:
         msg_corps += "<tr>"
         for cle, valeur in un_etablissement.items():
@@ -617,7 +618,7 @@ def nombre_critiere_recherche(liste_champs):
 # Cette fonction sera pour la tache E2
 def validation_champ_connexion(liste_champs, liste_validation):
     if (not liste_validation['champ_courriel_vide'] and not
-    liste_validation['champ_password_vide']):
+            liste_validation['champ_password_vide']):
         liste_validation = sous_validation_courriel_connexion(liste_champs,
                                                               liste_validation)
         liste_validation = sous_validation_password_connexion(liste_champs,
@@ -779,7 +780,8 @@ def situation_erreur(liste_validation):
     return liste_validation
 
 
-# Cette fonction sera utilisé par pas mal de taches pour vérifier si on poursuit
+# Cette fonction sera utilisé par pas mal de taches
+# pour vérifier si on poursuit
 # la route ou si on l'a met en erreur avec un un code 400
 def situation_erreur_interval(liste_validation):
     for cle, valeur in liste_validation.items():
@@ -892,15 +894,17 @@ def sous_message_erreur_password(messages, liste_validation):
                             "saisie était invalide !")
 
         if liste_validation['longueur_password_inv']:
-            messages.append("Attention la longueur permise pour le mot de passe"
+            messages.append("Attention la longueur permise pour "
+                            "le mot de passe"
                             "se trouve entre 8 et 20 charactères !")
 
         if liste_validation['champ_password_non_trouve'] and not \
                 liste_validation['champ_courriel_non_trouve']:
             messages.append("Au moment de vous connectez, votre mot de passe "
                             "n'était pas le bon avec votre courriel !")
-            messages.append("Vous devez vous créer un nouveau profil, comme la "
-                            "mécanique de réinitialisation de mot de passe "
-                            "n'est pas en place pour l'instant...")
+            messages.append("Vous devez vous créer un nouveau profil,"
+                            "comme la mécanique de réinitialisation "
+                            "de mot de passe n'est pas en place "
+                            "pour l'instant...")
 
     return messages

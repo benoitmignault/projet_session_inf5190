@@ -237,7 +237,7 @@ def api_creation_plainte():
         liste_champs_plainte['description'])
 
     return jsonify({"Voici le numéro de la plainte ouverte":
-                        liste_champs_plainte['id_plainte']}), 201
+                    liste_champs_plainte['id_plainte']}), 201
 
 
 # Cette fonction est pour la tache D1 de l'interface web
@@ -287,7 +287,7 @@ def api_creation_profil():
 
     else:
         return jsonify({"Impossible de créer le profil":
-                            "Courriel est déjà présent !"}), 404
+                        "Courriel est déjà présent !"}), 404
 
 
 # Cette fonction est pour la tache E2
@@ -566,8 +566,8 @@ def is_authenticated(session):
 def personne_non_autorisee():
     return Response("Vous tentez d''accéder à une page web sécurité !<br>"
                     "Veuillez vous authentifiez avec ce lien :<br> "
-                    "<a href=\"/connection\">Se Connecter</a>'"
-                    , 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
+                    "<a href=\"/connection\">Se Connecter</a>'", 401,
+                    {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 
 # La fonction sera exécuté à chaque jour à minuit, automatiquement
