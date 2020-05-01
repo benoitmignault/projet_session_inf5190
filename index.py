@@ -32,7 +32,7 @@ def not_found_404(e):
 @app.errorhandler(JsonValidationError)
 def validation_error(erreur):
     errors = [validation.message for validation in erreur.errors]
-
+    
     return jsonify({"Le champ en problème": erreur.message,
                     "Le message d'erreur": errors}), 400
 
@@ -40,7 +40,7 @@ def validation_error(erreur):
 @app.teardown_appcontext
 def close_connection(exception):
     db = getattr(g, '_database', None)
-
+    
     if db is not None:
         db.disconnect()
 
@@ -54,24 +54,24 @@ def documentation():
 def home():
     if session.get('reset_cookie'):
         session.clear()
-
+    
     if session.get('titre'):
         titre = session['titre']
-
+    
     else:
         titre = "Recherche de contrevenant"
-
+    
     if session.get('erreur_recherche'):
         liste_champs = session['liste_champs']
         liste_validation = session['liste_validation']
-
+    
     else:
         liste_champs = initial_champ_recherche()
         liste_validation = initial_champ_recherche_validation()
-
+    
     conn_db = get_db()
     liste_etablissement = conn_db.liste_tous_restaurants()
-
+    
     return render_template('home.html', titre=titre,
                            liste_etablissement=liste_etablissement,
                            liste_validation=liste_validation,
@@ -94,10 +94,10 @@ def recherche_restaurant():
         liste_champs['nb_restaurant_trouve'] = len(ensemble_trouve)
         if liste_champs['nb_restaurant_trouve'] == 0:
             liste_validation['aucun_restaurant_trouve'] = True
-
+    
     else:
         liste_validation['aucun_restaurant_trouve'] = True
-
+    
     liste_validation = situation_erreur(liste_validation)
     # Utilisation des variables de sessions pour transporter
     # les données nécessaire dans le traitement de la prochaine route
@@ -107,7 +107,7 @@ def recherche_restaurant():
         session['liste_champs'] = liste_champs
         session['titre'] = "Problème avec la recherche !"
         session['liste_validation'] = liste_validation
-
+        
         return redirect(url_for('.home'))
     else:
         session['titre'] = "Recherche réussi !"
@@ -156,15 +156,15 @@ def recherche_contrevenants_interval():
             ensemble_trouve = conn_db.liste_contravention_interval(
                 liste_champs_interval['date_debut'],
                 liste_champs_interval['date_fin'])
-
+            
             return jsonify(ensemble_trouve)
-
+        
         else:
             ensemble_trouve = conn_db.nombre_contravention_interval(
                 liste_champs_interval['date_debut'],
                 liste_champs_interval['date_fin'])
             return jsonify(ensemble_trouve)
-
+    
     else:
         titre = "Erreur Système - 400"
         erreur_400 = True
@@ -179,9 +179,9 @@ def recherche_liste_contravention_par_etablissement():
         conn_db = get_db()
         ensemble_trouve = conn_db.liste_contravention_etablissement(
             request.args["choix"])
-
+        
         return jsonify(ensemble_trouve)
-
+    
     else:
         titre = "Erreur Système - 400"
         erreur_400 = True
@@ -194,7 +194,7 @@ def recherche_liste_contravention_par_etablissement():
 def recherche_contrevenants_json():
     conn_db = get_db()
     ensemble_trouve = conn_db.nombre_contravention()
-
+    
     return jsonify(ensemble_trouve)
 
 
@@ -204,7 +204,7 @@ def recherche_contrevenants_xml():
     conn_db = get_db()
     ensemble_trouve = conn_db.nombre_contravention()
     xml_information = construction_xml(ensemble_trouve)
-
+    
     return Response(xml_information, mimetype='text/xml')
 
 
@@ -214,7 +214,7 @@ def recherche_contrevenants_csv():
     conn_db = get_db()
     ensemble_trouve = conn_db.nombre_contravention()
     csv_information = construction_csv(ensemble_trouve)
-
+    
     return Response(csv_information, mimetype='text/csv')
 
 
@@ -235,9 +235,9 @@ def api_creation_plainte():
         liste_champs_plainte['prenom_plaignant'],
         liste_champs_plainte['nom_plaignant'],
         liste_champs_plainte['description'])
-
+    
     return jsonify({"Voici le numéro de la plainte ouverte":
-                    liste_champs_plainte['id_plainte']}), 201
+                        liste_champs_plainte['id_plainte']}), 201
 
 
 # Cette fonction est pour la tache D1 de l'interface web
@@ -255,7 +255,7 @@ def creation_plainte():
 def suppression_plainte(id_plainte):
     conn_db = get_db()
     no_plainte = conn_db.verification_existance_plainte(id_plainte)
-
+    
     if no_plainte is None:
         return "", 404
     else:
@@ -271,10 +271,10 @@ def api_creation_profil():
     liste_champs_profil = initial_champ_nouveau_profil()
     liste_champs_profil = remplissage_champ_nouveau_profil(
         request, liste_champs_profil)
-
+    
     courriel = conn_db.verification_profil_existant(
         liste_champs_profil['courriel'])
-
+    
     if courriel is None:
         conn_db.inserer_nouveau_profil(
             liste_champs_profil['nom'], liste_champs_profil['prenom'],
@@ -282,19 +282,19 @@ def api_creation_profil():
             liste_champs_profil['password_hasher'],
             liste_champs_profil['salt'],
             liste_champs_profil['liste_etablissement'])
-
+        
         return jsonify({"Création du nouveau profil": "Succès !"}), 201
-
+    
     else:
         return jsonify({"Impossible de créer le profil":
-                        "Courriel est déjà présent !"}), 404
+                            "Courriel est déjà présent !"}), 404
 
 
 # Cette fonction est pour la tache E2
 @app.route('/nouveau_profil', methods=["GET"])
 def creation_profil():
     conn_db = get_db()
-
+    
     liste_etablissement = conn_db.liste_tous_restaurants()
     titre = "Création d'un profil"
     return render_template('creation_profil.html', titre=titre,
@@ -308,7 +308,7 @@ def connexion_profil():
         titre = "Page de Connexion !"
         return render_template("connection.html", courriel="", password="",
                                titre=titre, messages=[], erreur=False)
-
+    
     elif request.method == "POST":
         liste_champs_connexion = initial_champ_connexion()
         liste_validation_connexion = initial_champ_connexion_validation()
@@ -319,28 +319,28 @@ def connexion_profil():
             liste_champs_connexion['courriel'])
         if utilisateur is None:
             liste_validation_connexion['champ_courriel_non_trouve'] = True
-
+        
         else:
             liste_champs_connexion = remplissage_post_verification_conn(
                 liste_champs_connexion, utilisateur)
-
+        
         liste_validation_connexion = validation_champ_connexion(
             liste_champs_connexion, liste_validation_connexion)
         liste_validation_connexion = situation_erreur_interval(
             liste_validation_connexion)
-
+        
         if not liste_validation_connexion['situation_erreur']:
             id_session = uuid.uuid4().hex
             conn_db.creation_session_active(id_session,
                                             liste_champs_connexion['courriel'])
             session["id"] = id_session
             return redirect(url_for('.profil_connecter'))
-
+        
         else:
             liste_champs_connexion['messages'] = message_erreur_connexion(
                 liste_validation_connexion)
             titre = "Erreur de la Connexion !"
-
+            
             return render_template("connection.html", titre=titre, erreur=True,
                                    messages=liste_champs_connexion['messages'],
                                    liste_validation=liste_validation_connexion,
@@ -354,7 +354,7 @@ def authentification_requise(f):
         if not is_authenticated(session):
             return personne_non_autorisee()
         return f(*args, **kwargs)
-
+    
     return decorated
 
 
@@ -372,7 +372,7 @@ def profil_connecter():
         etablissement_dispo = conn_db.recuperation_etablissement_restant(
             info_profil[3])
         liste_infos = remplissage_infos_connecter(liste_infos, info_profil)
-
+        
         titre = "Vous êtes maintenant connecté !"
         return render_template("utilisateur_connecter.html", titre=titre,
                                liste_infos=liste_infos,
@@ -389,41 +389,41 @@ def ajouter_photo():
     id_photo_ancienne = None
     id_personne = ""
     type_photo = ""
-
+    
     if "photo" in request.files:
         fichier_photo = request.files["photo"]
         type_photo = request.files["photo"].content_type
         if type_photo == "image/png":
             type_photo = "png"
-
+        
         else:
             type_photo = "jpg"
-
+        
         id_photo_nouvelle = str(uuid.uuid4().hex)
-
+    
     if "id_photo" in request.form:
         id_photo_ancienne = request.form["id_photo"]
-
+    
     if "id_personne" in request.form:
         id_personne = request.form["id_personne"]
-
+    
     if id_photo_nouvelle is not None:
         conn_db = get_db()
-
+        
         if "ajout" in request.form:
             conn_db.ajouter_photo(id_photo_nouvelle, fichier_photo)
             conn_db.ajout_id_photo_profil(
                 id_photo_nouvelle, id_personne, type_photo)
-
+        
         elif "modifier" in request.form:
             conn_db.supprimer_photo_profil(id_photo_ancienne)
             conn_db.supprimer_lien_photo_profil(id_personne)
             conn_db.ajouter_photo(id_photo_nouvelle, fichier_photo)
             conn_db.ajout_id_photo_profil(
                 id_photo_nouvelle, id_personne, type_photo)
-
+        
         return redirect(url_for('.profil_connecter'))
-
+    
     else:
         return "", 404
 
@@ -436,14 +436,14 @@ def supprimer_photo():
     data = request.get_json()
     id_personne = data["id_personne"]
     id_photo = data["id_photo"]
-
+    
     if id_personne == "" or id_photo == "":
         return "", 404
-
+    
     else:
         conn_db.supprimer_photo_profil(id_photo)
         conn_db.supprimer_lien_photo_profil(id_personne)
-
+        
         return "", 200
 
 
@@ -459,10 +459,10 @@ def faire_afficher_photo(id_photo, type_photo):
         response = make_response(binary_data)
         if type_photo == "png":
             response.headers.set('Content-Type', 'image/png')
-
+        
         else:
             response.headers.set('Content-Type', 'image/jpeg')
-
+    
     return response
 
 
@@ -478,7 +478,7 @@ def ajouter_etablissement():
     conn_db.inserer_etablissement_surveiller_profil(
         liste_champs_ajout['id_personne'],
         liste_champs_ajout['liste_etablissement'])
-
+    
     etablissement = conn_db.recuperation_profil_etablissement(
         liste_champs_ajout['id_personne'])
     etablissement_dispo = conn_db.recuperation_etablissement_restant(
@@ -496,7 +496,7 @@ def retirer_etablissement():
     data = request.get_json()
     id_surveillance = conn_db.verification_etablissement_surveiller(
         data['id_surveillance'])
-
+    
     if id_surveillance is None:
         return "", 404
     else:
@@ -504,7 +504,7 @@ def retirer_etablissement():
             data['id_personne'], id_surveillance)
         etablissement_dispo = conn_db.recuperation_etablissement_restant(
             data['id_personne'])
-
+        
         return jsonify(etablissement_dispo), 200
 
 
@@ -518,10 +518,10 @@ def desabonnement(lien):
         titre = "Page inexistante"
         return render_template("erreur_404.html", titre=titre,
                                erreur_404=erreur_404), 404
-
+    
     else:
         titre = "Page de désabonnement"
-
+        
         return render_template("desabonnement_etablissement.html",
                                titre=titre, lien=lien,
                                etablissement=info_desabonnement[0])
@@ -539,7 +539,7 @@ def desabonner():
             "message_erreur":
                 "<p>Attention ! Le lien pour se désabonner "
                 "n'existe pas !</p>"}), 404
-
+    
     else:
         conn_db.supprimer_abonnement_etablissement(
             data['lien_desabonnement'])
