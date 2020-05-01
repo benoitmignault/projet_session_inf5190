@@ -178,7 +178,7 @@ class Database:
         sql = select + fromm + where
         cursor.execute(sql, (id_plainte,))
         result = cursor.fetchall()
-        if len(result) is 0:
+        if len(result) == 0:
             return None
         else:
             return result[0][0]
@@ -192,7 +192,7 @@ class Database:
         sql = select + fromm + where
         cursor.execute(sql, (id_surveillance,))
         result = cursor.fetchall()
-        if len(result) is 0:
+        if len(result) == 0:
             return None
         else:
             return result[0][0]
@@ -213,7 +213,7 @@ class Database:
         sql = select + fromm + where
         cursor.execute(sql, (courriel,))
         result = cursor.fetchall()
-        if len(result) is 0:
+        if len(result) == 0:
             return None
         else:
             return result[0][0]
